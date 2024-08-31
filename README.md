@@ -1,3 +1,18 @@
+
+# [Added by Jesse]
+## Java jdk 18 env set on MAC
+1. download from online to get a jdk file
+2. Move to javahome `sudo mv ~/Downloads/jdk-18.jdk /Library/Java/JavaVirtualMachines/`
+3. set as default
+```
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-18.jdk/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+```
+4. apply changes `source ~/.zshrc`
+5. check `java -version`
+
+------
+
 [![Java CI with Gradle](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml/badge.svg)](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml)
 
 # Cornell Database Systems Practicum - CS 4321/5321
@@ -123,6 +138,7 @@ of all teams.
 To check if your code style complies, type the following:
 
 `$ ./gradlew verGJF`
+
 
 ### Fix Format Issues
 In case the previous step fails, you can auto-format your code as follows:

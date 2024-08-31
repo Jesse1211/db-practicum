@@ -11,6 +11,11 @@ export PATH=$JAVA_HOME/bin:$PATH
 4. apply changes `source ~/.zshrc`
 5. check `java -version`
 
+## Set JAVA_HOME var in env on MAC
+1. check version `/usr/libexec/java_home -v 18`
+2. set path `export JAVA_HOME=$(/usr/libexec/java_home -v 18)`
+3. add path `echo 'export JAVA_HOME=$(/usr/libexec/java_home -v 18)' >> ~/.zshrc`
+4. `source ~/.zshrc`
 ------
 
 [![Java CI with Gradle](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml/badge.svg)](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml)

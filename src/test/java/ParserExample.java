@@ -1,14 +1,13 @@
 import common.DBCatalog;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
-
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -26,19 +25,14 @@ public class ParserExample {
   @Test
   public void parserExampleTest() {
     try {
-      ClassLoader classLoader = ParserExample.class.getClassLoader();
-      String path = Objects.requireNonNull(classLoader.getResource("samples/input")).getPath();
+      ClassLoader classLoader = P1UnitTests.class.getClassLoader();
+      String path = Paths.get(Objects.requireNonNull(classLoader.getResource("samples/input")).toURI()).toString();
       DBCatalog.getInstance().setDataDirectory(path + "/db");
-
-      String queriesFile =
-          Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).getPath();
-
+      String queriesFile = Paths.get(Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI()).toString();
       String str = Files.readString(Path.of(queriesFile));
-
       logger.info(str);
 
-      Statements statements =
-          CCJSqlParserUtil.parseStatements(str);
+      Statements statements = CCJSqlParserUtil.parseStatements(str);
 
       for (Statement statement : statements.getStatements()) {
         logger.info("Read statement: " + statement);

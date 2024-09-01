@@ -51,6 +51,9 @@ public class ProjectOperator extends Operator {
                 }
 
             }
+            if (tupleArray.size() == 0) {
+                return childTuple;
+            }
             return new Tuple(tupleArray);
         }
         return null;

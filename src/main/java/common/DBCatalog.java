@@ -65,7 +65,7 @@ public class DBCatalog {
         // table name : list of columns
         // columns = [column1, column2, ...]
         // column1 = new Column(new Table(null, tableName), tokens[i])
-        // //但是每个column都有一个新的Table????
+        // //但是每个column都有一个新的Table???? ===> 为了保持独立性: SelectOPerator.outputSchema
         // ’代码中为每个 Column 创建一个新的 Table 实例可能是为了提供设计的灵活性和独立性‘
         tables.put(tokens[0], cols);
       }
@@ -83,5 +83,15 @@ public class DBCatalog {
    */
   public File getFileForTable(String tableName) {
     return new File(dbDirectory + "/data/" + tableName);
+  }
+
+  /**
+   * Get columns for a table
+   *
+   * @param tableName
+   * @return list of columns for the table
+   */
+  public ArrayList<Column> getColumns(String tableName) {
+    return tables.get(tableName);
   }
 }

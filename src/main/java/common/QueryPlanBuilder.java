@@ -1,7 +1,9 @@
 package common;
 
-import jdk.jshell.spi.ExecutionControl;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import operator.*;
 
 /**
@@ -20,6 +22,7 @@ import operator.*;
  * 2 student instructions, Section 2.1
  */
 public class QueryPlanBuilder {
+
   public QueryPlanBuilder() {}
 
   /**
@@ -29,9 +32,13 @@ public class QueryPlanBuilder {
    * @return the root of the query plan
    * @precondition stmt is a Select having a body that is a PlainSelect
    */
-  @SuppressWarnings("unchecked")
-  public Operator buildPlan(Statement stmt) throws ExecutionControl.NotImplementedException {
+  public Operator buildPlan(Statement stmt) {
     // https://github.com/JSQLParser/JSqlParser/wiki/Examples-of-SQL-parsing
-    throw new ExecutionControl.NotImplementedException("");
+    Select select = (Select) stmt;
+    PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+    Table table = (Table) plainSelect.getFromItem();
+    Operator operator = new SelectOperator(DBCatalog.getInstance().getColumns(table.getName()));
+
+    return operator;
   }
 }

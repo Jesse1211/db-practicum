@@ -2,7 +2,7 @@ package operator;
 
 import common.Tuple;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import java.util.*;
@@ -23,7 +23,10 @@ public class ProjectOperator extends Operator {
 
         // Create a map of column name to index in the output schema
         for (int i = 0; i < outputSchema.size(); i++) {
-            columnMap.put(outputSchema.get(i).getColumnName(), i);
+            columnMap.put(
+                    outputSchema.get(i).getTable().getName() + "-" +
+                            outputSchema.get(i).getColumnName(),
+                    i);
         }
     }
 
@@ -42,9 +45,14 @@ public class ProjectOperator extends Operator {
             for (SelectItem item : selectedItems) {
                 if (item instanceof SelectExpressionItem) {
                     Column column = (Column) ((SelectExpressionItem) item).getExpression();
-                    String columnName = column.getColumnName();
+                    Table table = (Table) column.getTable();
+                    // String columnName = column.getColumnName();
                     // Find the index of the column in the output schema
-                    int columnIndex = columnMap.get(columnName);
+                    int columnIndex = columnMap.getOrDefault(table.getName() + "-" + column.getColumnName(), -1);
+
+                    if (columnIndex == -1) {
+                        continue;
+                    }
 
                     // Add the value from the child tuple's data to the new tuple's data array
                     tupleArray.add(childTuple.getElementAtIndex(columnIndex));

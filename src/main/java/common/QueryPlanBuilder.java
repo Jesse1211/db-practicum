@@ -1,5 +1,6 @@
 package common;
 
+import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -32,10 +33,6 @@ import operator.*;
  * 2 student instructions, Section 2.1
  */
 public class QueryPlanBuilder {
-
-  public QueryPlanBuilder() {
-  }
-
   /**
    * Top level method to translate statement to query plan
    *
@@ -48,10 +45,23 @@ public class QueryPlanBuilder {
     Select select = (Select) stmt;
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
     Table table = (Table) plainSelect.getFromItem();
-    Operator scanOperator = new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
 
-    Operator projecOperator = new ProjectOperator(scanOperator.getOutputSchema(), scanOperator,
-        plainSelect.getSelectItems());
-    return projecOperator;
+    Operator operator;
+    operator = new ScanOperator(
+            DBCatalog.getInstance().getColumns(table.getName()),
+            table.getName()
+    );
+
+    if (plainSelect.getWhere() != null) {
+      operator = new SelectOperator(
+              operator.getOutputSchema(),
+              (ScanOperator) operator,
+              (BinaryExpression) plainSelect.getWhere()
+      );
+    }
+
+    operator = new ProjectOperator(operator.getOutputSchema(), operator, plainSelect.getSelectItems());
+
+    return operator;
   }
 }

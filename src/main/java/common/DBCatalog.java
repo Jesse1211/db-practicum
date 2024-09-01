@@ -11,13 +11,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class to contain information about database - names of tables, schema of each table and file
+ * Class to contain information about database - names of tables, schema of each
+ * table and file
  * where each table is located. Uses singleton pattern.
  *
- * <p>Assumes dbDirectory has a schema.txt file and a /data subdirectory containing one file per
+ * <p>
+ * Assumes dbDirectory has a schema.txt file and a /data subdirectory containing
+ * one file per
  * relation, named "relname".
  *
- * <p>Call by using DBCatalog.getInstance();
+ * <p>
+ * Call by using DBCatalog.getInstance();
  */
 public class DBCatalog {
   private final Logger logger = LogManager.getLogger();
@@ -33,7 +37,8 @@ public class DBCatalog {
   }
 
   /**
-   * Instance getter for singleton pattern, lazy initialization on first invocation
+   * Instance getter for singleton pattern, lazy initialization on first
+   * invocation
    *
    * @return unique DB catalog instance
    */
@@ -57,10 +62,16 @@ public class DBCatalog {
       while ((line = br.readLine()) != null) {
         String[] tokens = line.split("\\s");
         String tableName = tokens[0];
+        // https://www.javadoc.io/doc/com.github.jsqlparser/jsqlparser/latest/net.sf.jsqlparser/net/sf/jsqlparser/schema/Column.html
         ArrayList<Column> cols = new ArrayList<Column>();
         for (int i = 1; i < tokens.length; i++) {
           cols.add(new Column(new Table(null, tableName), tokens[i]));
         }
+        // table name : list of columns
+        // columns = [column1, column2, ...]
+        // column1 = new Column(new Table(null, tableName), tokens[i])
+        // //但是每个column都有一个新的Table????
+        // ’代码中为每个 Column 创建一个新的 Table 实例可能是为了提供设计的灵活性和独立性‘
         tables.put(tokens[0], cols);
       }
       br.close();

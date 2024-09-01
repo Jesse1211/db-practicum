@@ -37,7 +37,7 @@ public class QueryPlanBuilder {
     Select select = (Select) stmt;
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
     Table table = (Table) plainSelect.getFromItem();
-    Operator operator = new SelectOperator(DBCatalog.getInstance().getColumns(table.getName()));
+    Operator operator = new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
 
     return operator;
   }

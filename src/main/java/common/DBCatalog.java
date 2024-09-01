@@ -11,17 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class to contain information about database - names of tables, schema of each
- * table and file
+ * Class to contain information about database - names of tables, schema of each table and file
  * where each table is located. Uses singleton pattern.
  *
- * <p>
- * Assumes dbDirectory has a schema.txt file and a /data subdirectory containing
- * one file per
+ * <p>Assumes dbDirectory has a schema.txt file and a /data subdirectory containing one file per
  * relation, named "relname".
  *
- * <p>
- * Call by using DBCatalog.getInstance();
+ * <p>Call by using DBCatalog.getInstance();
  */
 public class DBCatalog {
   private final Logger logger = LogManager.getLogger();
@@ -37,8 +33,7 @@ public class DBCatalog {
   }
 
   /**
-   * Instance getter for singleton pattern, lazy initialization on first
-   * invocation
+   * Instance getter for singleton pattern, lazy initialization on first invocation
    *
    * @return unique DB catalog instance
    */

@@ -11,38 +11,40 @@ import net.sf.jsqlparser.schema.Column;
 // Build a query plan that is a tree of operators.
 public class SelectOperator extends Operator {
 
-  private ScanOperator scanOperator;
-  private BinaryExpression whereExpression;
-  private Map<String, Integer> columnIndexMap;
+    private Operator childOperator;
+    private BinaryExpression whereExpression;
+    private Map<String, Integer> columnIndexMap;
 
-  public SelectOperator(ArrayList<Column> outputSchema, ScanOperator scanOperator, BinaryExpression whereExpression) {
-    super(outputSchema);
-    this.scanOperator = scanOperator;
-    this.whereExpression = whereExpression;
-    this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
-  }
+    public SelectOperator(ArrayList<Column> outputSchema, Operator childOperator,
+            BinaryExpression whereExpression) {
+        super(outputSchema);
+        this.childOperator = childOperator;
+        this.whereExpression = whereExpression;
+        this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
+    }
 
-  @Override
-  public void reset() {
-    // for (Operator operator : child) {
-    // operator.reset();
-    // }
-  }
+    @Override
+    public void reset() {
+        // for (Operator operator : child) {
+        // operator.reset();
+        // }
+    }
 
-  @Override
-  public Tuple getNextTuple() {
-    Tuple tuple;
-    if ((tuple = scanOperator.getNextTuple()) != null) {
-      ExpressionEvaluator evaluator = new ExpressionEvaluator(tuple, columnIndexMap);
-      whereExpression.accept(evaluator);
-      boolean result = evaluator.getResult();
-      System.out.println(result);
-      if (result){
-        return tuple;
-      }else{
-        getNextTuple();
-      }
-    };
-    return null;
-  }
+    @Override
+    public Tuple getNextTuple() {
+        Tuple tuple;
+        if ((tuple = childOperator.getNextTuple()) != null) {
+            // Use ExpressionEvaluator to evaluate tuple, if the condition matches, return the tuple
+            // Otherwise, continue checking the next tuple.
+            ExpressionEvaluator evaluator = new ExpressionEvaluator(tuple, columnIndexMap);
+            whereExpression.accept(evaluator);
+            boolean result = evaluator.getResult();
+            if (result) {
+                return tuple;
+            } else {
+                getNextTuple();
+            }
+        }
+        return null;
+    }
 }

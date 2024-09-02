@@ -3,6 +3,7 @@ package common;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import operator.*;
@@ -60,7 +61,9 @@ public class QueryPlanBuilder {
       );
     }
 
-    operator = new ProjectOperator(operator.getOutputSchema(), operator, plainSelect.getSelectItems());
+    if (plainSelect.getSelectItems().size() > 1 || !(plainSelect.getSelectItems().get(0) instanceof AllColumns)){
+      operator = new ProjectOperator(operator.getOutputSchema(), operator, plainSelect.getSelectItems());
+    }
 
     return operator;
   }

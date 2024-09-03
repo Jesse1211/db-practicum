@@ -46,6 +46,7 @@ public class QueryPlanBuilder {
     Table table = (Table) plainSelect.getFromItem();
     List<Join> joins = plainSelect.getJoins();
     Expression whereExpression = plainSelect.getWhere();
+    Map<String, String> tableAliasToName = HelperMethods.updateAliasInTable(plainSelect);
 
     // start process
     Operator operator;
@@ -67,6 +68,14 @@ public class QueryPlanBuilder {
     if (plainSelect.getSelectItems().size() > 1
         || !(plainSelect.getSelectItems().get(0) instanceof AllColumns)) {
       operator = new ProjectOperator(operator, plainSelect.getSelectItems());
+    }
+
+    if (plainSelect.getOrderByElements() != null) {
+      operator = new SortOperator(operator.getOutputSchema(), operator, plainSelect.getOrderByElements());
+    }
+
+    if (plainSelect.getDistinct() != null) {
+      operator = new DuplicateEliminationOperator(operator.getOutputSchema(), operator, plainSelect);
     }
 
     return operator;

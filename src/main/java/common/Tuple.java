@@ -66,6 +66,11 @@ public class Tuple {
     return stringRepresentation.toString();
   }
 
+  @Override
+  public int hashCode() {
+    return this.toString().hashCode();
+  }
+
   /**
    * @param obj The tuple to compare with
    * @return True if the two tuples are the same; False otherwise.

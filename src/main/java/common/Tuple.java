@@ -80,4 +80,12 @@ public class Tuple {
 
     return temp.toString().equals(this.toString());
   }
+
+  public Tuple concat(Tuple tuple) {
+    ArrayList<Integer> tupleArray = new ArrayList<>();
+    tupleArray.addAll(this.getAllElements());
+    tupleArray.addAll(tuple.getAllElements());
+
+    return new Tuple(tupleArray);
+  }
 }

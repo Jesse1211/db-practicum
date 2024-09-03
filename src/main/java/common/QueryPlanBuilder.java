@@ -1,9 +1,17 @@
 package common;
 
-import net.sf.jsqlparser.expression.BinaryExpression;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.AllColumns;
+import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import operator.*;
@@ -36,32 +44,106 @@ public class QueryPlanBuilder {
     Select select = (Select) stmt;
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
     Table table = (Table) plainSelect.getFromItem();
+    List<Join> joins = plainSelect.getJoins();
+    Expression whereExpression = plainSelect.getWhere();
 
+    // start process
     Operator operator;
-    operator =
-        new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
-
-    if (plainSelect.getWhere() != null) {
-
+    if (joins != null) {
+      ArrayList<Table> tables = new ArrayList<>();
+      tables.add(table);
+      for (Join join : joins) {
+        tables.add((Table) join.getRightItem());
+      }
+      operator = buildJoinPlan(whereExpression, tables);
+    } else {
       operator =
-          new SelectOperator(
-              operator.getOutputSchema(),
-              (ScanOperator) operator,
-              (BinaryExpression) plainSelect.getWhere());
-      // 分辨是否需要join
-      if (plainSelect.getJoins() != null) {
-        HelperMethods.sth(plainSelect.getWhere());
+          new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
+      if (whereExpression != null) {
+        operator = new SelectOperator(operator.getOutputSchema(), operator, whereExpression);
       }
     }
 
-    //
-
     if (plainSelect.getSelectItems().size() > 1
         || !(plainSelect.getSelectItems().get(0) instanceof AllColumns)) {
-      operator =
-          new ProjectOperator(operator.getOutputSchema(), operator, plainSelect.getSelectItems());
+      operator = new ProjectOperator(operator, plainSelect.getSelectItems());
     }
 
+    return operator;
+  }
+
+  private Operator buildJoinPlan(Expression whereExpression, ArrayList<Table> tables) {
+    // NOTE: can only process AND operators. This is enough for Project 1
+    ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
+    Map<String, Expression> tableWhereExpressionMap = new HashMap<>();
+    Expression joinWhereExpression = null;
+    Expression valueWhereExpression = null;
+
+    for (ComparisonOperator comparisonOperator : flattened) {
+      Pair<String, String> tableNamePair =
+          HelperMethods.getComparisonTableNames(comparisonOperator);
+      String leftTableName = tableNamePair.getLeft();
+      String rightTableName = tableNamePair.getRight();
+      String tableName;
+
+      if (leftTableName == null && rightTableName == null) {
+        // both are values, ex: 42 = 42, should evaluate first.
+        if (valueWhereExpression == null) {
+          valueWhereExpression = comparisonOperator;
+        } else {
+          valueWhereExpression = new AndExpression(valueWhereExpression, comparisonOperator);
+        }
+      } else if (leftTableName == null
+          || rightTableName == null
+          || leftTableName.equals(rightTableName)) {
+        // if one table or both table name are the same, then no join needed.
+        tableName = leftTableName == null ? rightTableName : leftTableName;
+        Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);
+        if (expression == null) {
+          tableWhereExpressionMap.put(tableName, expression);
+        } else {
+          tableWhereExpressionMap.put(tableName, new AndExpression(expression, comparisonOperator));
+        }
+      } else {
+        // two different tables, should join
+        if (joinWhereExpression == null) {
+          joinWhereExpression = comparisonOperator;
+        } else {
+          joinWhereExpression = new AndExpression(joinWhereExpression, comparisonOperator);
+        }
+      }
+    }
+
+    // Scan and select each table individually
+    ArrayDeque<Operator> operators = new ArrayDeque<>();
+    for (var table : tables) {
+      Operator operator =
+          new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
+      Expression expression = tableWhereExpressionMap.getOrDefault(table.getName(), null);
+      if (expression != null) {
+        operator = new SelectOperator(operator.getOutputSchema(), operator, expression);
+      }
+
+      operators.offer(operator);
+    }
+
+    // poll the queue, compute new operator and add back to the queue until 1 item left.
+    while (operators.size() > 1) {
+      Operator leftChildOperator = operators.poll();
+      Operator rightChildOperator = operators.poll();
+      Operator operator = new JoinOperator(leftChildOperator, rightChildOperator);
+      operators.offer(operator);
+    }
+
+    Operator operator = operators.poll();
+    // TODO: Can move valueComparison to the beginning so we exit before joining the tables.
+    if (valueWhereExpression != null) {
+      operator = new SelectOperator(operator.getOutputSchema(), operator, valueWhereExpression);
+    }
+
+    if (joinWhereExpression != null) {
+      operator = new SelectOperator(operator.getOutputSchema(), operator, joinWhereExpression);
+    }
     return operator;
   }
 }

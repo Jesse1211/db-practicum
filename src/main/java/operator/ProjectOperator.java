@@ -17,12 +17,11 @@ public class ProjectOperator extends Operator {
   private List<SelectItem> selectItems;
   private Map<String, Integer> columnIndexMap = new HashMap<>(); // column name : index
 
-  public ProjectOperator(
-      ArrayList<Column> outputSchema, Operator childOperator, List<SelectItem> selectItems) {
-    super(outputSchema);
+  public ProjectOperator(Operator childOperator, List<SelectItem> selectItems) {
+    super(new ArrayList<>());
     this.childOperator = childOperator;
     this.selectItems = selectItems;
-    this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
+    this.columnIndexMap = HelperMethods.mapColumnIndex(childOperator.getOutputSchema());
     updateOutputSchema();
   }
 

@@ -1,8 +1,3 @@
-SELECT * FROM Reserves R, Sailors S WHERE R.A < S.B;
-SELECT * FROM Reserves R WHERE R.A < R.B;
-SELECT * FROM Reserves R, Sailors S WHERE R.A < R.B AND S.C = 1 AND R.D = S.G AND R.D = S.A;
-SELECT * FROM R, S, T WHERE R.A = 1 AND R.B = S.C AND T.G < 5 AND T.G = S.H;
-
 SELECT * FROM Sailors;
 SELECT Sailors.A FROM Sailors;
 SELECT S.A FROM Sailors S;

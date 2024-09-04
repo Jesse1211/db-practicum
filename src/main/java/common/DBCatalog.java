@@ -94,4 +94,14 @@ public class DBCatalog {
   public ArrayList<Column> getColumns(String tableName) {
     return tables.get(tableName);
   }
+
+  public ArrayList<Column> getColumnsWithAlias(Table table) {
+    ArrayList<Column> columns = tables.get(table.getName());
+    ArrayList<Column> newColumns = new ArrayList<>();
+    for (int i = 0; i < columns.size(); i++) {
+      Column column = new Column(table, columns.get(i).getColumnName());
+      newColumns.add(column);
+    }
+    return newColumns;
+  }
 }

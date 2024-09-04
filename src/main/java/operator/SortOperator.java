@@ -23,13 +23,13 @@ public class SortOperator extends Operator {
     this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
 
     // sort the tuples
-    tupleList = new ArrayList<>(HelperMethods.collectAllTuples(operator));
+    tupleList = new ArrayList<>(HelperMethods.getAllTuples(operator));
     Collections.sort(tupleList, new Comparator<Tuple>() {
       @Override
       public int compare(Tuple t1, Tuple t2) {
         for (OrderByElement elementOrder : elementOrders) {
           Column column = (Column) elementOrder.getExpression();
-          int index = columnIndexMap.get(column.getName(false));
+          int index = columnIndexMap.get(column.getName(true));
           int compare = Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
           if (compare != 0) {
             return compare;

@@ -25,9 +25,7 @@ public class SelectOperator extends Operator {
 
   @Override
   public void reset() {
-    // for (Operator operator : child) {
-    // operator.reset();
-    // }
+    childOperator.reset();
   }
 
   @Override
@@ -43,7 +41,7 @@ public class SelectOperator extends Operator {
       if (result) {
         return tuple;
       } else {
-        getNextTuple();
+        return getNextTuple();
       }
     }
     return null;

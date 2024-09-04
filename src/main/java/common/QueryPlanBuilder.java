@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
@@ -45,21 +46,16 @@ public class QueryPlanBuilder {
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
     Table table = (Table) plainSelect.getFromItem();
     List<Join> joins = plainSelect.getJoins();
-    Expression whereExpression = plainSelect.getWhere();
-    Map<String, String> tableAliasToName = HelperMethods.updateAliasInTable(plainSelect);
+    // All tables in from statement, including join tables
+    ArrayList<Table> allTables = HelperMethods.getAllTables(table, joins);
 
+    Expression whereExpression = plainSelect.getWhere();
     // start process
     Operator operator;
     if (joins != null) {
-      ArrayList<Table> tables = new ArrayList<>();
-      tables.add(table);
-      for (Join join : joins) {
-        tables.add((Table) join.getRightItem());
-      }
-      operator = buildJoinPlan(whereExpression, tables);
+      operator = buildJoinPlan(whereExpression, allTables);
     } else {
-      operator =
-          new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
+      operator = new ScanOperator(table);
       if (whereExpression != null) {
         operator = new SelectOperator(operator.getOutputSchema(), operator, whereExpression);
       }
@@ -81,7 +77,7 @@ public class QueryPlanBuilder {
     return operator;
   }
 
-  private Operator buildJoinPlan(Expression whereExpression, ArrayList<Table> tables) {
+  private Operator buildJoinPlan(Expression whereExpression, ArrayList<Table> allTables) {
     // NOTE: can only process AND operators. This is enough for Project 1
     ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
     Map<String, Expression> tableWhereExpressionMap = new HashMap<>();
@@ -89,11 +85,9 @@ public class QueryPlanBuilder {
     Expression valueWhereExpression = null;
 
     for (ComparisonOperator comparisonOperator : flattened) {
-      Pair<String, String> tableNamePair =
-          HelperMethods.getComparisonTableNames(comparisonOperator);
+      Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
       String rightTableName = tableNamePair.getRight();
-      String tableName;
 
       if (leftTableName == null && rightTableName == null) {
         // both are values, ex: 42 = 42, should evaluate first.
@@ -102,14 +96,12 @@ public class QueryPlanBuilder {
         } else {
           valueWhereExpression = new AndExpression(valueWhereExpression, comparisonOperator);
         }
-      } else if (leftTableName == null
-          || rightTableName == null
-          || leftTableName.equals(rightTableName)) {
+      } else if (leftTableName == null || rightTableName == null || leftTableName.equals(rightTableName)) {
         // if one table or both table name are the same, then no join needed.
-        tableName = leftTableName == null ? rightTableName : leftTableName;
+        String tableName = leftTableName == null ? rightTableName : leftTableName;
         Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);
         if (expression == null) {
-          tableWhereExpressionMap.put(tableName, expression);
+          tableWhereExpressionMap.put(tableName, comparisonOperator);
         } else {
           tableWhereExpressionMap.put(tableName, new AndExpression(expression, comparisonOperator));
         }
@@ -125,14 +117,14 @@ public class QueryPlanBuilder {
 
     // Scan and select each table individually
     ArrayDeque<Operator> operators = new ArrayDeque<>();
-    for (var table : tables) {
-      Operator operator =
-          new ScanOperator(DBCatalog.getInstance().getColumns(table.getName()), table.getName());
-      Expression expression = tableWhereExpressionMap.getOrDefault(table.getName(), null);
+    for (Table table : allTables) {
+      Operator operator = new ScanOperator(table);
+      Alias alias = table.getAlias();
+      String name = alias != null ? alias.getName() : table.getName();
+      Expression expression = tableWhereExpressionMap.getOrDefault(name, null);
       if (expression != null) {
         operator = new SelectOperator(operator.getOutputSchema(), operator, expression);
       }
-
       operators.offer(operator);
     }
 
@@ -153,6 +145,7 @@ public class QueryPlanBuilder {
     if (joinWhereExpression != null) {
       operator = new SelectOperator(operator.getOutputSchema(), operator, joinWhereExpression);
     }
+
     return operator;
   }
 }

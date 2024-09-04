@@ -15,7 +15,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 public class ProjectOperator extends Operator {
   private Operator childOperator;
   private List<SelectItem> selectItems;
-  private Map<String, Integer> columnIndexMap = new HashMap<>(); // column name : index
+  private Map<String, Integer> columnIndexMap; // column name : index
 
   public ProjectOperator(Operator childOperator, List<SelectItem> selectItems) {
     super(new ArrayList<>());
@@ -26,7 +26,9 @@ public class ProjectOperator extends Operator {
   }
 
   @Override
-  public void reset() {}
+  public void reset() {
+    childOperator.reset();
+  }
 
   @Override
   public Tuple getNextTuple() {
@@ -37,7 +39,7 @@ public class ProjectOperator extends Operator {
 
       for (Column column : outputSchema) {
         // Find the index of the column in the output schema
-        int index = columnIndexMap.get(column.getName(false));
+        int index = columnIndexMap.get(column.getName(true));
 
         // Add the value from the child tuple's data to the new tuple's data array
         tupleArray.add(tuple.getElementAtIndex(index));
@@ -52,8 +54,8 @@ public class ProjectOperator extends Operator {
     for (SelectItem item : selectItems) {
       if (item instanceof SelectExpressionItem) {
         Column column = (Column) ((SelectExpressionItem) item).getExpression();
-        int index = columnIndexMap.get(column.getName(false));
-        outputSchema.add(this.outputSchema.get(index));
+        int index = columnIndexMap.get(column.getName(true));
+        outputSchema.add(childOperator.getOutputSchema().get(index));
       } else if (item instanceof AllColumns) {
         outputSchema.addAll(this.outputSchema);
       }

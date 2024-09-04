@@ -9,16 +9,35 @@ import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import operator.Operator;
 
 public class HelperMethods {
   public static Map<String, Integer> mapColumnIndex(ArrayList<Column> columns) {
     Map<String, Integer> map = new HashMap<String, Integer>();
     for (int i = 0; i < columns.size(); i++) {
-      map.put(columns.get(i).getName(false), i);
+      map.put(columns.get(i).getName(true), i);
     }
     return map;
+  }
+
+  public static List<Tuple> getAllTuples(Operator operator) {
+    Tuple tuple;
+    List<Tuple> tuples = new ArrayList<>();
+    while ((tuple = operator.getNextTuple()) != null) {
+      tuples.add(tuple);
+    }
+    return tuples;
+  }
+
+  public static ArrayList<Table> getAllTables(Table table, List<Join> joins) {
+    ArrayList<Table> allTables = new ArrayList<>();
+    allTables.add(table);
+    if(joins != null) {
+      for (Join join : joins) {
+        allTables.add((Table) join.getRightItem());
+      }
+    }
+    return allTables;
   }
 
   public static ArrayList<ComparisonOperator> flattenExpression(Expression expression) {
@@ -53,32 +72,19 @@ public class HelperMethods {
     return new Pair<>(leftTableName, rightTableName);
   }
 
-  public static Map<String, String> updateAliasInTable(PlainSelect plainSelect) {
-    Map<String, String> tableAliasToName = new HashMap<String, String>(); // alias to name
+  @Deprecated
+  /**
+   *  not used anymore
+   */
+  public static Map<String, Table> buildTableNameMap(ArrayList<Table> allTables) {
+    Map<String, Table> tableNameMap = new HashMap<>(); // alias to name
 
-    Table table = (Table) plainSelect.getFromItem();
-    tableAliasToName.put(table.getName(), table.getName());
-    if (table.getAlias() != null) {
-      tableAliasToName.put(table.getAlias().getName(), table.getName());
-    }
-
-    // 可能有多个table & alias
-    if (plainSelect.getJoins() != null) {
-      for (Join join : plainSelect.getJoins()) {
-        var curTable = (Table) join.getRightItem();
-        tableAliasToName.put(curTable.getAlias().getName(), curTable.getName());
+    for (Table table : allTables) {
+      tableNameMap.put(table.getName(), table);
+      if (table.getAlias() != null) {
+        tableNameMap.put(table.getAlias().getName(), table);
       }
     }
-    return tableAliasToName;
-  }
-
-  public static List<Tuple> collectAllTuples(Operator operator) {
-    Tuple tuple;
-    List<Tuple> tuples = new ArrayList<>();
-    while ((tuple = operator.getNextTuple()) != null) {
-      tuples.add(tuple);
-    }
-
-    return tuples;
+    return tableNameMap;
   }
 }

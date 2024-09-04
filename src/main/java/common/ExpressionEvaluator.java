@@ -37,7 +37,7 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
 
   @Override
   public void visit(Column column) {
-    int index = columnIndexMap.get(column.getName(false));
+    int index = columnIndexMap.get(column.getName(true));
     value = tuple.getElementAtIndex(index);
   }
 

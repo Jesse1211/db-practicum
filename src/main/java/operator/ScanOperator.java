@@ -6,16 +6,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 
 public class ScanOperator extends Operator {
-  private BufferedReader br;
+  private BufferedReader bufferedReader;
+  private File file;
 
-  public ScanOperator(ArrayList<Column> outputSchema, String tableName) {
-    super(outputSchema);
+
+  public ScanOperator(Table table) {
+    super(new ArrayList<>());
     try {
-      File file = DBCatalog.getInstance().getFileForTable(tableName);
-      br = new BufferedReader(new FileReader(file));
+      this.file = DBCatalog.getInstance().getFileForTable(table.getName());
+      this.bufferedReader = new BufferedReader(new FileReader(file));
+      this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
@@ -23,8 +26,15 @@ public class ScanOperator extends Operator {
 
   @Override
   public void reset() {
+    try{
+      bufferedReader.close();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+
     try {
-      br.reset();
+      // Reopen to go back to the first line
+      bufferedReader = new BufferedReader(new FileReader(file));
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
@@ -34,10 +44,10 @@ public class ScanOperator extends Operator {
   public Tuple getNextTuple() {
     try {
       String line;
-      if ((line = br.readLine()) != null) {
+      if ((line = bufferedReader.readLine()) != null) {
         return new Tuple(line);
       } else {
-        br.close();
+        bufferedReader.close();
       }
     } catch (Exception e) {
       logger.error(e.getMessage());

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -66,13 +67,11 @@ public class QueryPlanBuilder {
     }
 
     if (plainSelect.getOrderByElements() != null) {
-      operator =
-          new SortOperator(operator, plainSelect.getOrderByElements());
+      operator = new SortOperator(operator, plainSelect.getOrderByElements());
     }
 
     if (plainSelect.getDistinct() != null) {
-      operator =
-          new DuplicateEliminationOperator(operator);
+      operator = new DuplicateEliminationOperator(operator);
     }
 
     return operator;
@@ -85,7 +84,11 @@ public class QueryPlanBuilder {
     Expression joinWhereExpression = null;
     Expression valueWhereExpression = null;
 
+    // Separate the comparisons into 3 categories: value comparison, table
+    // comparison, and join
     for (ComparisonOperator comparisonOperator : flattened) {
+
+      // Get 2 table names from the comparison operator
       Pair<String, String> tableNamePair =
           HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
@@ -103,12 +106,12 @@ public class QueryPlanBuilder {
           || leftTableName.equals(rightTableName)) {
         // if one table or both table name are the same, then no join needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
-        Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);
-        if (expression == null) {
-          tableWhereExpressionMap.put(tableName, comparisonOperator);
-        } else {
-          tableWhereExpressionMap.put(tableName, new AndExpression(expression, comparisonOperator));
-        }
+        // if table name is null, then it is a value comparison, should evaluate first.
+        tableWhereExpressionMap.putIfAbsent(tableName, comparisonOperator);
+        // if table name is not null, then it is a table comparison, should join.
+        tableWhereExpressionMap.put(
+            tableName,
+            new AndExpression(tableWhereExpressionMap.get(tableName), comparisonOperator));
       } else {
         // two different tables, should join
         if (joinWhereExpression == null) {
@@ -119,8 +122,9 @@ public class QueryPlanBuilder {
       }
     }
 
-    // Scan and select each table individually
-    ArrayDeque<Operator> operators = new ArrayDeque<>();
+    // SCAN and SELECT each table individually by initializing a queue of SCAN |
+    // SELECT Operators
+    Queue<Operator> operators = new ArrayDeque<>();
     for (Table table : allTables) {
       Operator operator = new ScanOperator(table);
       Alias alias = table.getAlias();
@@ -132,7 +136,7 @@ public class QueryPlanBuilder {
       operators.offer(operator);
     }
 
-    // poll the queue, compute new operator and add back to the queue until 1 item left.
+    // BFS and concatenate every pairs until 1 item left in queue.
     while (operators.size() > 1) {
       Operator leftChildOperator = operators.poll();
       Operator rightChildOperator = operators.poll();
@@ -141,12 +145,16 @@ public class QueryPlanBuilder {
     }
 
     Operator operator = operators.poll();
-    // TODO: Can move valueComparison to the beginning so we exit before joining the tables.
+    // TODO: Can move valueComparison to the beginning so we exit before joining the
+    // tables.
+
     if (valueWhereExpression != null) {
+      // if there is a value comparison, should evaluate first.
       operator = new SelectOperator(operator, valueWhereExpression);
     }
 
     if (joinWhereExpression != null) {
+      // if there is a join comparison, should join.
       operator = new SelectOperator(operator, joinWhereExpression);
     }
 

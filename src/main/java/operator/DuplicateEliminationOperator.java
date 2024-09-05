@@ -7,29 +7,24 @@ public class DuplicateEliminationOperator extends Operator {
   private Operator operator;
   private Set<Tuple> distinctSet = new HashSet<>();
 
-
   /**
    * Avoid duplicate tuples in output
+   *
    * @param operator child operator, this is invoked as last operator in plan builder
    */
-  public DuplicateEliminationOperator(
-      Operator operator) {
+  public DuplicateEliminationOperator(Operator operator) {
     super(operator.getOutputSchema());
     this.operator = operator;
   }
 
-  /**
-   * Clear all visited tuples
-   */
+  /** Clear all visited tuples */
   @Override
   public void reset() {
     operator.reset();
     distinctSet.clear();
   }
 
-  /**
-   * Return only distinct tuples
-   */
+  /** Return only distinct tuples */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

@@ -14,6 +14,7 @@ public class SortOperator extends Operator {
 
   /**
    * Sort in ascending order with ORDER BY
+   *
    * @param operator scan | select | join operator
    * @param elementOrders list of ORDER BY elements
    */
@@ -44,17 +45,13 @@ public class SortOperator extends Operator {
     it = tupleList.iterator();
   }
 
-  /**
-   * Re-initialize iterator
-   */
+  /** Re-initialize iterator */
   @Override
   public void reset() {
     it = tupleList.iterator();
   }
 
-  /**
-   * Return individual tuples from the child operator's all tuples
-   */
+  /** Return individual tuples from the child operator's all tuples */
   @Override
   public Tuple getNextTuple() {
     if (it.hasNext()) {

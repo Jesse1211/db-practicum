@@ -14,6 +14,7 @@ public class SelectOperator extends Operator {
 
   /**
    * Process comparators, Filter rows
+   *
    * @param childOperator scan operator
    * @param whereExpression WHERE expressions as 'Table.column = value' expression
    */
@@ -24,17 +25,13 @@ public class SelectOperator extends Operator {
     this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
   }
 
-  /**
-   * Invoke childOperator's reset method
-   */
+  /** Invoke childOperator's reset method */
   @Override
   public void reset() {
     childOperator.reset();
   }
 
-  /**
-   * Return satisfied row as tuple based on `ExpressionEvaluator`
-   */
+  /** Return satisfied row as tuple based on `ExpressionEvaluator` */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

@@ -15,6 +15,7 @@ public class ProjectOperator extends Operator {
 
   /**
    * Determine output format from selectedItems
+   *
    * @param childOperator select | scan operator
    * @param selectItems list of SELECT as `Table.column1, Table.column2` expression
    */
@@ -26,17 +27,13 @@ public class ProjectOperator extends Operator {
     updateOutputSchema();
   }
 
-  /**
-   * Invoke childOperator's reset method
-   */
+  /** Invoke childOperator's reset method */
   @Override
   public void reset() {
     childOperator.reset();
   }
 
-  /**
-   * Based on filtered output, return only selected column as tuple
-   */
+  /** Based on filtered output, return only selected column as tuple */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

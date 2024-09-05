@@ -14,7 +14,7 @@ public class ScanOperator extends Operator {
 
   /**
    * Scan all info from the Table by Buffer Reader
-   * 
+   *
    * @param table single table
    */
   public ScanOperator(Table table) {
@@ -28,9 +28,7 @@ public class ScanOperator extends Operator {
     }
   }
 
-  /**
-   * re-initialize buffer reader
-   */
+  /** re-initialize buffer reader */
   @Override
   public void reset() {
     try {
@@ -47,9 +45,7 @@ public class ScanOperator extends Operator {
     }
   }
 
-  /**
-   * Return single row as tuple
-   */
+  /** Return single row as tuple */
   @Override
   public Tuple getNextTuple() {
     try {

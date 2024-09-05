@@ -8,15 +8,16 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-/*
- * Operator for the Project operation: SELECT *Sailors.id* FROM Sailors WHERE Sailors.age = 20
- * [Assume queries do not use aliases]
- */
 public class ProjectOperator extends Operator {
   private Operator childOperator;
   private List<SelectItem> selectItems;
-  private Map<String, Integer> columnIndexMap; // column name : index
+  private Map<String, Integer> columnIndexMap;
 
+  /**
+   * Determine output format from selectedItems
+   * @param childOperator select | scan operator
+   * @param selectItems list of SELECT as `Table.column1, Table.column2` expression
+   */
   public ProjectOperator(Operator childOperator, List<SelectItem> selectItems) {
     super(new ArrayList<>());
     this.childOperator = childOperator;
@@ -25,11 +26,17 @@ public class ProjectOperator extends Operator {
     updateOutputSchema();
   }
 
+  /**
+   * Invoke childOperator's reset method
+   */
   @Override
   public void reset() {
     childOperator.reset();
   }
 
+  /**
+   * Based on filtered output, return only selected column as tuple
+   */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

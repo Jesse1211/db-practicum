@@ -3,12 +3,9 @@ package operator;
 import common.ExpressionEvaluator;
 import common.HelperMethods;
 import common.Tuple;
-import java.util.ArrayList;
 import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
 
-// Build a query plan that is a tree of operators.
 public class SelectOperator extends Operator {
 
   private Operator childOperator;
@@ -27,11 +24,17 @@ public class SelectOperator extends Operator {
     this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
   }
 
+  /**
+   * Invoke childOperator's reset method
+   */
   @Override
   public void reset() {
     childOperator.reset();
   }
 
+  /**
+   * Return satisfied row as tuple based on `ExpressionEvaluator`
+   */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

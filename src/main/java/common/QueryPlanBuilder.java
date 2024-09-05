@@ -152,5 +152,6 @@ public class QueryPlanBuilder {
     }
 
     return operator;
+
   }
 }

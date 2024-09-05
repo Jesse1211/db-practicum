@@ -1,3 +1,5 @@
 Sailors A B C
 Boats D E F
 Reserves G H
+DB1 A B
+DB2 G H

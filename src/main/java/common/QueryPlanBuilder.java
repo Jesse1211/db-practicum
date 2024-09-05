@@ -67,11 +67,13 @@ public class QueryPlanBuilder {
     }
 
     if (plainSelect.getOrderByElements() != null) {
-      operator = new SortOperator(operator.getOutputSchema(), operator, plainSelect.getOrderByElements());
+      operator =
+          new SortOperator(operator.getOutputSchema(), operator, plainSelect.getOrderByElements());
     }
 
     if (plainSelect.getDistinct() != null) {
-      operator = new DuplicateEliminationOperator(operator.getOutputSchema(), operator, plainSelect);
+      operator =
+          new DuplicateEliminationOperator(operator.getOutputSchema(), operator, plainSelect);
     }
 
     return operator;
@@ -85,7 +87,8 @@ public class QueryPlanBuilder {
     Expression valueWhereExpression = null;
 
     for (ComparisonOperator comparisonOperator : flattened) {
-      Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparisonOperator);
+      Pair<String, String> tableNamePair =
+          HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
       String rightTableName = tableNamePair.getRight();
 
@@ -96,7 +99,9 @@ public class QueryPlanBuilder {
         } else {
           valueWhereExpression = new AndExpression(valueWhereExpression, comparisonOperator);
         }
-      } else if (leftTableName == null || rightTableName == null || leftTableName.equals(rightTableName)) {
+      } else if (leftTableName == null
+          || rightTableName == null
+          || leftTableName.equals(rightTableName)) {
         // if one table or both table name are the same, then no join needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
         Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);

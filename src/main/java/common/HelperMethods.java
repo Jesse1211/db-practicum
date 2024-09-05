@@ -32,7 +32,7 @@ public class HelperMethods {
   public static ArrayList<Table> getAllTables(Table table, List<Join> joins) {
     ArrayList<Table> allTables = new ArrayList<>();
     allTables.add(table);
-    if(joins != null) {
+    if (joins != null) {
       for (Join join : joins) {
         allTables.add((Table) join.getRightItem());
       }
@@ -73,9 +73,7 @@ public class HelperMethods {
   }
 
   @Deprecated
-  /**
-   *  not used anymore
-   */
+  /** not used anymore */
   public static Map<String, Table> buildTableNameMap(ArrayList<Table> allTables) {
     Map<String, Table> tableNameMap = new HashMap<>(); // alias to name
 

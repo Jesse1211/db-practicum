@@ -12,7 +12,6 @@ public class ScanOperator extends Operator {
   private BufferedReader bufferedReader;
   private File file;
 
-
   public ScanOperator(Table table) {
     super(new ArrayList<>());
     try {
@@ -26,7 +25,7 @@ public class ScanOperator extends Operator {
 
   @Override
   public void reset() {
-    try{
+    try {
       bufferedReader.close();
     } catch (Exception e) {
       logger.error(e.getMessage());

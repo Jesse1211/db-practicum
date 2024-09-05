@@ -1,7 +1,6 @@
 package operator;
 
 import common.Tuple;
-
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -16,8 +15,8 @@ public class DuplicateEliminationOperator extends Operator {
   // key: column index, value: value in that row of that column
   private Set<Tuple> distinctSet = new HashSet<>();
 
-  public DuplicateEliminationOperator(ArrayList<Column> outputSchema, Operator operator,
-      PlainSelect plainSelect) {
+  public DuplicateEliminationOperator(
+      ArrayList<Column> outputSchema, Operator operator, PlainSelect plainSelect) {
     super(outputSchema);
     this.operator = operator;
   }
@@ -36,7 +35,7 @@ public class DuplicateEliminationOperator extends Operator {
       if (!distinctSet.contains(tuple)) {
         distinctSet.add(tuple);
         return tuple;
-      }else{
+      } else {
         return getNextTuple();
       }
     }

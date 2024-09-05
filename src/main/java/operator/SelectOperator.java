@@ -15,9 +15,13 @@ public class SelectOperator extends Operator {
   private Expression whereExpression;
   private Map<String, Integer> columnIndexMap;
 
-  public SelectOperator(
-      ArrayList<Column> outputSchema, Operator childOperator, Expression whereExpression) {
-    super(outputSchema);
+  /**
+   * Process comparators, Filter rows
+   * @param childOperator scan operator
+   * @param whereExpression WHERE expressions as 'Table.column = value' expression
+   */
+  public SelectOperator(Operator childOperator, Expression whereExpression) {
+    super(childOperator.getOutputSchema());
     this.childOperator = childOperator;
     this.whereExpression = whereExpression;
     this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);

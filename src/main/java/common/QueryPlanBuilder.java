@@ -46,7 +46,6 @@ public class QueryPlanBuilder {
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
     Table table = (Table) plainSelect.getFromItem();
     List<Join> joins = plainSelect.getJoins();
-    // All tables in from statement, including join tables
     ArrayList<Table> allTables = HelperMethods.getAllTables(table, joins);
 
     Expression whereExpression = plainSelect.getWhere();
@@ -57,7 +56,7 @@ public class QueryPlanBuilder {
     } else {
       operator = new ScanOperator(table);
       if (whereExpression != null) {
-        operator = new SelectOperator(operator.getOutputSchema(), operator, whereExpression);
+        operator = new SelectOperator(operator, whereExpression);
       }
     }
 
@@ -68,12 +67,12 @@ public class QueryPlanBuilder {
 
     if (plainSelect.getOrderByElements() != null) {
       operator =
-          new SortOperator(operator.getOutputSchema(), operator, plainSelect.getOrderByElements());
+          new SortOperator(operator, plainSelect.getOrderByElements());
     }
 
     if (plainSelect.getDistinct() != null) {
       operator =
-          new DuplicateEliminationOperator(operator.getOutputSchema(), operator, plainSelect);
+          new DuplicateEliminationOperator(operator);
     }
 
     return operator;
@@ -128,7 +127,7 @@ public class QueryPlanBuilder {
       String name = alias != null ? alias.getName() : table.getName();
       Expression expression = tableWhereExpressionMap.getOrDefault(name, null);
       if (expression != null) {
-        operator = new SelectOperator(operator.getOutputSchema(), operator, expression);
+        operator = new SelectOperator(operator, expression);
       }
       operators.offer(operator);
     }
@@ -144,11 +143,11 @@ public class QueryPlanBuilder {
     Operator operator = operators.poll();
     // TODO: Can move valueComparison to the beginning so we exit before joining the tables.
     if (valueWhereExpression != null) {
-      operator = new SelectOperator(operator.getOutputSchema(), operator, valueWhereExpression);
+      operator = new SelectOperator(operator, valueWhereExpression);
     }
 
     if (joinWhereExpression != null) {
-      operator = new SelectOperator(operator.getOutputSchema(), operator, joinWhereExpression);
+      operator = new SelectOperator(operator, joinWhereExpression);
     }
 
     return operator;

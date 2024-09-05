@@ -17,9 +17,13 @@ public class SortOperator extends Operator {
   private List<Tuple> tupleList;
   Iterator<Tuple> it;
 
-  public SortOperator(
-      ArrayList<Column> outputSchema, Operator operator, List<OrderByElement> elementOrders) {
-    super(outputSchema);
+  /**
+   * Sort in ascending order with ORDER BY
+   * @param operator scan | select | join operator
+   * @param elementOrders list of ORDER BY elements
+   */
+  public SortOperator(Operator operator, List<OrderByElement> elementOrders) {
+    super(operator.getOutputSchema());
 
     this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
 

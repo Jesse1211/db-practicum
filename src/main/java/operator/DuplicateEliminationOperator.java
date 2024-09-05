@@ -16,8 +16,8 @@ public class DuplicateEliminationOperator extends Operator {
   private Set<Tuple> distinctSet = new HashSet<>();
 
   public DuplicateEliminationOperator(
-      ArrayList<Column> outputSchema, Operator operator, PlainSelect plainSelect) {
-    super(outputSchema);
+      Operator operator) {
+    super(operator.getOutputSchema());
     this.operator = operator;
   }
 

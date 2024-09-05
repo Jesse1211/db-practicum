@@ -2,6 +2,7 @@ import common.DBCatalog;
 import common.QueryPlanBuilder;
 import common.Tuple;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,24 +28,19 @@ public class P1UnitTests {
   private static Statements statements;
 
   @BeforeAll
-  static void setupBeforeAllTests() throws IOException, JSQLParserException {
-    try {
-      ClassLoader classLoader = P1UnitTests.class.getClassLoader();
-      String path =
-          Paths.get(Objects.requireNonNull(classLoader.getResource("samples/input")).toURI())
-              .toString();
-      DBCatalog.getInstance().setDataDirectory(path + "/db");
-      String queriesFile =
-          Paths.get(
-                  Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql"))
-                      .toURI())
-              .toString();
-      statements = CCJSqlParserUtil.parseStatements(Files.readString(Path.of(queriesFile)));
-      queryPlanBuilder = new QueryPlanBuilder();
-      statementList = statements.getStatements();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+  static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {
+    ClassLoader classLoader = P1UnitTests.class.getClassLoader();
+    URI path = Objects.requireNonNull(classLoader.getResource("samples/input")).toURI();
+    Path resourcePath = Paths.get(path);
+
+    DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
+
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+
+    statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
+    queryPlanBuilder = new QueryPlanBuilder();
+    statementList = statements.getStatements();
   }
 
   @Test

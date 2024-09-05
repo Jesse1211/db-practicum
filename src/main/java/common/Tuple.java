@@ -66,6 +66,11 @@ public class Tuple {
     return stringRepresentation.toString();
   }
 
+  @Override
+  public int hashCode() {
+    return this.toString().hashCode();
+  }
+
   /**
    * @param obj The tuple to compare with
    * @return True if the two tuples are the same; False otherwise.
@@ -79,5 +84,13 @@ public class Tuple {
     }
 
     return temp.toString().equals(this.toString());
+  }
+
+  public Tuple concat(Tuple tuple) {
+    ArrayList<Integer> tupleArray = new ArrayList<>();
+    tupleArray.addAll(this.getAllElements());
+    tupleArray.addAll(tuple.getAllElements());
+
+    return new Tuple(tupleArray);
   }
 }

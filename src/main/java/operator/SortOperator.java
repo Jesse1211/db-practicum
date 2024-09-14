@@ -6,20 +6,20 @@ import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
-/*
- * we only want to sort in ascending order
- * the attributes mentioned in the ORDER BY are a subset of those retained by the SELECT. This allows you to do the sorting last, after projection.
- * Note that this does not mean that every attribute in ORDER BY must be mentioned in the SELECT - a query like SELECT * FROM Sailors S ORDER BY S.name is valid.
- */
 public class SortOperator extends Operator {
 
   private Map<String, Integer> columnIndexMap;
   private List<Tuple> tupleList;
   Iterator<Tuple> it;
 
-  public SortOperator(
-      ArrayList<Column> outputSchema, Operator operator, List<OrderByElement> elementOrders) {
-    super(outputSchema);
+  /**
+   * Sort in ascending order with ORDER BY
+   *
+   * @param operator scan | select | join operator
+   * @param elementOrders list of ORDER BY elements
+   */
+  public SortOperator(Operator operator, List<OrderByElement> elementOrders) {
+    super(operator.getOutputSchema());
 
     this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
 
@@ -45,15 +45,13 @@ public class SortOperator extends Operator {
     it = tupleList.iterator();
   }
 
+  /** Re-initialize iterator */
   @Override
   public void reset() {
     it = tupleList.iterator();
   }
 
-  /*
-   * read all of the output from its child, place it into an internal buffer, sort
-   * it, and then return individual tuples when requested.
-   */
+  /** Return individual tuples from the child operator's all tuples */
   @Override
   public Tuple getNextTuple() {
     if (it.hasNext()) {

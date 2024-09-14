@@ -6,3 +6,22 @@ SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;
 SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A;
 SELECT DISTINCT R.G FROM Reserves R;
 SELECT * FROM Sailors ORDER BY Sailors.B;
+
+-- new cases
+-- DB1:     A B
+        -- 1,20
+        -- 2,30
+        -- 3,25
+        -- 4,35
+-- DB2:    G H
+        -- 1,101
+        -- 2,102
+        -- 3,103
+        -- 5,105
+SELECT * FROM DB1 WHERE DB1.B > 25;
+SELECT DB1.A, DB1.B FROM DB1 WHERE DB1.A < 4;
+SELECT DB1.A, DB2.H FROM DB1, DB2 WHERE DB1.A = DB2.G; -- SELECT DB1.A, DB2.H FROM DB1 JOIN DB2 ON DB1.A = DB2.G;
+SELECT * FROM DB2 WHERE DB2.G >= 2;
+SELECT DISTINCT DB2.G FROM DB2;
+SELECT S1.A, S2.A FROM DB1 S1, DB1 S2 WHERE S1.A < S2.A;
+SELECT * FROM DB1 ORDER BY DB1.B ASC;

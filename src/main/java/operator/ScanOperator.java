@@ -12,6 +12,11 @@ public class ScanOperator extends Operator {
   private BufferedReader bufferedReader;
   private File file;
 
+  /**
+   * Scan all info from the Table by Buffer Reader
+   *
+   * @param table single table
+   */
   public ScanOperator(Table table) {
     super(new ArrayList<>());
     try {
@@ -23,6 +28,7 @@ public class ScanOperator extends Operator {
     }
   }
 
+  /** re-initialize buffer reader */
   @Override
   public void reset() {
     try {
@@ -39,6 +45,7 @@ public class ScanOperator extends Operator {
     }
   }
 
+  /** Return single row as tuple */
   @Override
   public Tuple getNextTuple() {
     try {

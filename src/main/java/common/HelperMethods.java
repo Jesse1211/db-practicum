@@ -1,8 +1,6 @@
 package common;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
@@ -11,7 +9,14 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
 import operator.Operator;
 
+/** Helper methods for query plan builder */
 public class HelperMethods {
+  /**
+   * Map column name to index as columnName : index
+   *
+   * @param columns
+   * @return
+   */
   public static Map<String, Integer> mapColumnIndex(ArrayList<Column> columns) {
     Map<String, Integer> map = new HashMap<String, Integer>();
     for (int i = 0; i < columns.size(); i++) {
@@ -20,6 +25,12 @@ public class HelperMethods {
     return map;
   }
 
+  /**
+   * Collect all tuples from the operator
+   *
+   * @param operator operator
+   * @return list of tuples
+   */
   public static List<Tuple> getAllTuples(Operator operator) {
     Tuple tuple;
     List<Tuple> tuples = new ArrayList<>();
@@ -29,6 +40,13 @@ public class HelperMethods {
     return tuples;
   }
 
+  /**
+   * Store all tables in from statement, including join tables
+   *
+   * @param table main table
+   * @param joins list of joins
+   * @return list of all tables
+   */
   public static ArrayList<Table> getAllTables(Table table, List<Join> joins) {
     ArrayList<Table> allTables = new ArrayList<>();
     allTables.add(table);
@@ -40,6 +58,12 @@ public class HelperMethods {
     return allTables;
   }
 
+  /**
+   * Flatten the expression into a list of comparison operators
+   *
+   * @param expression expression
+   * @return list of comparison operators
+   */
   public static ArrayList<ComparisonOperator> flattenExpression(Expression expression) {
     ArrayList<ComparisonOperator> expressions = new ArrayList<>();
     if (expression instanceof ComparisonOperator) {
@@ -56,6 +80,12 @@ public class HelperMethods {
     return expressions;
   }
 
+  /**
+   * Get a pair of table names from a comparison operator
+   *
+   * @param expression
+   * @return pair of table names
+   */
   public static Pair<String, String> getComparisonTableNames(ComparisonOperator expression) {
     Expression leftExpression = expression.getLeftExpression();
     Expression rightExpression = expression.getRightExpression();

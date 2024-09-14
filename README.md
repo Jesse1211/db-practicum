@@ -1,3 +1,45 @@
+# Notes from P1 instruction:
+
+- `inputdir` structure from db_practicum_early-bird-1.jar:
+  ```
+  jesseliu@dhcp-vl2041-18670 libs % java -jar db_practicum_early-bird-1.jar input expected_output
+  17:35:18.727 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors
+  17:35:18.730 [main] INFO  compiler.Compiler - Processing query: SELECT Sailors.A FROM Sailors
+  17:35:18.730 [main] INFO  compiler.Compiler - Processing query: SELECT S.A FROM Sailors S
+  17:35:18.731 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S WHERE S.A < 3
+  17:35:18.733 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G
+  17:35:18.734 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A
+  17:35:18.735 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT R.G FROM Reserves R
+  17:35:18.736 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors ORDER BY Sailors.B
+  17:35:18.736 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 WHERE DB1.B > 25
+  17:35:18.737 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB1.B FROM DB1 WHERE DB1.A < 4
+  17:35:18.737 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB2.H FROM DB1, DB2 WHERE DB1.A = DB2.G
+  17:35:18.738 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB2 WHERE DB2.G >= 2
+  17:35:18.738 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT DB2.G FROM DB2
+  17:35:18.739 [main] INFO  compiler.Compiler - Processing query: SELECT S1.A, S2.A FROM DB1 S1, DB1 S2 WHERE S1.A < S2.A
+  17:35:18.739 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 ORDER BY DB1.B ASC
+  ```
+- Strategy from extracting join conditions from `WHERE` and evaluating as part of join:
+
+  1. Preparing data:
+
+  - - Store all table names including aliases into `ArrayList<Table> allTables`
+  - - Flatten the `WHERE` expressions into `ArrayList<ComparisonOperator> flattened` because we only consider AND operators.
+  - - Initialize variables, prepare for categorizing data into join expressions - `Expression joinWhereExpression` and value expressions - `Expression valueWhereExpression`, and map from table name to expression - `Map<String, Expression> tableWhereExpressionMap`
+
+  2. Categorize elements `comparisonOperator` inside `flattened` by 3 conditions:
+
+  - - Identify as value comparison: element has no left table or right table name. Then bind to `valueWhereExpression` by `AndExpression`
+  - - Identify as table comparasion without join: at lease one table is null or both tables are same. Update the corresponded AndExpression from `tableWhereExpressionMap`
+  - - join tables other wise. Then bind to `valueWhereExpression` by `AndExpression`
+
+  3. Scan and Select each table from `allTables` by offering to queue
+  4. Keep polling queue and concatenate each operators until 1 item left:
+
+  - - At each iteration, poll twice to get left & right child operators, then concatenate into a Join Operator. Offer the concatenated operator into queue.
+
+  5. Identify the final operator by detecting as value / join comparison
+
 # Design Architecture
 
 #### 1. **Parse** data by necessary
@@ -61,119 +103,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 3. add path `echo 'export JAVA_HOME=$(/usr/libexec/java_home -v 21)' >> ~/.zshrc`
 4. `source ~/.zshrc`
 
----
+## Don't forget bump gradle version to >= 8.5
 
-[![Java CI with Gradle](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml/badge.svg)](https://github.com/CornellDB/db_practicum/actions/workflows/gradle.yml)
-
-# Cornell Database Systems Practicum - CS 4321/5321
-
-The public repository for Cornell's Database Systems Implementation course (Practicum).
-
-## Creating a Private Fork
-
-You can create a private fork for your own convenience with the following steps.
-
-**Clone**. First, you need to create a bare clone of the repository:
-
-```
-$ git clone --bare https://github.com/CornellDB/db_practicum.git db_practicum_tmp
-$ cd db_practicum_tmp
-```
-
-**Create a Private Repository**. You can do that using the following [link](https://github.com/new). Pick up
-a name of your preference in the _Repository Name_ box. Below the description box, make sure to select the **Private**
-option.
-
-**Mirror-Push**. You now need to mirror the public DB Practicum repository.
-
-```
-$ git push --mirror https://github.com/YOUR_USERNAME/REPO_NAME.git
-```
-
-After this step, all the files of the public DB Practicum repository should have be cloned in your own private
-repository. You can now delete the `db_practicum_tmp` repo.
-
-**Clone your Repo.** Clone your new private repository:
-
-```
-$ git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
-```
-
-**Add Remote**. The next step is to add the official public repository as remote, to be able to fetch our commits for
-the future deliverables.
-
-```
-$ cd REPO_NAME
-$ git remote add upstream https://github.com/CornellDB/db_practicum.git
-$ git remote set-url --push upstream DISABLE
-```
-
-**Check**. To check that the previous steps were successful, run the following command:
-
-```
-$ git remote -v
-```
-
-If you have done everything correctly, your output should look as the following:
-
-```
-origin	git@github.com:YOUR_USERNAME/REPO_NAME.git (fetch)
-origin	git@github.com:YOUR_USERNAME/REPO_NAME.git (push)
-upstream	https://github.com/CornellDB/db_practicum.git (fetch)
-upstream	DISABLE (push)
-```
-
-**Sync-up**. In case we push new commits, you will need to sync-up your repo with the following command:
-
-```
-$ git fetch upstream
-$ git rebase upstream/main
-```
-
-## General Instructions
-
-### Java version
-
-We will be using Java 21 for this assignment. Make sure to download and install the correct Java version, and set
-`JAVA_HOME` accordingly.
-
-### Your first commit
-
-Edit the `config.properties` file and set the `TEAM_NAME` part with your team's name. Next, set the `DELIVERABLE`
-variable to `1`. Keep in mind to update the latter in every deliverable, so the produced jars have the correct names.
-For example, if you set your `TEAM_NAME` to `capybara` and `DELIVERABLE` to `3`, the `./gradlew build` command will
-produce a jar named `db_practicum_capybara-3.jar`.
-
-### Keep the main branch clean
-
-We strongly suggest to not push any commit/change to
-the `main` branch. This will make the sync-up with the official repo easier, when we push new changes that you will need
-to fetch.
-
-### One branch per deliverable
-
-For every new deliverable, you will need to create a new branch. This will make it easier for you to keep track of your
-changes across different deliverables, and will make debugging easier (i.e. a wrong output result or a performance
-degradation in an operator that used to work well in the past).
-
-### Example
-
-When you start, the default branch will be the `main`. You can verify that by typing:
-
-`$ git branch`
-
-For the first deliverable, create a new branch on top of the `main` branch as follows:
-
-`$ git checkout -b p1_deliverable`
-
-For the second deliverable, make sure you are on the `p1_deliverable` (you can check that using `git branch`). Create
-a new branch for the second deliverable on top of the `p1_deliverable` as follows:
-
-```
-$ git checkout -b p2_deliverable
-```
-
-Similar steps should be followed for each deliverable.
+`distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip`
 
 ## Build Instructions
 

@@ -21,10 +21,7 @@ public class Compiler {
 
   private static String outputDir;
   private static String inputDir;
-  private static final boolean outputToFiles = true; // true = output to
-
-  // files, false = output
-  // to System.out
+  private static final boolean outputToFiles = true;
 
   /**
    * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping

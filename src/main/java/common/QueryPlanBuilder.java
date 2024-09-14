@@ -62,7 +62,7 @@ public class QueryPlanBuilder {
     }
 
     if (plainSelect.getSelectItems().size() > 1
-        || !(plainSelect.getSelectItems().get(0) instanceof AllColumns)) {
+        || !(plainSelect.getSelectItems().getFirst() instanceof AllColumns)) {
       operator = new ProjectOperator(operator, plainSelect.getSelectItems());
     }
 
@@ -77,15 +77,22 @@ public class QueryPlanBuilder {
     return operator;
   }
 
+  /**
+   * @param whereExpression where expression of the statement what contains join
+   * @param allTables all tables in the statement.
+   * @return an operator that contained an output schema of joined items.
+   */
   private Operator buildJoinPlan(Expression whereExpression, ArrayList<Table> allTables) {
     // NOTE: can only process AND operators. This is enough for Project 1
+
+    // Flatten nested comparisons
     ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
     Map<String, Expression> tableWhereExpressionMap = new HashMap<>();
     Expression joinWhereExpression = null;
     Expression valueWhereExpression = null;
 
-    // Separate the comparisons into 3 categories: value comparison, table
-    // comparison, and join
+    /* Separate the comparisons into 3 categories: value comparison, same-table
+    comparison, and join comparison */
     for (ComparisonOperator comparisonOperator : flattened) {
 
       // Get 2 table names from the comparison operator
@@ -95,6 +102,7 @@ public class QueryPlanBuilder {
       String rightTableName = tableNamePair.getRight();
 
       if (leftTableName == null && rightTableName == null) {
+        // if value comparison
         // both are values, ex: 42 = 42, should evaluate first.
         if (valueWhereExpression == null) {
           valueWhereExpression = comparisonOperator;
@@ -104,16 +112,18 @@ public class QueryPlanBuilder {
       } else if (leftTableName == null
           || rightTableName == null
           || leftTableName.equals(rightTableName)) {
+        // if same-table comparison
         // if one table or both table name are the same, then no join needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
-        // if table name is null, then it is a value comparison, should evaluate first.
-        tableWhereExpressionMap.putIfAbsent(tableName, comparisonOperator);
-        // if table name is not null, then it is a table comparison, should join.
-        tableWhereExpressionMap.put(
-            tableName,
-            new AndExpression(tableWhereExpressionMap.get(tableName), comparisonOperator));
+
+        Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);
+        if (expression == null) {
+          tableWhereExpressionMap.put(tableName, comparisonOperator);
+        } else {
+          tableWhereExpressionMap.put(tableName, new AndExpression(expression, comparisonOperator));
+        }
       } else {
-        // two different tables, should join
+        // two different tables, should join. join comparison
         if (joinWhereExpression == null) {
           joinWhereExpression = comparisonOperator;
         } else {
@@ -122,8 +132,7 @@ public class QueryPlanBuilder {
       }
     }
 
-    // SCAN and SELECT each table individually by initializing a queue of SCAN |
-    // SELECT Operators
+    // SELECT required column from each table individually and put into the queue
     Queue<Operator> operators = new ArrayDeque<>();
     for (Table table : allTables) {
       Operator operator = new ScanOperator(table);
@@ -131,12 +140,13 @@ public class QueryPlanBuilder {
       String name = alias != null ? alias.getName() : table.getName();
       Expression expression = tableWhereExpressionMap.getOrDefault(name, null);
       if (expression != null) {
+        // process same-table column comparisons.
         operator = new SelectOperator(operator, expression);
       }
       operators.offer(operator);
     }
 
-    // BFS and concatenate every pairs until 1 item left in queue.
+    // Concatenate every pairs until 1 item left in queue.
     while (operators.size() > 1) {
       Operator leftChildOperator = operators.poll();
       Operator rightChildOperator = operators.poll();
@@ -145,9 +155,8 @@ public class QueryPlanBuilder {
     }
 
     Operator operator = operators.poll();
-    // TODO: Can move valueComparison to the beginning so we exit before joining the
-    // tables.
-
+    /* NOTE: Can move valueComparison to the beginning so we exit before
+    // joining the tables. */
     if (valueWhereExpression != null) {
       // if there is a value comparison, should evaluate first.
       operator = new SelectOperator(operator, valueWhereExpression);

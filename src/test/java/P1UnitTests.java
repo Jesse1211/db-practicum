@@ -43,36 +43,37 @@ public class P1UnitTests {
     statementList = statements.getStatements();
   }
 
+  @Test
   public void testCustomize() throws ExecutionControl.NotImplementedException {
     // [8 to 18]
     // Create a list of expected tuples for the range [8 to 18]
     List<Tuple[]> expectedTuplesArray =
         Arrays.asList(
-            new Tuple[] { // 1
+            new Tuple[] { // 0
               new Tuple(new ArrayList<>(List.of(2, 30))), new Tuple(new ArrayList<>(List.of(4, 35)))
             },
-            new Tuple[] { // 2
+            new Tuple[] { // 1
               new Tuple(new ArrayList<>(List.of(1, 20))),
               new Tuple(new ArrayList<>(List.of(2, 30))),
               new Tuple(new ArrayList<>(List.of(3, 25)))
             },
-            new Tuple[] { // 3
+            new Tuple[] { // 2
               new Tuple(new ArrayList<>(List.of(1, 101))),
               new Tuple(new ArrayList<>(List.of(2, 102))),
               new Tuple(new ArrayList<>(List.of(3, 103)))
             },
-            new Tuple[] { // 4
+            new Tuple[] { // 3
               new Tuple(new ArrayList<>(List.of(2, 102))),
               new Tuple(new ArrayList<>(List.of(3, 103))),
               new Tuple(new ArrayList<>(List.of(5, 105)))
             },
-            new Tuple[] { // 5
+            new Tuple[] { // 4
               new Tuple(new ArrayList<>(List.of(1))),
               new Tuple(new ArrayList<>(List.of(2))),
               new Tuple(new ArrayList<>(List.of(3))),
               new Tuple(new ArrayList<>(List.of(5))),
             },
-            new Tuple[] { // 6
+            new Tuple[] { // 5
               new Tuple(new ArrayList<>(List.of(1, 2))),
               new Tuple(new ArrayList<>(List.of(1, 3))),
               new Tuple(new ArrayList<>(List.of(1, 4))),
@@ -80,18 +81,21 @@ public class P1UnitTests {
               new Tuple(new ArrayList<>(List.of(2, 4))),
               new Tuple(new ArrayList<>(List.of(3, 4)))
             },
-            new Tuple[] { // 7
+            new Tuple[] { // 6
               new Tuple(new ArrayList<>(List.of(1, 20))),
               new Tuple(new ArrayList<>(List.of(3, 25))),
               new Tuple(new ArrayList<>(List.of(2, 30))),
               new Tuple(new ArrayList<>(List.of(4, 35)))
+            },
+            new Tuple[] { // 6
+              new Tuple(new ArrayList<>(List.of(3, 4, 3))),
             });
 
-    for (int index = 8; index < 8 + 7; index++) {
+    for (int index = 0; index < 8; index++) {
 
       Tuple[] expectedTuples = expectedTuplesArray.get(index);
 
-      Operator plan = queryPlanBuilder.buildPlan(statementList.get(index));
+      Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 8));
 
       List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
 

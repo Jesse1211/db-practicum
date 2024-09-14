@@ -58,16 +58,10 @@ public class DBCatalog {
         String[] tokens = line.split("\\s");
         String tableName = tokens[0];
         // https://www.javadoc.io/doc/com.github.jsqlparser/jsqlparser/latest/net.sf.jsqlparser/net/sf/jsqlparser/schema/Column.html
-        ArrayList<Column> cols = new ArrayList<Column>();
+        ArrayList<Column> cols = new ArrayList<>();
         for (int i = 1; i < tokens.length; i++) {
           cols.add(new Column(new Table(null, tableName), tokens[i]));
         }
-        // table name : list of columns
-        // columns = [column1, column2, ...]
-        // column1 = new Column(new Table(null, tableName), tokens[i])
-
-        // //但是每个column都有一个新的Table???? ===> 为了保持独立性: SelectOPerator.outputSchema
-        // ’代码中为每个 Column 创建一个新的 Table 实例可能是为了提供设计的灵活性和独立性‘
         tables.put(tokens[0], cols);
       }
       br.close();
@@ -89,18 +83,25 @@ public class DBCatalog {
   /**
    * Get columns for a table
    *
-   * @param tableName
+   * @param tableName table name
    * @return list of columns for the table
    */
   public ArrayList<Column> getColumns(String tableName) {
     return tables.get(tableName);
   }
 
+  /**
+   * Get columns with alias for a table
+   *
+   * @param table table object
+   * @return list of columns for the table
+   */
   public ArrayList<Column> getColumnsWithAlias(Table table) {
     ArrayList<Column> columns = tables.get(table.getName());
     ArrayList<Column> newColumns = new ArrayList<>();
-    for (int i = 0; i < columns.size(); i++) {
-      Column column = new Column(table, columns.get(i).getColumnName());
+    for (Column value : columns) {
+      // Create a new Column object that include the input table (contains alias)
+      Column column = new Column(table, value.getColumnName());
       newColumns.add(column);
     }
     return newColumns;

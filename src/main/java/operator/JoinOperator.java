@@ -12,7 +12,7 @@ public class JoinOperator extends Operator {
   private Operator leftChildOperator;
   private Operator rightChildOperator;
 
-  private Tuple leftTuple = null;
+  private Tuple leftTuple;
 
   public JoinOperator(Operator leftChildOperator, Operator rightChildOperator) {
     super(new ArrayList<>());
@@ -31,6 +31,7 @@ public class JoinOperator extends Operator {
   public void reset() {
     leftChildOperator.reset();
     rightChildOperator.reset();
+    leftTuple = leftChildOperator.getNextTuple();
   }
 
   @Override
@@ -48,8 +49,6 @@ public class JoinOperator extends Operator {
     }
 
     // Glues them together
-    Tuple joinedTuple = leftTuple.concat(rightTuple);
-
-    return joinedTuple;
+    return leftTuple.concat(rightTuple);
   }
 }

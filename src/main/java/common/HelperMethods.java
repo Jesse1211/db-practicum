@@ -14,11 +14,11 @@ public class HelperMethods {
   /**
    * Map column name to index as columnName : index
    *
-   * @param columns
-   * @return
+   * @param columns list of columns
+   * @return map of <column name, column index>
    */
   public static Map<String, Integer> mapColumnIndex(ArrayList<Column> columns) {
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, Integer> map = new HashMap<>();
     for (int i = 0; i < columns.size(); i++) {
       map.put(columns.get(i).getName(true), i);
     }
@@ -45,7 +45,8 @@ public class HelperMethods {
    *
    * @param table main table
    * @param joins list of joins
-   * @return list of all tables
+   * @return list of all tables, if there is an alias of the same table, it will be treated as a
+   *     separate table because alias will be treated as table names.
    */
   public static ArrayList<Table> getAllTables(Table table, List<Join> joins) {
     ArrayList<Table> allTables = new ArrayList<>();
@@ -83,7 +84,7 @@ public class HelperMethods {
   /**
    * Get a pair of table names from a comparison operator
    *
-   * @param expression
+   * @param expression ComparisonOperator expression
    * @return pair of table names
    */
   public static Pair<String, String> getComparisonTableNames(ComparisonOperator expression) {
@@ -98,21 +99,6 @@ public class HelperMethods {
     if (rightExpression instanceof Column) {
       rightTableName = ((Column) rightExpression).getTable().getName();
     }
-
     return new Pair<>(leftTableName, rightTableName);
-  }
-
-  @Deprecated
-  /** not used anymore */
-  public static Map<String, Table> buildTableNameMap(ArrayList<Table> allTables) {
-    Map<String, Table> tableNameMap = new HashMap<>(); // alias to name
-
-    for (Table table : allTables) {
-      tableNameMap.put(table.getName(), table);
-      if (table.getAlias() != null) {
-        tableNameMap.put(table.getAlias().getName(), table);
-      }
-    }
-    return tableNameMap;
   }
 }

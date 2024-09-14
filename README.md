@@ -1,46 +1,42 @@
 # Notes from P1 instruction:
 
-- `inputdir` structure from db_practicum_early-bird-1.jar:
+## `inputdir` structure from db_practicum_early-bird-1.jar:
   ```
-  jesseliu@dhcp-vl2041-18670 libs % java -jar db_practicum_early-bird-1.jar input expected_output
-  17:35:18.727 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors
-  17:35:18.730 [main] INFO  compiler.Compiler - Processing query: SELECT Sailors.A FROM Sailors
-  17:35:18.730 [main] INFO  compiler.Compiler - Processing query: SELECT S.A FROM Sailors S
-  17:35:18.731 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S WHERE S.A < 3
-  17:35:18.733 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G
-  17:35:18.734 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A
-  17:35:18.735 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT R.G FROM Reserves R
-  17:35:18.736 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors ORDER BY Sailors.B
-  17:35:18.736 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 WHERE DB1.B > 25
-  17:35:18.737 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB1.B FROM DB1 WHERE DB1.A < 4
-  17:35:18.737 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB2.H FROM DB1, DB2 WHERE DB1.A = DB2.G
-  17:35:18.738 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB2 WHERE DB2.G >= 2
-  17:35:18.738 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT DB2.G FROM DB2
-  17:35:18.739 [main] INFO  compiler.Compiler - Processing query: SELECT S1.A, S2.A FROM DB1 S1, DB1 S2 WHERE S1.A < S2.A
-  17:35:18.739 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 ORDER BY DB1.B ASC
+  \db-practicum> java -jar ./build/libs/db_practicum_early-bird-1.jar ./src/test/resources/samples/input ./src/test/resources/samples/expected_output_1
+  15:39:08.801 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors
+  15:39:08.808 [main] INFO  compiler.Compiler - Processing query: SELECT Sailors.A FROM Sailors
+  15:39:08.809 [main] INFO  compiler.Compiler - Processing query: SELECT S.A FROM Sailors S
+  15:39:08.810 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S WHERE S.A < 3
+  15:39:08.817 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G
+  15:39:08.820 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A
+  15:39:08.824 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT R.G FROM Reserves R
+  15:39:08.825 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM Sailors ORDER BY Sailors.B
+  15:39:08.827 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 WHERE DB1.B > 25
+  15:39:08.828 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB1.B FROM DB1 WHERE DB1.A < 4
+  15:39:08.829 [main] INFO  compiler.Compiler - Processing query: SELECT DB1.A, DB2.H FROM DB1, DB2 WHERE DB1.A = DB2.G
+  15:39:08.830 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB2 WHERE DB2.G >= 2
+  15:39:08.832 [main] INFO  compiler.Compiler - Processing query: SELECT DISTINCT DB2.G FROM DB2
+  15:39:08.833 [main] INFO  compiler.Compiler - Processing query: SELECT S1.A, S2.A FROM DB1 S1, DB1 S2 WHERE S1.A < S2.A
+  15:39:08.836 [main] INFO  compiler.Compiler - Processing query: SELECT * FROM DB1 ORDER BY DB1.B ASC
+  15:39:08.837 [main] INFO  compiler.Compiler - Processing query: SELECT S1.A, S2.A, S3.G FROM DB1 S1, DB1 S2, DB2 S3 WHERE S1.A < S2.A AND S1.A = S3.G AND S3.H = 103
   ```
-- Strategy from extracting join conditions from `WHERE` and evaluating as part of join:
+## Strategy from extracting join conditions from `WHERE` and evaluating as part of join:
 
   1. Preparing data:
+     - Store all table including aliases into `ArrayList<Table> allTables`
+     - Flatten the `WHERE` expressions into `ArrayList<ComparisonOperator> flattened`. Nested comparisons will be extracted. This works because we only consider `AND` operators.
+     - Initialize expressions `Expression joinWhereExpression`, `Expression valueWhereExpression`, and `Map<String, Expression> tableWhereExpressionMap`.
+  2. Categorize elements `comparisonOperator` inside `flattened` by 3 conditions and put into corresponding container:
+     - Identify as value comparison (42 = 42): element has no left table and right table name.
+     - Identify as same-table comparison (s.a = 42, s.a = s.b): either left or right expression is a value, or both left and right column have the same table name or alias
+     - Identify as cross-table comparison (s1.a = s2.a): left and right are not the same table
 
-  - - Store all table names including aliases into `ArrayList<Table> allTables`
-  - - Flatten the `WHERE` expressions into `ArrayList<ComparisonOperator> flattened` because we only consider AND operators.
-  - - Initialize variables, prepare for categorizing data into join expressions - `Expression joinWhereExpression` and value expressions - `Expression valueWhereExpression`, and map from table name to expression - `Map<String, Expression> tableWhereExpressionMap`
+  3. Scan each table and select the tuples based expression in `tableWhereExpressionMap`, store the operators in a queue.
 
-  2. Categorize elements `comparisonOperator` inside `flattened` by 3 conditions:
+  4. Use `JoinOperators` to join all operators in the queue. This will result one final operator.
+  5. Use SelectOperators to evaluate `valueWhereExpression` and `joinWhereExpression`
 
-  - - Identify as value comparison: element has no left table or right table name. Then bind to `valueWhereExpression` by `AndExpression`
-  - - Identify as table comparasion without join: at lease one table is null or both tables are same. Update the corresponded AndExpression from `tableWhereExpressionMap`
-  - - join tables other wise. Then bind to `valueWhereExpression` by `AndExpression`
-
-  3. Scan and Select each table from `allTables` by offering to queue
-  4. Keep polling queue and concatenate each operators until 1 item left:
-
-  - - At each iteration, poll twice to get left & right child operators, then concatenate into a Join Operator. Offer the concatenated operator into queue.
-
-  5. Identify the final operator by detecting as value / join comparison
-
-# Design Architecture
+## Design Architecture
 
 #### 1. **Parse** data by necessary
 
@@ -66,7 +62,7 @@
 - `outputSchema`: update by `selectedItems` - after SELECT before WHERE
   - outputSchema had ALL columns before, now only store what is mentioned from selectedItems
 - Use childOperator's outputSchema to a map as `{columnName: index in outputSchema}`
-- `reset()`: no needed to modify
+- `reset()`: call childOperator's reset()
 - `getNextTuple()`: based on filtered output, return only selected column as tuple
 
 #### 6. **Order the output** in `SortOperator(childOperator, elementOrders)`

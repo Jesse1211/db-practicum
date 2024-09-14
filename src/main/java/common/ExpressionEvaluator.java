@@ -14,8 +14,8 @@ import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.expression.operators.relational.NotEqualsTo;
 import net.sf.jsqlparser.schema.Column;
 
+/** Expression evaluator that evaluates the comparison and return a boolean result. */
 public class ExpressionEvaluator extends ExpressionVisitorAdapter {
-
   private Tuple tuple;
   private Map<String, Integer> columnIndexMap;
   private boolean result;

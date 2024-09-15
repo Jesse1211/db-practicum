@@ -6,6 +6,10 @@ import common.Tuple;
 import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;
 
+/**
+ * An operator for WHERE. Only return the tuples that matches the comparison expression (only when
+ * the expression evaluates to true).
+ */
 public class SelectOperator extends Operator {
 
   private Operator childOperator;
@@ -13,7 +17,7 @@ public class SelectOperator extends Operator {
   private Map<String, Integer> columnIndexMap;
 
   /**
-   * Process comparators, Filter rows
+   * SelectOperator Constructor
    *
    * @param childOperator scan operator
    * @param whereExpression WHERE expressions as 'Table.column = value' expression
@@ -31,7 +35,9 @@ public class SelectOperator extends Operator {
     childOperator.reset();
   }
 
-  /** Return satisfied row as tuple based on `ExpressionEvaluator` */
+  /**
+   * @return satisfied row as tuple based on `ExpressionEvaluator`
+   */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

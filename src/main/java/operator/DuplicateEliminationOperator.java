@@ -3,12 +3,16 @@ package operator;
 import common.Tuple;
 import java.util.*;
 
+/**
+ * An operator for DISTINCT, used to eliminate duplicate tuples. It uses a set to track visited
+ * tuples, and if a tuple is already in the set, skip the one.
+ */
 public class DuplicateEliminationOperator extends Operator {
   private Operator operator;
   private Set<Tuple> distinctSet = new HashSet<>();
 
   /**
-   * Avoid duplicate tuples in output
+   * DuplicateEliminationOperator constructor
    *
    * @param operator child operator, this is invoked as last operator in plan builder
    */

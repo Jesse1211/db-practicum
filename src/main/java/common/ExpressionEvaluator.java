@@ -21,26 +21,52 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
   private boolean result;
   private int value;
 
+  /**
+   * constructor of ExpressionEvaluator
+   *
+   * @param tuple current tuple
+   * @param columnIndexMap columnIndexMap that use column names for keys and column index for values
+   */
   public ExpressionEvaluator(Tuple tuple, Map<String, Integer> columnIndexMap) {
     this.tuple = tuple;
     this.columnIndexMap = columnIndexMap;
   }
 
+  /**
+   * get the result from this expression evaluator
+   *
+   * @return the result in a boolean
+   */
   public boolean getResult() {
     return result;
   }
 
+  /**
+   * if the expression is a value, set the value and no action is needed.
+   *
+   * @param longValue
+   */
   @Override
   public void visit(LongValue longValue) {
     value = (int) longValue.getValue();
   }
 
+  /**
+   * if the expression is a column, get the corresponding value from the current tuple
+   *
+   * @param column
+   */
   @Override
   public void visit(Column column) {
     int index = columnIndexMap.get(column.getName(true));
     value = tuple.getElementAtIndex(index);
   }
 
+  /**
+   * evaluate AndExpression, the recursively evaluate nested expressions
+   *
+   * @param andExpression
+   */
   @Override
   public void visit(AndExpression andExpression) {
     andExpression.getLeftExpression().accept(this);
@@ -51,6 +77,12 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftResult && rightResult;
   }
 
+  /**
+   * Not used in this project because of precondition. evaluate OrExpression, the recursively
+   * evaluate nested expressions
+   *
+   * @param orExpression
+   */
   @Override
   public void visit(OrExpression orExpression) {
     orExpression.getLeftExpression().accept(this);
@@ -62,6 +94,12 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftResult || rightResult;
   }
 
+  /**
+   * Not used in this project because of precondition. evaluate xorExpression, the recursively
+   * evaluate nested expressions
+   *
+   * @param xorExpression
+   */
   @Override
   public void visit(XorExpression xorExpression) {
     xorExpression.getLeftExpression().accept(this);
@@ -73,6 +111,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftResult ^ rightResult;
   }
 
+  /**
+   * evaluate equalsTo, set the result as leftValue == rightValue
+   *
+   * @param equalsTo
+   */
   @Override
   public void visit(EqualsTo equalsTo) {
     equalsTo.getLeftExpression().accept(this);
@@ -83,6 +126,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftValue == rightValue;
   }
 
+  /**
+   * evaluate greaterThan, set the result as leftValue > rightValue
+   *
+   * @param greaterThan
+   */
   @Override
   public void visit(GreaterThan greaterThan) {
     greaterThan.getLeftExpression().accept(this);
@@ -93,6 +141,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftValue > rightValue;
   }
 
+  /**
+   * evaluate greaterThanEquals, set the result as leftValue >= rightValue
+   *
+   * @param greaterThanEquals
+   */
   @Override
   public void visit(GreaterThanEquals greaterThanEquals) {
     greaterThanEquals.getLeftExpression().accept(this);
@@ -103,6 +156,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftValue >= rightValue;
   }
 
+  /**
+   * evaluate minorThan, set the result as leftValue < rightValue
+   *
+   * @param minorThan
+   */
   @Override
   public void visit(MinorThan minorThan) {
     minorThan.getLeftExpression().accept(this);
@@ -113,6 +171,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftValue < rightValue;
   }
 
+  /**
+   * evaluate minorThanEquals, set the result as leftValue <= rightValue
+   *
+   * @param minorThanEquals
+   */
   @Override
   public void visit(MinorThanEquals minorThanEquals) {
     minorThanEquals.getLeftExpression().accept(this);
@@ -123,6 +186,11 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     result = leftValue <= rightValue;
   }
 
+  /**
+   * evaluate notEqualsTo, set the result as leftValue <>/!= rightValue
+   *
+   * @param notEqualsTo
+   */
   @Override
   public void visit(NotEqualsTo notEqualsTo) {
     notEqualsTo.getLeftExpression().accept(this);

@@ -8,14 +8,15 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Table;
 
+/** An operator for SELECT *. It reads all rows of data from the file using BufferReader */
 public class ScanOperator extends Operator {
   private BufferedReader bufferedReader;
   private File file;
 
   /**
-   * Scan all info from the Table by Buffer Reader
+   * ScanOperator constructor
    *
-   * @param table single table
+   * @param table table that needs to be scanned
    */
   public ScanOperator(Table table) {
     super(new ArrayList<>());
@@ -45,7 +46,9 @@ public class ScanOperator extends Operator {
     }
   }
 
-  /** Return single row as tuple */
+  /**
+   * @return single row as tuple
+   */
   @Override
   public Tuple getNextTuple() {
     try {

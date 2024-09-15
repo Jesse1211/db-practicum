@@ -6,6 +6,11 @@ import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
+/**
+ * An operator for ORDER BY. Sort the tuples based on the column provided. If there are multiple
+ * columns like `ORDER BY a, b, c`, it will preserve the order and only use the subsequent columns
+ * to break ties.
+ */
 public class SortOperator extends Operator {
 
   private Map<String, Integer> columnIndexMap;
@@ -13,7 +18,7 @@ public class SortOperator extends Operator {
   Iterator<Tuple> it;
 
   /**
-   * Sort in ascending order with ORDER BY
+   * SelectOperator constructor
    *
    * @param operator scan | select | join operator
    * @param elementOrders list of ORDER BY elements
@@ -51,7 +56,9 @@ public class SortOperator extends Operator {
     it = tupleList.iterator();
   }
 
-  /** Return individual tuples from the child operator's all tuples */
+  /**
+   * @return individual tuples from the child operator's all tuples
+   */
   @Override
   public Tuple getNextTuple() {
     if (it.hasNext()) {

@@ -14,6 +14,12 @@ public class JoinOperator extends Operator {
 
   private Tuple leftTuple;
 
+  /**
+   * JoinOperator Constructor
+   *
+   * @param leftChildOperator leftChildOperator that needs to perform to join
+   * @param rightChildOperator rightChildOperator that needs to perform to join
+   */
   public JoinOperator(Operator leftChildOperator, Operator rightChildOperator) {
     super(new ArrayList<>());
 
@@ -26,7 +32,7 @@ public class JoinOperator extends Operator {
     leftTuple = leftChildOperator.getNextTuple();
   }
 
-  /** Reset the operator to the start. */
+  /** reset the operator to the start. */
   @Override
   public void reset() {
     leftChildOperator.reset();
@@ -34,10 +40,14 @@ public class JoinOperator extends Operator {
     leftTuple = leftChildOperator.getNextTuple();
   }
 
+  /**
+   * for each left tuple, concatenate with each of the right tuples.
+   *
+   * @return a tuple that glues left and right tuples
+   */
   @Override
   public Tuple getNextTuple() {
     Tuple rightTuple = rightChildOperator.getNextTuple();
-    // 左边走一行 - 右边走一遍
     if (rightTuple == null) {
       rightChildOperator.reset();
       leftTuple = leftChildOperator.getNextTuple();

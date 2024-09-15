@@ -50,11 +50,12 @@ public class QueryPlanBuilder {
     ArrayList<Table> allTables = HelperMethods.getAllTables(table, joins);
 
     Expression whereExpression = plainSelect.getWhere();
-    // start process
     Operator operator;
+
     if (joins != null) {
       operator = buildJoinPlan(whereExpression, allTables);
     } else {
+      // If the statement does not have join, it will directly evaluate the where expression
       operator = new ScanOperator(table);
       if (whereExpression != null) {
         operator = new SelectOperator(operator, whereExpression);
@@ -112,8 +113,8 @@ public class QueryPlanBuilder {
       } else if (leftTableName == null
           || rightTableName == null
           || leftTableName.equals(rightTableName)) {
-        // if same-table comparison
-        // if one table or both table name are the same, then no join needed.
+        // if same-table comparison or one table or both table name are the same, then no join
+        // needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
 
         Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);

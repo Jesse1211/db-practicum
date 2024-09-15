@@ -86,6 +86,13 @@ public class Tuple {
     return temp.toString().equals(this.toString());
   }
 
+  /**
+   * Concatenate another tuple subsequent this tuple. Ex: a = (1, 1), a.concat(2, 3) = new Tuple (1,
+   * 1, 2, 3)
+   *
+   * @param tuple tuple to concatenate
+   * @return Return a new concatenated tuple.
+   */
   public Tuple concat(Tuple tuple) {
     ArrayList<Integer> tupleArray = new ArrayList<>();
     tupleArray.addAll(this.getAllElements());

@@ -8,13 +8,17 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
+/**
+ * An operator for SELECT, only returns the columns stated in the select expression. It will also
+ * update the output schema based on the select expression.
+ */
 public class ProjectOperator extends Operator {
   private Operator childOperator;
   private List<SelectItem> selectItems;
   private Map<String, Integer> columnIndexMap;
 
   /**
-   * Determine output format from selectedItems
+   * Constructor
    *
    * @param childOperator select | scan operator
    * @param selectItems list of SELECT as `Table.column1, Table.column2` expression
@@ -33,7 +37,9 @@ public class ProjectOperator extends Operator {
     childOperator.reset();
   }
 
-  /** Based on filtered output, return only selected column as tuple */
+  /**
+   * @return only returns tuples with selected column based on outputSchema
+   */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;
@@ -53,6 +59,7 @@ public class ProjectOperator extends Operator {
     return null;
   }
 
+  /** updates the output schema based on select items from the select statement. */
   private void updateOutputSchema() {
     ArrayList<Column> outputSchema = new ArrayList<>();
     for (SelectItem item : selectItems) {

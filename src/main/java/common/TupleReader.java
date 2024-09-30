@@ -7,8 +7,4 @@ public interface TupleReader {
     public void close();
 
     public void reset();
-
-    public int getAttributeNum();
-
-    public int getTuplesNum();
 }

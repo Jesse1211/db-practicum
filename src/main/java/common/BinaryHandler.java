@@ -144,15 +144,4 @@ public class BinaryHandler implements TupleWriter, TupleReader {
             logger.error(e.getMessage());
         }
     }
-
-    @Override
-    public int getAttributeNum() {
-        return this.attributeNum;
-    }
-
-    @Override
-    public int getTuplesNum() {
-        return this.tupleNum;
-
-    }
 }

@@ -7,7 +7,7 @@ import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
-import operator.Operator;
+import physical_operator.Operator;
 
 /** Helper methods for query plan builder */
 public class HelperMethods {

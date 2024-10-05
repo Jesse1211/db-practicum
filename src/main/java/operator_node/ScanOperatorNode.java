@@ -1,25 +1,19 @@
 package operator_node;
 
 import common.DBCatalog;
+import common.OperatorNodeVisitor;
+import java.util.ArrayList;
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
-public class ScanOperatorNode extends OperatorNode{
+public class ScanOperatorNode extends OperatorNode {
 
   private Table table;
-  private OperatorNode childNode;
 
-  public ScanOperatorNode(OperatorNode childNode, Table table) {
-    this.childNode = childNode;
+  public ScanOperatorNode(Table table) {
     this.table = table;
     this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
-  }
-
-  public OperatorNode getChildNode() {
-    return childNode;
-  }
-
-  public void setChildNode(OperatorNode childNode) {
-    this.childNode = childNode;
   }
 
   public Table getTable() {
@@ -28,5 +22,19 @@ public class ScanOperatorNode extends OperatorNode{
 
   public void setTable(Table table) {
     this.table = table;
+  }
+
+  /**
+   * @param operatorNodeVisitor
+   */
+  @Override
+  public void accept(OperatorNodeVisitor operatorNodeVisitor) {
+    operatorNodeVisitor.visit(this);
+  }
+
+  @Override
+  public OperatorNode getChildNode() {
+    System.out.println("JoinOperator should not have a child.");
+    return null;
   }
 }

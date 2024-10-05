@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import operator.Operator;
+import physical_operator.Operator;
 import org.apache.logging.log4j.*;
 
 /**

@@ -1,4 +1,4 @@
-package operator;
+package physical_operator;
 
 import common.HelperMethods;
 import common.Tuple;
@@ -21,14 +21,11 @@ public class ProjectOperator extends Operator {
    * Constructor
    *
    * @param childOperator select | scan operator
-   * @param selectItems list of SELECT as `Table.column1, Table.column2` expression
    */
-  public ProjectOperator(Operator childOperator, List<SelectItem> selectItems) {
-    super(new ArrayList<>());
+  public ProjectOperator(ArrayList<Column> outputSchema, Operator childOperator) {
+    super(outputSchema);
     this.childOperator = childOperator;
-    this.selectItems = selectItems;
     this.columnIndexMap = HelperMethods.mapColumnIndex(childOperator.getOutputSchema());
-    updateOutputSchema();
   }
 
   /** Invoke childOperator's reset method */
@@ -43,7 +40,6 @@ public class ProjectOperator extends Operator {
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;
-
     if ((tuple = childOperator.getNextTuple()) != null) {
       ArrayList<Integer> tupleArray = new ArrayList<>();
 
@@ -57,20 +53,5 @@ public class ProjectOperator extends Operator {
       return new Tuple(tupleArray);
     }
     return null;
-  }
-
-  /** updates the output schema based on select items from the select statement. */
-  private void updateOutputSchema() {
-    ArrayList<Column> outputSchema = new ArrayList<>();
-    for (SelectItem item : selectItems) {
-      if (item instanceof SelectExpressionItem) {
-        Column column = (Column) ((SelectExpressionItem) item).getExpression();
-        int index = columnIndexMap.get(column.getName(true));
-        outputSchema.add(childOperator.getOutputSchema().get(index));
-      } else if (item instanceof AllColumns) {
-        outputSchema.addAll(this.outputSchema);
-      }
-    }
-    this.outputSchema = outputSchema;
   }
 }

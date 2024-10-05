@@ -44,7 +44,7 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for sailors tables
+   * Test the select statement for sailors tables - "<"
    * 
    * @throws ExecutionControl.NotImplementedException
    */
@@ -73,7 +73,7 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for sailors tables
+   * Test the select statement for sailors tables - ">"
    * 
    * @throws ExecutionControl.NotImplementedException
    */
@@ -99,5 +99,184 @@ public class SelectTests {
       Tuple actualTuple = tuples.get(i);
       Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
     }
+  }
+
+  /**
+   * Test the select statement for sailors tables - "="
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors3() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 2));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 4;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 4 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(47, 47, 73))),
+        new Tuple(new ArrayList<>(Arrays.asList(147, 147, 111))),
+        new Tuple(new ArrayList<>(Arrays.asList(8, 8, 84))),
+        new Tuple(new ArrayList<>(Arrays.asList(78, 78, 50)))
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
+
+  /**
+   * Test the select statement for sailors tables - "<="
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors4() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 3));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 503;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 3 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+        new Tuple(new ArrayList<>(Arrays.asList(75, 191, 192))),
+        new Tuple(new ArrayList<>(Arrays.asList(133, 197, 18))),
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
+
+  /**
+   * Test the select statement for sailors tables - ">="
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors5() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 4));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 501;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 4 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118))),
+        new Tuple(new ArrayList<>(Arrays.asList(81, 1, 195)))
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
+
+  /**
+   * Test the select statement for sailors tables - "<>"
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors6() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 5));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 996;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 4 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
+
+  /**
+   * Test the select statement for sailors tables - "TRUE AND TRUE"
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors7() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 6));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 1000;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 3 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
+
+  /**
+   * Test the select statement for sailors tables - "TRUE AND FALSE"
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors8() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 7));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 0;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+  }
+
+  /**
+   * Test the select statement for sailors tables - "FALSE AND FALSE"
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testSelectSailors9() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 8));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 0;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
   }
 }

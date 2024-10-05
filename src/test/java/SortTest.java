@@ -21,15 +21,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class ScanTests {
+public class SortTest {
 
   private static List<Statement> statementList;
   private static QueryPlanBuilder queryPlanBuilder;
   private static Statements statements;
+  private int index = 16;
 
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {
-    ClassLoader classLoader = ScanTests.class.getClassLoader();
+    ClassLoader classLoader = SortTest.class.getClassLoader();
     URI path = Objects.requireNonNull(classLoader.getResource("samples/input")).toURI();
     Path resourcePath = Paths.get(path);
 
@@ -43,13 +44,13 @@ public class ScanTests {
   }
 
   /**
-   * Test the scan statement for sailors tables
+   * Test the sort statement for sailors tables - "single column"
    * 
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
-  public void testScanSailors() throws ExecutionControl.NotImplementedException {
-    Operator plan = queryPlanBuilder.buildPlan(statementList.get(0));
+  public void testSortSailors1() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 0));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
 
@@ -59,9 +60,9 @@ public class ScanTests {
 
     // Check the first 3 tuple
     Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 135, 109))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120)))
     };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
@@ -72,13 +73,13 @@ public class ScanTests {
   }
 
   /**
-   * Test the scan statement for boats
+   * Test the sort statement for sailors tables - "multiple column"
    * 
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
-  public void testScanBoats() throws ExecutionControl.NotImplementedException {
-    Operator plan = queryPlanBuilder.buildPlan(statementList.get(1));
+  public void testSortSailors2() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 1));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
 
@@ -88,9 +89,9 @@ public class ScanTests {
 
     // Check the first 3 tuple
     Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(12, 143, 196))),
-        new Tuple(new ArrayList<>(Arrays.asList(30, 63, 101))),
-        new Tuple(new ArrayList<>(Arrays.asList(57, 24, 130)))
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
     };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
@@ -101,13 +102,13 @@ public class ScanTests {
   }
 
   /**
-   * Test the scan statement for reserves
+   * Test the select statement for sailors tables - multiple columns
    * 
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
-  public void testScanReserves() throws ExecutionControl.NotImplementedException {
-    Operator plan = queryPlanBuilder.buildPlan(statementList.get(2));
+  public void testSortSailors3() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 2));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
 
@@ -117,9 +118,9 @@ public class ScanTests {
 
     // Check the first 3 tuple
     Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(164, 10))),
-        new Tuple(new ArrayList<>(Arrays.asList(13, 107))),
-        new Tuple(new ArrayList<>(Arrays.asList(75, 179)))
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
     };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {

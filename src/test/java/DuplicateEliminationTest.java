@@ -16,20 +16,21 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
+import operator.Operator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class P1UnitTests {
+public class DuplicateEliminationTest {
 
   private static List<Statement> statementList;
   private static QueryPlanBuilder queryPlanBuilder;
   private static Statements statements;
+  private int index = 19;
 
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {
-    ClassLoader classLoader = P1UnitTests.class.getClassLoader();
+    ClassLoader classLoader = DuplicateEliminationTest.class.getClassLoader();
     URI path = Objects.requireNonNull(classLoader.getResource("samples/input")).toURI();
     Path resourcePath = Paths.get(path);
 
@@ -42,5 +43,32 @@ public class P1UnitTests {
     statementList = statements.getStatements();
   }
 
-  // Moved all test cases to other classes by operators
+  /**
+   * Test the distinct statement for sailors tables - "single column"
+   * 
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testDistinctSailors1() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 0));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 198;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 3 tuple
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64))),
+        new Tuple(new ArrayList<>(Arrays.asList(181))),
+        new Tuple(new ArrayList<>(Arrays.asList(147)))
+    };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
 }

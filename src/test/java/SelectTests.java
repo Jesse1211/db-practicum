@@ -16,11 +16,11 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import physical_operator.Operator;
 
 public class SelectTests {
 
@@ -37,7 +37,8 @@ public class SelectTests {
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -45,7 +46,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A < Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A <
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A < Sailors.B")
   @Test
@@ -59,11 +61,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-        new Tuple(new ArrayList<>(Arrays.asList(75, 191, 192))),
-        new Tuple(new ArrayList<>(Arrays.asList(133, 197, 18)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+          new Tuple(new ArrayList<>(Arrays.asList(75, 191, 192))),
+          new Tuple(new ArrayList<>(Arrays.asList(133, 197, 18)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -73,7 +76,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A > Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A >
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A > Sailors.B")
   @Test
@@ -87,11 +91,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118))),
-        new Tuple(new ArrayList<>(Arrays.asList(81, 1, 195)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118))),
+          new Tuple(new ArrayList<>(Arrays.asList(81, 1, 195)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -101,7 +106,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A = Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A =
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A = Sailors.B")
   @Test
@@ -115,12 +121,13 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 4 tuples
-    Tuple[] expectedFirstFourTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(47, 47, 73))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 147, 111))),
-        new Tuple(new ArrayList<>(Arrays.asList(8, 8, 84))),
-        new Tuple(new ArrayList<>(Arrays.asList(78, 78, 50)))
-    };
+    Tuple[] expectedFirstFourTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(47, 47, 73))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 147, 111))),
+          new Tuple(new ArrayList<>(Arrays.asList(8, 8, 84))),
+          new Tuple(new ArrayList<>(Arrays.asList(78, 78, 50)))
+        };
 
     for (int i = 0; i < expectedFirstFourTuples.length; i++) {
       Tuple expectedTuple = expectedFirstFourTuples[i];
@@ -130,7 +137,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A <= Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A <=
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A <= Sailors.B")
   @Test
@@ -144,11 +152,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-        new Tuple(new ArrayList<>(Arrays.asList(75, 191, 192))),
-        new Tuple(new ArrayList<>(Arrays.asList(133, 197, 18))),
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+          new Tuple(new ArrayList<>(Arrays.asList(75, 191, 192))),
+          new Tuple(new ArrayList<>(Arrays.asList(133, 197, 18))),
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -158,7 +167,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A >= Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A >=
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A >= Sailors.B")
   @Test
@@ -172,11 +182,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118))),
-        new Tuple(new ArrayList<>(Arrays.asList(81, 1, 195)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118))),
+          new Tuple(new ArrayList<>(Arrays.asList(81, 1, 195)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -186,7 +197,8 @@ public class SelectTests {
   }
 
   /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A <> Sailors.B"
+   * Test the select statement for Sailors table - "SELECT * FROM Sailors where Sailors.A <>
+   * Sailors.B"
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A <> Sailors.B")
   @Test
@@ -200,11 +212,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+          new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -213,9 +226,7 @@ public class SelectTests {
     }
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=1"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=1" */
   @DisplayName("SELECT * FROM Sailors where 1=1 AND 1=1")
   @Test
   public void testSelectSailors7() throws ExecutionControl.NotImplementedException {
@@ -228,11 +239,12 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuples
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-        new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-        new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+          new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -241,9 +253,7 @@ public class SelectTests {
     }
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=0"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=0" */
   @DisplayName("SELECT * FROM Sailors where 1=1 AND 1=0")
   @Test
   public void testSelectSailors8() throws ExecutionControl.NotImplementedException {
@@ -256,9 +266,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=0 AND 1=0"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=0 AND 1=0" */
   @DisplayName("SELECT * FROM Sailors where 1=0 AND 1=0")
   @Test
   public void testSelectSailors9() throws ExecutionControl.NotImplementedException {
@@ -271,9 +279,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<2" */
   @DisplayName("SELECT * FROM Sailors where 1<2")
   @Test
   public void testSelectSailors10() throws ExecutionControl.NotImplementedException {
@@ -286,9 +292,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 3<2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 3<2" */
   @DisplayName("SELECT * FROM Sailors where 3<2")
   @Test
   public void testSelectSailors11() throws ExecutionControl.NotImplementedException {
@@ -301,9 +305,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1>2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1>2" */
   @DisplayName("SELECT * FROM Sailors where 1>2")
   @Test
   public void testSelectSailors12() throws ExecutionControl.NotImplementedException {
@@ -316,9 +318,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 3>2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 3>2" */
   @DisplayName("SELECT * FROM Sailors where 3>2")
   @Test
   public void testSelectSailors13() throws ExecutionControl.NotImplementedException {
@@ -331,9 +331,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<=2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<=2" */
   @DisplayName("SELECT * FROM Sailors where 1<=2")
   @Test
   public void testSelectSailors14() throws ExecutionControl.NotImplementedException {
@@ -346,9 +344,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 3<=2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 3<=2" */
   @DisplayName("SELECT * FROM Sailors where 3<=2")
   @Test
   public void testSelectSailors15() throws ExecutionControl.NotImplementedException {
@@ -361,9 +357,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1>=2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1>=2" */
   @DisplayName("SELECT * FROM Sailors where 1>=2")
   @Test
   public void testSelectSailors16() throws ExecutionControl.NotImplementedException {
@@ -376,9 +370,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 3>=2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 3>=2" */
   @DisplayName("SELECT * FROM Sailors where 3>=2")
   @Test
   public void testSelectSailors17() throws ExecutionControl.NotImplementedException {
@@ -391,9 +383,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=2" */
   @DisplayName("SELECT * FROM Sailors where 1=2")
   @Test
   public void testSelectSailors18() throws ExecutionControl.NotImplementedException {
@@ -406,9 +396,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1" */
   @DisplayName("SELECT * FROM Sailors where 1=1")
   @Test
   public void testSelectSailors19() throws ExecutionControl.NotImplementedException {
@@ -421,9 +409,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<>2"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<>2" */
   @DisplayName("SELECT * FROM Sailors where 1<>2")
   @Test
   public void testSelectSailors20() throws ExecutionControl.NotImplementedException {
@@ -436,9 +422,7 @@ public class SelectTests {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
 
-  /**
-   * Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<>1"
-   */
+  /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1<>1" */
   @DisplayName("SELECT * FROM Sailors where 1<>1")
   @Test
   public void testSelectSailors21() throws ExecutionControl.NotImplementedException {
@@ -450,5 +434,4 @@ public class SelectTests {
 
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
   }
-
 }

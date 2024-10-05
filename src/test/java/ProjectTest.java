@@ -16,10 +16,10 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import physical_operator.Operator;
 
 public class ProjectTest {
 
@@ -36,7 +36,8 @@ public class ProjectTest {
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -45,7 +46,7 @@ public class ProjectTest {
 
   /**
    * Test the project statement for sailors tables - "single column"
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -59,11 +60,12 @@ public class ProjectTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64))),
-        new Tuple(new ArrayList<>(Arrays.asList(181))),
-        new Tuple(new ArrayList<>(Arrays.asList(147)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64))),
+          new Tuple(new ArrayList<>(Arrays.asList(181))),
+          new Tuple(new ArrayList<>(Arrays.asList(147)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -72,10 +74,9 @@ public class ProjectTest {
     }
   }
 
-
   /**
    * Test the project statement for sailors tables - "single column"
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -89,11 +90,12 @@ public class ProjectTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(113))),
-        new Tuple(new ArrayList<>(Arrays.asList(128))),
-        new Tuple(new ArrayList<>(Arrays.asList(45)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(113))),
+          new Tuple(new ArrayList<>(Arrays.asList(128))),
+          new Tuple(new ArrayList<>(Arrays.asList(45)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -104,7 +106,7 @@ public class ProjectTest {
 
   /**
    * Test the select statement for sailors tables - multiple columns
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -118,11 +120,12 @@ public class ProjectTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-      new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
-      new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
-      new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
-  };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139))),
+          new Tuple(new ArrayList<>(Arrays.asList(181, 128, 129))),
+          new Tuple(new ArrayList<>(Arrays.asList(147, 45, 118)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -130,5 +133,4 @@ public class ProjectTest {
       Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
     }
   }
-
 }

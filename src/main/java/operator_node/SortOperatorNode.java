@@ -4,7 +4,7 @@ import common.OperatorNodeVisitor;
 import java.util.List;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
-public class SortOperatorNode extends OperatorNode{
+public class SortOperatorNode extends OperatorNode {
 
   private List<OrderByElement> elementOrders;
 

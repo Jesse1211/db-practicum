@@ -21,11 +21,11 @@ public class SortOperator extends Operator {
   /**
    * SelectOperator constructor
    *
-   * @param operator      scan | select | join operator
+   * @param operator scan | select | join operator
    * @param elementOrders list of ORDER BY elements
    */
-  public SortOperator(ArrayList<Column> outputSchema, Operator operator,
-          List<OrderByElement> elementOrders) {
+  public SortOperator(
+      ArrayList<Column> outputSchema, Operator operator, List<OrderByElement> elementOrders) {
     super(outputSchema);
     this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
     this.elementOrders = elementOrders;
@@ -36,25 +36,26 @@ public class SortOperator extends Operator {
   }
 
   private void sort() {
-    Collections.sort(tupleList, new Comparator<Tuple>() {
-      @Override
-      public int compare(Tuple t1, Tuple t2) {
-        for (OrderByElement elementOrder : elementOrders) {
-          Column column = (Column) elementOrder.getExpression();
-          int index = columnIndexMap.get(column.getName(true));
-          int compare = Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
-          if (compare != 0) {
-            return compare;
+    Collections.sort(
+        tupleList,
+        new Comparator<Tuple>() {
+          @Override
+          public int compare(Tuple t1, Tuple t2) {
+            for (OrderByElement elementOrder : elementOrders) {
+              Column column = (Column) elementOrder.getExpression();
+              int index = columnIndexMap.get(column.getName(true));
+              int compare =
+                  Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
+              if (compare != 0) {
+                return compare;
+              }
+            }
+            return 0;
           }
-        }
-        return 0;
-      }
-    });
+        });
   }
 
-  /**
-   * Re-initialize iterator
-   */
+  /** Re-initialize iterator */
   @Override
   public void reset() {
     it = tupleList.iterator();

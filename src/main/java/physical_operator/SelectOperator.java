@@ -24,7 +24,8 @@ public class SelectOperator extends Operator {
    * @param childOperator scan operator
    * @param whereExpression WHERE expressions as 'Table.column = value' expression
    */
-  public SelectOperator(ArrayList<Column> outputSchema, Operator childOperator, Expression whereExpression) {
+  public SelectOperator(
+      ArrayList<Column> outputSchema, Operator childOperator, Expression whereExpression) {
     super(outputSchema);
     this.childOperator = childOperator;
     this.whereExpression = whereExpression;
@@ -44,7 +45,7 @@ public class SelectOperator extends Operator {
   public Tuple getNextTuple() {
     Tuple tuple;
 
-    while((tuple = childOperator.getNextTuple()) != null) {
+    while ((tuple = childOperator.getNextTuple()) != null) {
       ExpressionEvaluator evaluator = new ExpressionEvaluator(tuple, columnIndexMap);
       whereExpression.accept(evaluator);
       boolean result = evaluator.getResult();

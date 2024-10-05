@@ -20,8 +20,7 @@ public class OperatorNodeEvaluator implements OperatorNodeVisitor {
 
   private Operator operator;
 
-  public OperatorNodeEvaluator() {
-  }
+  public OperatorNodeEvaluator() {}
 
   /**
    * @param node

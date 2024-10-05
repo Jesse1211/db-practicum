@@ -2,8 +2,6 @@ package operator_node;
 
 import common.OperatorNodeVisitor;
 import java.util.ArrayList;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
-import net.sf.jsqlparser.schema.Column;
 
 public class JoinOperatorNode extends OperatorNode {
   private OperatorNode leftChildNode;
@@ -45,8 +43,9 @@ public class JoinOperatorNode extends OperatorNode {
   }
 
   @Override
-  public OperatorNode getChildNode(){
-    System.out.println("JoinOperator should not have a single child, used getLeftChildNode and getRightChildNode instead.");
+  public OperatorNode getChildNode() {
+    System.out.println(
+        "JoinOperator should not have a single child, used getLeftChildNode and getRightChildNode instead.");
     return null;
   }
 }

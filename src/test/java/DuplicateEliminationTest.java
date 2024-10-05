@@ -16,10 +16,10 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import physical_operator.Operator;
 
 public class DuplicateEliminationTest {
 
@@ -36,7 +36,8 @@ public class DuplicateEliminationTest {
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -45,7 +46,7 @@ public class DuplicateEliminationTest {
 
   /**
    * Test the distinct statement for sailors tables - "single column"
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -59,11 +60,12 @@ public class DuplicateEliminationTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(64))),
-        new Tuple(new ArrayList<>(Arrays.asList(181))),
-        new Tuple(new ArrayList<>(Arrays.asList(147)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(64))),
+          new Tuple(new ArrayList<>(Arrays.asList(181))),
+          new Tuple(new ArrayList<>(Arrays.asList(147)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];

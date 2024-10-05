@@ -2,7 +2,6 @@ package operator_node;
 
 import common.OperatorNodeVisitor;
 import java.util.ArrayList;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import net.sf.jsqlparser.schema.Column;
 
 public abstract class OperatorNode {
@@ -20,7 +19,7 @@ public abstract class OperatorNode {
     this.outputSchema = outputSchema;
   }
 
-  public OperatorNode getChildNode(){
+  public OperatorNode getChildNode() {
     return childNode;
   }
 
@@ -35,5 +34,4 @@ public abstract class OperatorNode {
   public void setParentNode(OperatorNode parentNode) {
     this.parentNode = parentNode;
   }
-
 }

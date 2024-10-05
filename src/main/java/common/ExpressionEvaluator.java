@@ -19,7 +19,9 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
   private Tuple tuple;
   private Map<String, Integer> columnIndexMap;
   private boolean result;
-  private int value;  /**
+  private int value;
+
+  /**
    * constructor of ExpressionEvaluator
    *
    * @param tuple current tuple
@@ -30,8 +32,7 @@ public class ExpressionEvaluator extends ExpressionVisitorAdapter {
     this.columnIndexMap = columnIndexMap;
   }
 
-  public ExpressionEvaluator() {
-  }
+  public ExpressionEvaluator() {}
 
   /**
    * get the result from this expression evaluator

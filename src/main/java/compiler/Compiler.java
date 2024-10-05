@@ -9,8 +9,8 @@ import java.nio.file.Paths;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
 import org.apache.logging.log4j.*;
+import physical_operator.Operator;
 
 /**
  * Top level harness class; reads queries from an input file one at a time, processes them and sends

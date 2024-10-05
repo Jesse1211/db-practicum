@@ -16,10 +16,10 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
-import physical_operator.Operator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import physical_operator.Operator;
 
 public class SortTest {
 
@@ -36,7 +36,8 @@ public class SortTest {
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -45,7 +46,7 @@ public class SortTest {
 
   /**
    * Test the sort statement for sailors tables - "single column"
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -59,11 +60,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 135, 109))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 135, 109))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -74,7 +76,7 @@ public class SortTest {
 
   /**
    * Test the sort statement for sailors tables - "multiple column"
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -88,11 +90,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -103,7 +106,7 @@ public class SortTest {
 
   /**
    * Test the select statement for sailors tables - multiple columns
-   * 
+   *
    * @throws ExecutionControl.NotImplementedException
    */
   @Test
@@ -117,11 +120,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -129,5 +133,4 @@ public class SortTest {
       Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
     }
   }
-
 }

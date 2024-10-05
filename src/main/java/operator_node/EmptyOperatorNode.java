@@ -2,7 +2,7 @@ package operator_node;
 
 import common.OperatorNodeVisitor;
 
-public class EmptyOperatorNode extends OperatorNode{
+public class EmptyOperatorNode extends OperatorNode {
 
   /**
    * @param operatorNodeVisitor

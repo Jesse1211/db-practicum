@@ -3,7 +3,7 @@ package operator_node;
 import common.OperatorNodeVisitor;
 import net.sf.jsqlparser.expression.Expression;
 
-public class SelectOperatorNode extends OperatorNode{
+public class SelectOperatorNode extends OperatorNode {
 
   private Expression whereExpression;
 

@@ -24,10 +24,7 @@ import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
 
-/**
- * Class to translate a JSQLParser statement into a relational algebra query plan.
- *
- **/
+/** Class to translate a JSQLParser statement into a relational algebra query plan. */
 public class LogicalPlanBuilder {
   public static OperatorNode buildPlan(Statement stmt) {
     // https://github.com/JSQLParser/JSqlParser/wiki/Examples-of-SQL-parsing
@@ -40,13 +37,14 @@ public class LogicalPlanBuilder {
 
     OperatorNode operatorNode;
     if (joins != null) {
-      operatorNode =  buildMultiTablePlan(whereExpression, allTables);
+      operatorNode = buildMultiTablePlan(whereExpression, allTables);
     } else {
       operatorNode = buildSingleTablePlan(whereExpression, table);
     }
 
     // select * does not require projection, we can skip that.
-    if (plainSelect.getSelectItems().size() > 1 || !(plainSelect.getSelectItems().getFirst() instanceof AllColumns)) {
+    if (plainSelect.getSelectItems().size() > 1
+        || !(plainSelect.getSelectItems().getFirst() instanceof AllColumns)) {
       operatorNode = new ProjectOperatorNode(operatorNode, plainSelect.getSelectItems());
     }
 
@@ -60,7 +58,6 @@ public class LogicalPlanBuilder {
     return operatorNode;
   }
 
-
   private static OperatorNode buildSingleTablePlan(Expression whereExpression, Table table) {
     OperatorNode operatorNode = new ScanOperatorNode(table);
     if (whereExpression != null) {
@@ -69,8 +66,8 @@ public class LogicalPlanBuilder {
     return operatorNode;
   }
 
-
-  private static OperatorNode buildMultiTablePlan(Expression whereExpression, ArrayList<Table> allTables) {
+  private static OperatorNode buildMultiTablePlan(
+      Expression whereExpression, ArrayList<Table> allTables) {
     ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
     Map<String, Expression> tableWhereExpressionMap = new HashMap<>();
     Expression joinWhereExpression = null;
@@ -81,7 +78,8 @@ public class LogicalPlanBuilder {
     for (ComparisonOperator comparisonOperator : flattened) {
 
       // Get 2 table names from the comparison operator
-      Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparisonOperator);
+      Pair<String, String> tableNamePair =
+          HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
       String rightTableName = tableNamePair.getRight();
 
@@ -93,7 +91,9 @@ public class LogicalPlanBuilder {
         } else {
           valueWhereExpression = new AndExpression(valueWhereExpression, comparisonOperator);
         }
-      } else if (leftTableName == null  || rightTableName == null || leftTableName.equals(rightTableName)) {
+      } else if (leftTableName == null
+          || rightTableName == null
+          || leftTableName.equals(rightTableName)) {
         // if same-table comparison or one table or both table name are the same, then no join
         // needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
@@ -113,12 +113,12 @@ public class LogicalPlanBuilder {
       }
     }
 
-
-    // evaluate value comparisons like 42 = 42 or 21 > 40. If it's false, the result will be empty */
+    // evaluate value comparisons like 42 = 42 or 21 > 40. If it's false, the result will be empty
+    // */
     if (valueWhereExpression != null) {
-      ExpressionEvaluator evaluator =  new ExpressionEvaluator();
+      ExpressionEvaluator evaluator = new ExpressionEvaluator();
       valueWhereExpression.accept(evaluator);
-      if (evaluator.getResult() == false){
+      if (evaluator.getResult() == false) {
         return new EmptyOperatorNode();
       }
     }
@@ -141,13 +141,14 @@ public class LogicalPlanBuilder {
     while (deque.size() > 1) {
       OperatorNode leftChildOperatorNode = deque.poll();
       OperatorNode rightChildOperatorNode = deque.poll();
-      assert(leftChildOperatorNode != null && rightChildOperatorNode != null);
-      OperatorNode operatorNode = new JoinOperatorNode(leftChildOperatorNode, rightChildOperatorNode);
+      assert (leftChildOperatorNode != null && rightChildOperatorNode != null);
+      OperatorNode operatorNode =
+          new JoinOperatorNode(leftChildOperatorNode, rightChildOperatorNode);
       deque.addFirst(operatorNode); // stack back to the queue
     }
 
     OperatorNode operatorNode = deque.poll();
-    assert(operatorNode != null);
+    assert (operatorNode != null);
 
     if (joinWhereExpression != null) {
       // if there is a join comparison, should evaluate.

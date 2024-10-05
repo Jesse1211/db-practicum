@@ -10,7 +10,7 @@ import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-public class ProjectOperatorNode extends OperatorNode{
+public class ProjectOperatorNode extends OperatorNode {
 
   private final Map<String, Integer> columnIndexMap;
   private List<SelectItem> selectItems;

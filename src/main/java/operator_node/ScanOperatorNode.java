@@ -2,9 +2,6 @@ package operator_node;
 
 import common.DBCatalog;
 import common.OperatorNodeVisitor;
-import java.util.ArrayList;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 
 public class ScanOperatorNode extends OperatorNode {

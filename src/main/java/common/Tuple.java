@@ -3,15 +3,13 @@ package common;
 import java.util.ArrayList;
 
 /**
- * Class to encapsulate functionality about a database tuple. A tuple is an
- * ArrayList of integers.
+ * Class to encapsulate functionality about a database tuple. A tuple is an ArrayList of integers.
  */
 public class Tuple {
   ArrayList<Integer> tupleArray;
 
   /**
-   * Creates a tuple using string representation of the tuple. Delimiter between
-   * the columns is a
+   * Creates a tuple using string representation of the tuple. Delimiter between the columns is a
    * comma.
    *
    * @param s String representation of the tuple.
@@ -35,7 +33,7 @@ public class Tuple {
 
   /**
    * Creates a tuple using an array of integers.
-   * 
+   *
    * @param elements Array with elements of the tuple, in order
    */
   public Tuple(int[] elements) {
@@ -80,8 +78,7 @@ public class Tuple {
   /**
    * Returns a string representation of the tuple.
    *
-   * @return string representation of the tuple, with attributes separated by
-   *         commas.
+   * @return string representation of the tuple, with attributes separated by commas.
    */
   @Override
   public String toString() {
@@ -114,8 +111,7 @@ public class Tuple {
   }
 
   /**
-   * Concatenate another tuple subsequent this tuple. Ex: a = (1, 1), a.concat(2,
-   * 3) = new Tuple (1,
+   * Concatenate another tuple subsequent this tuple. Ex: a = (1, 1), a.concat(2, 3) = new Tuple (1,
    * 1, 2, 3)
    *
    * @param tuple tuple to concatenate

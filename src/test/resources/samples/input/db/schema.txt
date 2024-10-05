@@ -3,3 +3,6 @@ Boats D E F
 Reserves G H
 DB1 A B
 DB2 G H
+Sailors_humanreadable A B C
+Boats_humanreadable D E F
+Reserves_humanreadable G H

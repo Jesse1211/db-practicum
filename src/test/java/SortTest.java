@@ -26,7 +26,7 @@ public class SortTest {
   private static List<Statement> statementList;
   private static QueryPlanBuilder queryPlanBuilder;
   private static Statements statements;
-  private int index = 16;
+  private int index = 28;
 
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {

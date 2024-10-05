@@ -26,7 +26,7 @@ public class DuplicateEliminationTest {
   private static List<Statement> statementList;
   private static QueryPlanBuilder queryPlanBuilder;
   private static Statements statements;
-  private int index = 19;
+  private int index = 31;
 
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {

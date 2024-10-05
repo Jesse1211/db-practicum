@@ -23,7 +23,6 @@ import operator_node.ProjectOperatorNode;
 import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
-import physical_operator.EmptyOperator;
 
 /**
  * Class to translate a JSQLParser statement into a relational algebra query plan.

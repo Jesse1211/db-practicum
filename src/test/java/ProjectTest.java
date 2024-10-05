@@ -26,7 +26,7 @@ public class ProjectTest {
   private static List<Statement> statementList;
   private static QueryPlanBuilder queryPlanBuilder;
   private static Statements statements;
-  private int index = 12;
+  private int index = 24;
 
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {

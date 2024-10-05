@@ -1,10 +1,12 @@
-package operator;
+package physical_operator;
 
 import common.ExpressionEvaluator;
 import common.HelperMethods;
 import common.Tuple;
+import java.util.ArrayList;
 import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
 
 /**
  * An operator for WHERE. Only return the tuples that matches the comparison expression (only when
@@ -22,8 +24,8 @@ public class SelectOperator extends Operator {
    * @param childOperator scan operator
    * @param whereExpression WHERE expressions as 'Table.column = value' expression
    */
-  public SelectOperator(Operator childOperator, Expression whereExpression) {
-    super(childOperator.getOutputSchema());
+  public SelectOperator(ArrayList<Column> outputSchema, Operator childOperator, Expression whereExpression) {
+    super(outputSchema);
     this.childOperator = childOperator;
     this.whereExpression = whereExpression;
     this.columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
@@ -42,16 +44,12 @@ public class SelectOperator extends Operator {
   public Tuple getNextTuple() {
     Tuple tuple;
 
-    if ((tuple = childOperator.getNextTuple()) != null) {
-      // Use ExpressionEvaluator to evaluate tuple, if the condition matches, return
-      // the tuple。 Otherwise, continue checking the next tuple.
+    while((tuple = childOperator.getNextTuple()) != null) {
       ExpressionEvaluator evaluator = new ExpressionEvaluator(tuple, columnIndexMap);
       whereExpression.accept(evaluator);
       boolean result = evaluator.getResult();
       if (result) {
         return tuple;
-      } else {
-        return getNextTuple();
       }
     }
     return null;

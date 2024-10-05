@@ -1,7 +1,8 @@
-package operator;
+package physical_operator;
 
 import common.Tuple;
 import java.util.*;
+import net.sf.jsqlparser.schema.Column;
 
 /**
  * An operator for DISTINCT, used to eliminate duplicate tuples. It uses a set to track visited
@@ -16,8 +17,8 @@ public class DuplicateEliminationOperator extends Operator {
    *
    * @param operator child operator, this is invoked as last operator in plan builder
    */
-  public DuplicateEliminationOperator(Operator operator) {
-    super(operator.getOutputSchema());
+  public DuplicateEliminationOperator(ArrayList<Column> outputSchema, Operator operator) {
+    super(outputSchema);
     this.operator = operator;
   }
 

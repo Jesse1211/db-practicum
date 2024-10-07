@@ -39,7 +39,8 @@ public class ParserExample {
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
     URI queriesUri =
-        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql")).toURI();
+        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
+            .toURI();
     Path queriesFilePath = Paths.get(queriesUri);
 
     Statements statements = CCJSqlParserUtil.parseStatements(Files.readString(queriesFilePath));

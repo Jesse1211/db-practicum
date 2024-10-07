@@ -20,8 +20,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
 
   private Operator operator;
 
-  public PhysicalPlanBuilder() {
-  }
+  public PhysicalPlanBuilder() {}
 
   /**
    * @param node

@@ -1,9 +1,9 @@
 package compiler;
 
+import common.BinaryHandler;
 import common.DBCatalog;
 import common.QueryPlanBuilder;
 import java.io.File;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -53,7 +53,9 @@ public class Compiler {
 
           if (outputToFiles) {
             File outfile = new File(outputDir + "/query" + counter);
-            plan.dump(new PrintStream(outfile));
+            System.currentTimeMillis();
+            plan.dump(new BinaryHandler(outfile));
+            System.currentTimeMillis();
           } else {
             plan.dump(System.out);
           }

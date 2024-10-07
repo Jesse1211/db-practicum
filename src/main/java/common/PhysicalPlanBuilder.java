@@ -16,11 +16,12 @@ import physical_operator.ScanOperator;
 import physical_operator.SelectOperator;
 import physical_operator.SortOperator;
 
-public class OperatorNodeEvaluator implements OperatorNodeVisitor {
+public class PhysicalPlanBuilder implements OperatorNodeVisitor {
 
   private Operator operator;
 
-  public OperatorNodeEvaluator() {}
+  public PhysicalPlanBuilder() {
+  }
 
   /**
    * @param node

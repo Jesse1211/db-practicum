@@ -32,8 +32,8 @@ public class QueryPlanBuilder {
     OperatorNode root = LogicalPlanBuilder.buildPlan(stmt);
 
     // Translate to physical plan
-    OperatorNodeEvaluator evaluator = new OperatorNodeEvaluator();
-    root.accept(evaluator);
-    return evaluator.getResult();
+    PhysicalPlanBuilder planBuilder = new PhysicalPlanBuilder();
+    root.accept(planBuilder);
+    return planBuilder.getResult();
   }
 }

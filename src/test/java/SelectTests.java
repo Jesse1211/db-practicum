@@ -38,7 +38,7 @@ public class SelectTests {
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
 
     URI queriesFile =
-        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
+        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();

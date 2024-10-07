@@ -1,10 +1,14 @@
 package common;
 
+import java.util.ArrayList;
+
 public interface TupleReader {
 
-  public Tuple readNextTuple();
+    public Tuple readNextTuple();
 
-  public void close();
+    public ArrayList<Tuple> readAllTuples();
 
-  public void reset();
+    public void close();
+
+    public void reset();
 }

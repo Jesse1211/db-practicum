@@ -60,16 +60,18 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       return tuples;
     }
 
-    /**
-     * Read one tuple from a file at a time
-     */
-    @Override
-    public Tuple readNextTuple() {
-        if (this.offset == this.tupleNum * this.attributeNum + 2) {
-            if (!loadNextPage()) {
-                return null;
-            }
-        }
+  /** Read one tuple from a file at a time */
+  @Override
+  public Tuple readNextTuple() {
+    if (this.offset == 0 || this.tupleNum == 0 || this.attributeNum == 0) {
+      return null;
+    }
+
+    if (this.offset == this.tupleNum * this.attributeNum + 2) {
+      if (!loadNextPage()) {
+        return null;
+      }
+    }
 
         int tupleSize = this.attributeNum;
         int[] tupleArray = new int[tupleSize];

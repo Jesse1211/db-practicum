@@ -2,6 +2,7 @@ package common;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -18,6 +19,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
   private int offset;
 
   private FileInputStream fileInputStream;
+  private FileOutputStream fileOutputStream;
   private FileChannel fileChannel;
   private ByteBuffer byteBuffer;
 
@@ -36,11 +38,13 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   public BinaryHandler(File file) {
     try {
-      this.fileInputStream = new FileInputStream(file);
-      this.fileChannel = fileInputStream.getChannel();
+      file.createNewFile();
+      this.fileOutputStream = new FileOutputStream(file);
+      this.fileChannel = fileOutputStream.getChannel();
       this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
       this.offset = 0;
-      loadNextPage();
+      this.attributeNum = 0;
+      this.tupleNum = 0;
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
@@ -103,45 +107,60 @@ public class BinaryHandler implements TupleWriter, TupleReader {
    */
   @Override
   public void writeTuple(Tuple tuple) {
-    // TODO: 如果没满但是不够放下这个tuple???
-    if (this.offset == this.bufferCapacity) {
+    if (this.offset != 0 && this.offset + this.attributeNum * 4 >= this.bufferCapacity / 4) {
       writeNextPage();
+    }
+
+    if (this.offset == 0) {
+      prepareAttribues(tuple.getSize());
     }
 
     int[] tupleArray = tuple.getAllElementsAsArray();
 
-    this.byteBuffer.asIntBuffer().put(attributeNum, tupleArray);
-    this.offset += tupleArray.length * 4;
+    this.tupleNum++;
+    this.byteBuffer.asIntBuffer().put(this.offset, tupleArray);
+    this.offset += this.attributeNum * 4;
   }
 
   /** Write the current page to the file, Load the next page */
   private void writeNextPage() {
-    this.byteBuffer.flip();
     try {
-      fileChannel.write(byteBuffer);
+      this.byteBuffer.asIntBuffer().put(4, this.tupleNum);
+
+      this.byteBuffer.flip(); // Prepare the buffer for writing to the file
+
+      fileChannel.write(this.byteBuffer); // Write the flipped buffer to the file
+
+      this.byteBuffer.clear(); // Clear buffer for the next load
+      this.offset = 0;
+
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      System.out.println(e.getMessage());
     }
-    this.byteBuffer.clear();
-    this.offset = 0;
-    try {
-      int fileReadLength = fileChannel.read(byteBuffer);
-      if (fileReadLength == -1) {
-        return;
-      }
-      this.byteBuffer.flip();
-      this.attributeNum = this.byteBuffer.asIntBuffer().get(0);
-      this.tupleNum = this.byteBuffer.asIntBuffer().get(1);
-      this.offset += 4 * 2;
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-    }
+  }
+
+  /** Prepare the attributes of the file */
+  private void prepareAttribues(int attributeNum) {
+    this.offset = 8; // skip space for attributeNum and tupleNum
+    this.attributeNum = attributeNum;
+    this.byteBuffer.asIntBuffer().put(0, attributeNum);
+    this.byteBuffer.asIntBuffer().put(4, 0);
   }
 
   @Override
   public void close() {
     try {
-      this.fileInputStream.close();
+      if (this.offset != 0 && this.fileOutputStream != null) {
+        writeNextPage();
+      }
+
+      if (this.fileOutputStream != null) {
+        this.fileOutputStream.close();
+      }
+
+      if (this.fileInputStream != null) {
+        this.fileInputStream.close();
+      }
     } catch (Exception e) {
       logger.error(e.getMessage());
     }

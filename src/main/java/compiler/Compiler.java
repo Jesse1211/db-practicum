@@ -35,7 +35,7 @@ public class Compiler {
     outputDir = args[1];
     DBCatalog.getInstance().setDataDirectory(inputDir + "/db");
     try {
-      String str = Files.readString(Paths.get(inputDir + "/queries.sql"));
+      String str = Files.readString(Paths.get(inputDir + "/customized_queries.sql"));
       Statements statements = CCJSqlParserUtil.parseStatements(str);
       QueryPlanBuilder queryPlanBuilder = new QueryPlanBuilder();
 
@@ -62,7 +62,7 @@ public class Compiler {
         } catch (Exception e) {
           logger.error(e.getMessage());
         }
-
+        System.err.println("------------------------");
         ++counter;
       }
     } catch (Exception e) {

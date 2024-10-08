@@ -124,4 +124,8 @@ public class Tuple {
 
     return new Tuple(tupleArray);
   }
+
+  public int getSize() {
+    return tupleArray.size();
+  }
 }

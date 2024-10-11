@@ -17,19 +17,18 @@ import physical_operator.SelectOperator;
 import physical_operator.SortOperator;
 
 /**
- * PhysicalPlanBuilder is a class to build the physical query plan based on
- * relational algebra query plan.
+ * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra query
+ * plan.
  */
 public class PhysicalPlanBuilder implements OperatorNodeVisitor {
 
   private Operator operator;
 
   /**
-   * PhysicalPlanBuilder is a class to build the physical query plan based on
-   * relational algebra query plan.
+   * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra
+   * query plan.
    */
-  public PhysicalPlanBuilder() {
-  }
+  public PhysicalPlanBuilder() {}
 
   /**
    * @param node
@@ -41,7 +40,6 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   }
 
   /**
-   * 
    * @param node
    */
   @Override

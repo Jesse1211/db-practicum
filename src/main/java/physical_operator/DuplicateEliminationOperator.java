@@ -5,8 +5,7 @@ import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
 /**
- * An operator for DISTINCT, used to eliminate duplicate tuples. It uses a set
- * to track visited
+ * An operator for DISTINCT, used to eliminate duplicate tuples. It uses a set to track visited
  * tuples, and if a tuple is already in the set, skip the one.
  */
 public class DuplicateEliminationOperator extends Operator {
@@ -16,8 +15,7 @@ public class DuplicateEliminationOperator extends Operator {
   /**
    * DuplicateEliminationOperator constructor
    *
-   * @param operator child operator, this is invoked as last operator in plan
-   *                 builder
+   * @param operator child operator, this is invoked as last operator in plan builder
    */
   public DuplicateEliminationOperator(ArrayList<Column> outputSchema, Operator operator) {
     super(outputSchema);

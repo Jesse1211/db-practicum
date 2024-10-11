@@ -11,8 +11,7 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 /**
- * ProjectOperatorNode is a class to represent the project operator nodes in the
- * logical query plan.
+ * ProjectOperatorNode is a class to represent the project operator nodes in the logical query plan.
  */
 public class ProjectOperatorNode extends OperatorNode {
 
@@ -21,8 +20,8 @@ public class ProjectOperatorNode extends OperatorNode {
 
   /**
    * Set the node as the child to project operator
-   * 
-   * @param childNode   the child node of the project operator
+   *
+   * @param childNode the child node of the project operator
    * @param selectItems the items to be projected from the select statement
    */
   public ProjectOperatorNode(OperatorNode childNode, List<SelectItem> selectItems) {
@@ -35,7 +34,7 @@ public class ProjectOperatorNode extends OperatorNode {
 
   /**
    * Get the select items of the project operator node
-   * 
+   *
    * @return the select items of the project operator node
    */
   public List<SelectItem> getSelectItems() {
@@ -44,7 +43,7 @@ public class ProjectOperatorNode extends OperatorNode {
 
   /**
    * Set the select items of the project operator node
-   * 
+   *
    * @param selectItems the expected select items of the project operator node
    */
   public void setSelectItems(List<SelectItem> selectItems) {
@@ -52,9 +51,7 @@ public class ProjectOperatorNode extends OperatorNode {
     updateOutputSchema();
   }
 
-  /**
-   * updates the output schema based on select items from the select statement.
-   */
+  /** updates the output schema based on select items from the select statement. */
   private void updateOutputSchema() {
     ArrayList<Column> outputSchema = new ArrayList<>();
     for (SelectItem item : selectItems) {

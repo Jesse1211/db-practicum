@@ -18,9 +18,9 @@ public class TextHandler implements TupleWriter, TupleReader {
   private BufferedWriter bufferedWriter;
 
   /**
-   * Use TextHandler to read/write (human-readable) tuples to a (human-readable)
-   * file according to tableName
-   * 
+   * Use TextHandler to read/write (human-readable) tuples to a (human-readable) file according to
+   * tableName
+   *
    * @param tableName
    */
   public TextHandler(String tableName) {
@@ -34,9 +34,9 @@ public class TextHandler implements TupleWriter, TupleReader {
   }
 
   /**
-   * Use TextHandler to read/write (human-readable) tuples to a (human-readable)
-   * file according to file
-   * 
+   * Use TextHandler to read/write (human-readable) tuples to a (human-readable) file according to
+   * file
+   *
    * @param file
    */
   public TextHandler(File file) {
@@ -50,7 +50,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   /**
    * Read all tuples from a file
-   * 
+   *
    * @return an ArrayList for all tuples
    */
   @Override
@@ -65,7 +65,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   /**
    * Read the next tuple from the file
-   * 
+   *
    * @return the next tuple, or null if no more tuples
    */
   @Override
@@ -85,7 +85,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   /**
    * Write a tuple to the file
-   * 
+   *
    * @param tuple the tuple to write to the file for one row
    */
   @Override
@@ -99,7 +99,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   /**
    * Close the file
-   * 
+   *
    * @throws IOException caused by buffer reader
    */
   @Override
@@ -113,7 +113,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   /**
    * Reset the file
-   * 
+   *
    * @throws IOException caused by buffer reader
    */
   @Override

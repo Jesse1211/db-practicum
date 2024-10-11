@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * A class to handle binary files. It reads OR writes (binary) tuples to a
- * (binary) file.
- */
+/** A class to handle binary files. It reads OR writes (binary) tuples to a (binary) file. */
 public class BinaryHandler implements TupleWriter, TupleReader {
   protected final Logger logger = LogManager.getLogger();
   private final int bufferCapacity = 4096;
@@ -29,7 +26,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Use BinaryHandler to read/write tuples to a file according to tableName
-   * 
+   *
    * @param tableName
    */
   public BinaryHandler(String tableName) {
@@ -39,7 +36,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Use BinaryHandler to read/write tuples to a file according to file
-   * 
+   *
    * @param file
    */
   public BinaryHandler(File file) {
@@ -49,7 +46,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Read all tuples from a file
-   * 
+   *
    * @return an ArrayList for all tuples
    */
   @Override
@@ -63,9 +60,9 @@ public class BinaryHandler implements TupleWriter, TupleReader {
   }
 
   /**
-   * Read one tuple from a file at a time. It will return null if there is no more
-   * tuple to read. And it will handle the file reading process.
-   * 
+   * Read one tuple from a file at a time. It will return null if there is no more tuple to read.
+   * And it will handle the file reading process.
+   *
    * @return the row in this file
    * @throws IOException caused by file reading for writing
    */
@@ -93,9 +90,8 @@ public class BinaryHandler implements TupleWriter, TupleReader {
   }
 
   /**
-   * Load the next page of the file for reading, update the attributeNum,
-   * tupleNum, and offset
-   * 
+   * Load the next page of the file for reading, update the attributeNum, tupleNum, and offset
+   *
    * @return true if the next page is loaded successfully, false otherwise
    * @throws IOException caused by file reading for writing or byte buffer
    */
@@ -157,7 +153,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Write the current page to the file, Load the next page by
-   * 
+   *
    * @return void
    * @throws IOException caused by file writing
    */
@@ -182,7 +178,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Write potential tuples, Close the file input stream and file output stream
-   * 
+   *
    * @return void
    * @throws IOException caused by file writing / reading / closing
    */
@@ -207,7 +203,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   /**
    * Reset the file to the beginning
-   * 
+   *
    * @return void
    * @throws IOException caused by file reading or byte buffer
    */

@@ -24,10 +24,7 @@ import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
 
-/**
- * Class to translate a JSQLParser statement into a relational algebra query
- * plan.
- */
+/** Class to translate a JSQLParser statement into a relational algebra query plan. */
 public class LogicalPlanBuilder {
 
   /**
@@ -72,7 +69,7 @@ public class LogicalPlanBuilder {
    * Build a query plan for a single table
    *
    * @param whereExpression the where expression from the query
-   * @param table           the table to build the plan for
+   * @param table the table to build the plan for
    * @return the root of the query plan
    */
   private static OperatorNode buildSingleTablePlan(Expression whereExpression, Table table) {
@@ -87,7 +84,7 @@ public class LogicalPlanBuilder {
    * Build a query plan for multiple tables (joins)
    *
    * @param whereExpression the where expression from the query
-   * @param allTables       all tables in the query
+   * @param allTables all tables in the query
    * @return the root of the query plan
    */
   private static OperatorNode buildMultiTablePlan(
@@ -104,7 +101,8 @@ public class LogicalPlanBuilder {
     for (ComparisonOperator comparisonOperator : flattened) {
 
       // Get 2 table names from the comparison operator
-      Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparisonOperator);
+      Pair<String, String> tableNamePair =
+          HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
       String rightTableName = tableNamePair.getRight();
 

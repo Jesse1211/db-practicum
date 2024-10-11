@@ -38,7 +38,6 @@ public class JoinOperator extends Operator {
     leftTuple = leftChildOperator.getNextTuple();
   }
 
-
   /**
    * for each left tuple, concatenate with each of the right tuples.
    *

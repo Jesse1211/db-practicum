@@ -4,10 +4,7 @@ import common.OperatorNodeVisitor;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Column;
 
-/**
- * OperatorNode is a class to represent the operator nodes in the logical query
- * plan.
- */
+/** OperatorNode is a class to represent the operator nodes in the logical query plan. */
 public abstract class OperatorNode {
   protected ArrayList<Column> outputSchema;
   protected OperatorNode childNode;
@@ -21,16 +18,16 @@ public abstract class OperatorNode {
   }
 
   /**
-   * Visit the current class by the operatorNodeVisitor, next step should accept
-   * the child's node in a recursive manner
-   * 
+   * Visit the current class by the operatorNodeVisitor, next step should accept the child's node in
+   * a recursive manner
+   *
    * @param operatorNodeVisitor
    */
   public abstract void accept(OperatorNodeVisitor operatorNodeVisitor);
 
   /**
    * Set the output schema of the operator node
-   * 
+   *
    * @param outputSchema the expected output schema of the operator node
    */
   public void setOutputSchema(ArrayList<Column> outputSchema) {
@@ -39,7 +36,7 @@ public abstract class OperatorNode {
 
   /**
    * Get the child node of the operator node
-   * 
+   *
    * @return the child node of the operator node
    */
   public OperatorNode getChildNode() {
@@ -48,7 +45,7 @@ public abstract class OperatorNode {
 
   /**
    * Set the child node of the operator node
-   * 
+   *
    * @param childNode the expected child node of the operator node
    */
   public void setChildNode(OperatorNode childNode) {
@@ -57,7 +54,7 @@ public abstract class OperatorNode {
 
   /**
    * Get the parent node of the operator node
-   * 
+   *
    * @return the parent node of the operator node
    */
   public OperatorNode getParentNode() {
@@ -66,7 +63,7 @@ public abstract class OperatorNode {
 
   /**
    * Set the parent node of the operator node
-   * 
+   *
    * @param parentNode the expected parent node of the operator node
    */
   public void setParentNode(OperatorNode parentNode) {

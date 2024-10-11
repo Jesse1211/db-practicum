@@ -7,8 +7,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 /**
- * An operator for SELECT, only returns the columns stated in the select
- * expression. It will also
+ * An operator for SELECT, only returns the columns stated in the select expression. It will also
  * update the output schema based on the select expression.
  */
 public class ProjectOperator extends Operator {

@@ -10,8 +10,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import jdk.jshell.spi.ExecutionControl;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -247,11 +249,10 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-    //    for (int i = 0; i < expectedTuples.size(); i++) {
-    //      Tuple expectedTuple = expectedTuples.get(i);
-    //      Tuple actualTuple = tuples.get(i);
-    //      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-    //    }
+    Set<Tuple> expectedSet = new HashSet<>(expectedTuples);
+    Set<Tuple> actualSet = new HashSet<>(tuples);
+
+    Assertions.assertEquals(expectedSet, actualSet, "Unexpected tuples.");
   }
 
   @Test
@@ -285,11 +286,11 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-       for (int i = 0; i < expectedTuples.size(); i++) {
-         Tuple expectedTuple = expectedTuples.get(i);
-         Tuple actualTuple = tuples.get(i);
-         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-       }
+    for (int i = 0; i < expectedTuples.size(); i++) {
+      Tuple expectedTuple = expectedTuples.get(i);
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
   }
 
   @Test
@@ -304,11 +305,11 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-       for (int i = 0; i < expectedTuples.size(); i++) {
-         Tuple expectedTuple = expectedTuples.get(i);
-         Tuple actualTuple = tuples.get(i);
-         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-       }
+    for (int i = 0; i < expectedTuples.size(); i++) {
+      Tuple expectedTuple = expectedTuples.get(i);
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
   }
 
   @Test
@@ -323,10 +324,10 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-       for (int i = 0; i < expectedTuples.size(); i++) {
-         Tuple expectedTuple = expectedTuples.get(i);
-         Tuple actualTuple = tuples.get(i);
-         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-       }
+    for (int i = 0; i < expectedTuples.size(); i++) {
+      Tuple expectedTuple = expectedTuples.get(i);
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
   }
 }

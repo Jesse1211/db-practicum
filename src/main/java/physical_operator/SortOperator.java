@@ -51,13 +51,13 @@ public class SortOperator extends Operator {
               int compare =
                   Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
 
-              // if the tuples are not equal, return the comparison result
+              // if the attributes are not equal, return the comparison result
               if (compare != 0) {
                 return compare;
               }
             }
 
-            // if the tuples are equal, traverse columnIndexMap to compare the next
+            // if the attributes are equal, traverse columnIndexMap to compare the next
             // non-equal column
             for (Column column : getOutputSchema()) {
               String key = column.getName(true);

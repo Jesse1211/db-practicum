@@ -3,8 +3,8 @@ package physical_operator;
 import common.Tuple;
 
 /**
- * An operator for EMPTY, used to represent an empty operator. It is used to
- * represent the end of the operator chain.
+ * An operator for EMPTY, used to represent an empty operator. It is used to represent the end of
+ * the operator chain.
  */
 public class EmptyOperator extends Operator {
 
@@ -13,8 +13,7 @@ public class EmptyOperator extends Operator {
   }
 
   @Override
-  public void reset() {
-  }
+  public void reset() {}
 
   @Override
   public Tuple getNextTuple() {

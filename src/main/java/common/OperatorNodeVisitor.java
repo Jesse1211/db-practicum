@@ -8,6 +8,9 @@ import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
 
+/**
+ * An interface to visit ALL operator nodes for Logical Plan
+ */
 public interface OperatorNodeVisitor {
   void visit(DuplicateEliminationOperatorNode node);
 

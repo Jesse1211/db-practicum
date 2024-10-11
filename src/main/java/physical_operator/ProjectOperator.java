@@ -7,7 +7,8 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 /**
- * An operator for SELECT, only returns the columns stated in the select expression. It will also
+ * An operator for SELECT, only returns the columns stated in the select
+ * expression. It will also
  * update the output schema based on the select expression.
  */
 public class ProjectOperator extends Operator {
@@ -16,7 +17,7 @@ public class ProjectOperator extends Operator {
   private Map<String, Integer> columnIndexMap;
 
   /**
-   * Constructor
+   * ProjectOperator Constructor
    *
    * @param childOperator select | scan operator
    */
@@ -26,15 +27,11 @@ public class ProjectOperator extends Operator {
     this.columnIndexMap = HelperMethods.mapColumnIndex(childOperator.getOutputSchema());
   }
 
-  /** Invoke childOperator's reset method */
   @Override
   public void reset() {
     childOperator.reset();
   }
 
-  /**
-   * @return only returns tuples with selected column based on outputSchema
-   */
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;

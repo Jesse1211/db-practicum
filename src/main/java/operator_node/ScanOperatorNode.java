@@ -4,10 +4,20 @@ import common.DBCatalog;
 import common.OperatorNodeVisitor;
 import net.sf.jsqlparser.schema.Table;
 
+/**
+ * ScanOperatorNode is a class to represent the scan operator in the logical
+ * query
+ * plan.
+ */
 public class ScanOperatorNode extends OperatorNode {
 
   private Table table;
 
+  /**
+   * Set the table as the child to scan operator
+   * 
+   * @param table the table of the scan operator
+   */
   public ScanOperatorNode(Table table) {
     this.table = table;
     this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);

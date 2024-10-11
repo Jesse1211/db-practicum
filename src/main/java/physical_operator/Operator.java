@@ -10,9 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Abstract class to represent relational operators. Every operator has a reference to an
- * outputSchema which represents the schema of the output tuples from the operator. This is a list
- * of Column objects. Each Column has an embedded Table object with the name and alias (if required)
+ * Abstract class to represent relational operators for physical query plans.
+ * Every operator has a
+ * reference to an
+ * outputSchema which represents the schema of the output tuples from the
+ * operator. This is a list
+ * of Column objects. Each Column has an embedded Table object with the name and
+ * alias (if required)
  * fields set appropriately.
  */
 public abstract class Operator {
@@ -20,10 +24,20 @@ public abstract class Operator {
   protected final Logger logger = LogManager.getLogger();
   protected ArrayList<Column> outputSchema;
 
+  /**
+   * Constructor for Operator
+   *
+   * @param outputSchema schema of the output tuples
+   */
   public Operator(ArrayList<Column> outputSchema) {
     this.outputSchema = outputSchema;
   }
 
+  /**
+   * Get the output schema of the operator
+   *
+   * @return output schema of the operator
+   */
   public ArrayList<Column> getOutputSchema() {
     return outputSchema;
   }
@@ -54,7 +68,8 @@ public abstract class Operator {
   }
 
   /**
-   * Iterate through output of operator and send it all to the specified printStream)
+   * Iterate through output of operator and send it all to the specified
+   * printStream)
    *
    * @param printStream stream to receive output, one tuple per line.
    */
@@ -65,6 +80,12 @@ public abstract class Operator {
     }
   }
 
+  /**
+   * Iterate through output of operator and send it all to the specified file by
+   * tupleWriter
+   *
+   * @param tupleWriter TupleWriter to receive output
+   */
   public void dump(TupleWriter tupleWriter) {
     Tuple t;
     while ((t = this.getNextTuple()) != null) {

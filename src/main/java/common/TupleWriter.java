@@ -2,7 +2,7 @@ package common;
 
 public interface TupleWriter {
 
-  public void writeTuple(Tuple tuple);
+  public void writeNextTuple(Tuple tuple);
 
   public void close();
 

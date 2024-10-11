@@ -62,7 +62,7 @@ public class TextHandler implements TupleWriter, TupleReader {
   }
 
   @Override
-  public void writeTuple(Tuple tuple) {
+  public void writeNextTuple(Tuple tuple) {
     try {
       this.bufferedWriter.write(tuple.toString() + "\n");
     } catch (IOException e) {

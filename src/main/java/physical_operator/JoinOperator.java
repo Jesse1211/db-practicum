@@ -31,13 +31,13 @@ public class JoinOperator extends Operator {
     leftTuple = leftChildOperator.getNextTuple();
   }
 
-  /** reset the operator to the start. */
   @Override
   public void reset() {
     leftChildOperator.reset();
     rightChildOperator.reset();
     leftTuple = leftChildOperator.getNextTuple();
   }
+
 
   /**
    * for each left tuple, concatenate with each of the right tuples.

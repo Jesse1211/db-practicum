@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/** A class to handle binary files. It reads and writes tuples to the file. */
+/**
+ * A class to handle binary files. It reads OR writes (binary) tuples to a
+ * (binary) file.
+ */
 public class BinaryHandler implements TupleWriter, TupleReader {
   protected final Logger logger = LogManager.getLogger();
   private final int bufferCapacity = 4096;
@@ -24,16 +27,31 @@ public class BinaryHandler implements TupleWriter, TupleReader {
   private FileChannel fileChannel;
   private ByteBuffer byteBuffer;
 
+  /**
+   * Use BinaryHandler to read/write tuples to a file according to tableName
+   * 
+   * @param tableName
+   */
   public BinaryHandler(String tableName) {
     this.file = DBCatalog.getInstance().getFileForTable(tableName);
     this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
   }
 
+  /**
+   * Use BinaryHandler to read/write tuples to a file according to file
+   * 
+   * @param file
+   */
   public BinaryHandler(File file) {
     this.file = file;
     this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
   }
 
+  /**
+   * Read all tuples from a file
+   * 
+   * @return an ArrayList for all tuples
+   */
   @Override
   public ArrayList<Tuple> readAllTuples() {
     ArrayList<Tuple> tuples = new ArrayList<>();
@@ -44,7 +62,13 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     return tuples;
   }
 
-  /** Read one tuple from a file at a time */
+  /**
+   * Read one tuple from a file at a time. It will return null if there is no more
+   * tuple to read. And it will handle the file reading process.
+   * 
+   * @return the row in this file
+   * @throws IOException caused by file reading for writing
+   */
   @Override
   public Tuple readNextTuple() {
     if (this.fileInputStream == null) {
@@ -68,7 +92,13 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     return new Tuple(tupleArray);
   }
 
-  /** Load the next page of the file */
+  /**
+   * Load the next page of the file for reading, update the attributeNum,
+   * tupleNum, and offset
+   * 
+   * @return true if the next page is loaded successfully, false otherwise
+   * @throws IOException caused by file reading for writing or byte buffer
+   */
   private boolean loadNextPage() {
     this.byteBuffer.clear();
     try {
@@ -91,6 +121,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
    * Write a tuple to the file
    *
    * @param tuple Tuple to write to the file
+   * @throws IOException caused by file writing
    */
   @Override
   public void writeNextTuple(Tuple tuple) {
@@ -124,7 +155,12 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     }
   }
 
-  /** Write the current page to the file, Load the next page */
+  /**
+   * Write the current page to the file, Load the next page by
+   * 
+   * @return void
+   * @throws IOException caused by file writing
+   */
   private void writePage() {
     try {
       this.byteBuffer.asIntBuffer().put(1, this.tupleNum);
@@ -144,6 +180,12 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Write potential tuples, Close the file input stream and file output stream
+   * 
+   * @return void
+   * @throws IOException caused by file writing / reading / closing
+   */
   @Override
   public void close() {
     try {
@@ -163,6 +205,12 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Reset the file to the beginning
+   * 
+   * @return void
+   * @throws IOException caused by file reading or byte buffer
+   */
   @Override
   public void reset() {
     try {

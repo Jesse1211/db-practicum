@@ -3,10 +3,20 @@ package operator_node;
 import common.OperatorNodeVisitor;
 import java.util.ArrayList;
 
+/**
+ * JoinOperatorNode is a class to represent the join operator in the logical
+ * query plan.
+ */
 public class JoinOperatorNode extends OperatorNode {
   private OperatorNode leftChildNode;
   private OperatorNode rightChildNode;
 
+  /**
+   * Set the left and right child nodes to the join operator
+   * 
+   * @param leftChildNode  the left child node of the join operator
+   * @param rightChildNode the right child node of the join operator
+   */
   public JoinOperatorNode(OperatorNode leftChildNode, OperatorNode rightChildNode) {
 
     this.leftChildNode = leftChildNode;
@@ -34,9 +44,6 @@ public class JoinOperatorNode extends OperatorNode {
     this.rightChildNode = rightChildNode;
   }
 
-  /**
-   * @param operatorNodeVisitor
-   */
   @Override
   public void accept(OperatorNodeVisitor operatorNodeVisitor) {
     operatorNodeVisitor.visit(this);

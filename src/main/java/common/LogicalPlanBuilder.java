@@ -24,8 +24,18 @@ import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
 
-/** Class to translate a JSQLParser statement into a relational algebra query plan. */
+/**
+ * Class to translate a JSQLParser statement into a relational algebra query
+ * plan.
+ */
 public class LogicalPlanBuilder {
+
+  /**
+   * Top level method to translate statement to query plan
+   * 
+   * @param stmt query to be translated
+   * @return the root of the query plan
+   */
   public static OperatorNode buildPlan(Statement stmt) {
     // https://github.com/JSQLParser/JSqlParser/wiki/Examples-of-SQL-parsing
     Select select = (Select) stmt;
@@ -58,6 +68,13 @@ public class LogicalPlanBuilder {
     return operatorNode;
   }
 
+  /**
+   * Build a query plan for a single table
+   * 
+   * @param whereExpression the where expression from the query
+   * @param table           the table to build the plan for
+   * @return the root of the query plan
+   */
   private static OperatorNode buildSingleTablePlan(Expression whereExpression, Table table) {
     OperatorNode operatorNode = new ScanOperatorNode(table);
     if (whereExpression != null) {
@@ -66,6 +83,13 @@ public class LogicalPlanBuilder {
     return operatorNode;
   }
 
+  /**
+   * Build a query plan for multiple tables (joins)
+   * 
+   * @param whereExpression the where expression from the query
+   * @param allTables       all tables in the query
+   * @return the root of the query plan
+   */
   private static OperatorNode buildMultiTablePlan(
       Expression whereExpression, ArrayList<Table> allTables) {
     ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
@@ -73,13 +97,14 @@ public class LogicalPlanBuilder {
     Expression joinWhereExpression = null;
     Expression valueWhereExpression = null;
 
-    /* Separate the comparisons into 3 categories: value comparison, same-table
-    comparison, and join comparison */
+    /*
+     * Separate the comparisons into 3 categories: value comparison, same-table
+     * comparison, and join comparison
+     */
     for (ComparisonOperator comparisonOperator : flattened) {
 
       // Get 2 table names from the comparison operator
-      Pair<String, String> tableNamePair =
-          HelperMethods.getComparisonTableNames(comparisonOperator);
+      Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparisonOperator);
       String leftTableName = tableNamePair.getLeft();
       String rightTableName = tableNamePair.getRight();
 
@@ -94,7 +119,8 @@ public class LogicalPlanBuilder {
       } else if (leftTableName == null
           || rightTableName == null
           || leftTableName.equals(rightTableName)) {
-        // if same-table comparison or one table or both table name are the same, then no join
+        // if same-table comparison or one table or both table name are the same, then
+        // no join
         // needed.
         String tableName = leftTableName == null ? rightTableName : leftTableName;
         Expression expression = tableWhereExpressionMap.getOrDefault(tableName, null);
@@ -113,7 +139,8 @@ public class LogicalPlanBuilder {
       }
     }
 
-    // evaluate value comparisons like 42 = 42 or 21 > 40. If it's false, the result will be empty
+    // evaluate value comparisons like 42 = 42 or 21 > 40. If it's false, the result
+    // will be empty
     // */
     if (valueWhereExpression != null) {
       ExpressionEvaluator evaluator = new ExpressionEvaluator();
@@ -142,8 +169,7 @@ public class LogicalPlanBuilder {
       OperatorNode leftChildOperatorNode = deque.poll();
       OperatorNode rightChildOperatorNode = deque.poll();
       assert (leftChildOperatorNode != null && rightChildOperatorNode != null);
-      OperatorNode operatorNode =
-          new JoinOperatorNode(leftChildOperatorNode, rightChildOperatorNode);
+      OperatorNode operatorNode = new JoinOperatorNode(leftChildOperatorNode, rightChildOperatorNode);
       deque.addFirst(operatorNode); // stack back to the queue
     }
 

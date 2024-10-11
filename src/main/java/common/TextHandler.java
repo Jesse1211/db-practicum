@@ -17,6 +17,12 @@ public class TextHandler implements TupleWriter, TupleReader {
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
 
+  /**
+   * Use TextHandler to read/write (human-readable) tuples to a (human-readable)
+   * file according to tableName
+   * 
+   * @param tableName
+   */
   public TextHandler(String tableName) {
     try {
       File file = DBCatalog.getInstance().getFileForTable(tableName);
@@ -27,6 +33,12 @@ public class TextHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Use TextHandler to read/write (human-readable) tuples to a (human-readable)
+   * file according to file
+   * 
+   * @param file
+   */
   public TextHandler(File file) {
     try {
       this.bufferedReader = new BufferedReader(new FileReader(file));
@@ -36,6 +48,11 @@ public class TextHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Read all tuples from a file
+   * 
+   * @return an ArrayList for all tuples
+   */
   @Override
   public ArrayList<Tuple> readAllTuples() {
     ArrayList<Tuple> tuples = new ArrayList<>();
@@ -46,6 +63,11 @@ public class TextHandler implements TupleWriter, TupleReader {
     return tuples;
   }
 
+  /**
+   * Read the next tuple from the file
+   * 
+   * @return the next tuple, or null if no more tuples
+   */
   @Override
   public Tuple readNextTuple() {
     try {
@@ -61,6 +83,11 @@ public class TextHandler implements TupleWriter, TupleReader {
     return null;
   }
 
+  /**
+   * Write a tuple to the file
+   * 
+   * @param tuple the tuple to write to the file for one row
+   */
   @Override
   public void writeNextTuple(Tuple tuple) {
     try {
@@ -70,6 +97,11 @@ public class TextHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Close the file
+   * 
+   * @throws IOException caused by buffer reader
+   */
   @Override
   public void close() {
     try {
@@ -79,6 +111,11 @@ public class TextHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Reset the file
+   * 
+   * @throws IOException caused by buffer reader
+   */
   @Override
   public void reset() {
     try {

@@ -35,6 +35,10 @@ public class SortOperator extends Operator {
     this.it = tupleList.iterator();
   }
 
+  /**
+   * Sort the tuples based on the column specified in the ORDER BY clause. Then sort the tuples
+   * based on the subsequent columns to break ties.
+   */
   private void sort() {
     Collections.sort(
         tupleList,
@@ -46,8 +50,22 @@ public class SortOperator extends Operator {
               int index = columnIndexMap.get(column.getName(true));
               int compare =
                   Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
+
+              // if the tuples are not equal, return the comparison result
               if (compare != 0) {
                 return compare;
+              }
+            }
+
+            // if the tuples are equal, traverse columnIndexMap to compare the next
+            // non-equal column
+            for (Column column : getOutputSchema()) {
+              String key = column.getName(true);
+              if (t1.getElementAtIndex(columnIndexMap.get(key))
+                  != t2.getElementAtIndex(columnIndexMap.get(key))) {
+                return Integer.compare(
+                    t1.getElementAtIndex(columnIndexMap.get(key)),
+                    t2.getElementAtIndex(columnIndexMap.get(key)));
               }
             }
             return 0;

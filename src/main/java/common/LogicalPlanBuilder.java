@@ -70,7 +70,7 @@ public class LogicalPlanBuilder {
       Expression whereExpression, ArrayList<Table> allTables) {
     ArrayList<ComparisonOperator> flattened = HelperMethods.flattenExpression(whereExpression);
     Map<String, Expression> tableWhereExpressionMap = new HashMap<>();
-    Expression joinWhereExpression = null;
+    Map<Pair<String, String>, Expression> joinWhereExpressionMap = new HashMap<>();
     Expression valueWhereExpression = null;
 
     /* Separate the comparisons into 3 categories: value comparison, same-table
@@ -104,11 +104,13 @@ public class LogicalPlanBuilder {
           tableWhereExpressionMap.put(tableName, new AndExpression(expression, comparisonOperator));
         }
       } else {
-        // two different tables, should join. join comparison
-        if (joinWhereExpression == null) {
-          joinWhereExpression = comparisonOperator;
+        // two different tables, put i  t in joinWhereExpression
+        Expression expression = joinWhereExpressionMap.getOrDefault(tableNamePair, null);
+        if (expression == null) {
+          joinWhereExpressionMap.put(tableNamePair, comparisonOperator);
         } else {
-          joinWhereExpression = new AndExpression(joinWhereExpression, comparisonOperator);
+          joinWhereExpressionMap.put(
+              tableNamePair, new AndExpression(expression, comparisonOperator));
         }
       }
     }
@@ -124,7 +126,7 @@ public class LogicalPlanBuilder {
     }
 
     // SELECT required column from each table individually and put into the queue
-    ArrayDeque<OperatorNode> deque = new ArrayDeque<>();
+    ArrayDeque<Pair<String, OperatorNode>> deque = new ArrayDeque<>();
     for (Table table : allTables) {
       OperatorNode operatorNode = new ScanOperatorNode(table);
       Alias alias = table.getAlias();
@@ -134,26 +136,51 @@ public class LogicalPlanBuilder {
         // process same-table column comparisons.
         operatorNode = new SelectOperatorNode(operatorNode, expression);
       }
-      deque.offer(operatorNode);
+      deque.offer(new Pair<>(name, operatorNode));
     }
 
+    List<String> names = new ArrayList<>();
     // Concatenate every pairs until 1 item left in queue.
     while (deque.size() > 1) {
-      OperatorNode leftChildOperatorNode = deque.poll();
-      OperatorNode rightChildOperatorNode = deque.poll();
-      assert (leftChildOperatorNode != null && rightChildOperatorNode != null);
-      OperatorNode operatorNode =
-          new JoinOperatorNode(leftChildOperatorNode, rightChildOperatorNode);
-      deque.addFirst(operatorNode); // stack back to the queue
+      Pair<String, OperatorNode> leftPair = deque.poll();
+      Pair<String, OperatorNode> rightPair = deque.poll();
+      assert (leftPair != null && rightPair != null);
+      OperatorNode operatorNode = new JoinOperatorNode(leftPair.getRight(), rightPair.getRight());
+      // if left is a single table, usually happens during first iteration, add to the list.
+      if (leftPair.getLeft() != null) {
+        names.add(leftPair.getLeft());
+      }
+
+      String rightName = rightPair.getLeft();
+      assert (rightName != null);
+
+      Expression expression = null;
+      for (String name : names) {
+        Expression _expression =
+            joinWhereExpressionMap.getOrDefault(new Pair<>(name, rightName), null);
+        if (_expression == null) continue;
+
+        if (expression == null) {
+          expression = _expression;
+        } else {
+          expression = new AndExpression(expression, _expression);
+        }
+      }
+
+      names.add(rightName);
+      if (expression != null) {
+        operatorNode = new SelectOperatorNode(operatorNode, expression);
+      }
+      deque.addFirst(new Pair<>(null, operatorNode)); // stack back to the queue
     }
 
-    OperatorNode operatorNode = deque.poll();
-    assert (operatorNode != null);
-
-    if (joinWhereExpression != null) {
-      // if there is a join comparison, should evaluate.
-      operatorNode = new SelectOperatorNode(operatorNode, joinWhereExpression);
-    }
+    OperatorNode operatorNode = deque.poll().getRight();
+    //    assert (operatorNode != null);
+    //
+    //    if (joinWhereExpression != null) {
+    //      // if there is a join comparison, should evaluate.
+    //      operatorNode = new SelectOperatorNode(operatorNode, joinWhereExpression);
+    //    }
     return operatorNode;
   }
 }

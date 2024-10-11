@@ -52,7 +52,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A < Sailors.B")
   @Test
-  public void testSelectSailors1() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors01() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 0));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -82,7 +82,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A > Sailors.B")
   @Test
-  public void testSelectSailors2() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors02() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 1));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -112,7 +112,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A = Sailors.B")
   @Test
-  public void testSelectSailors3() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors03() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 2));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -143,7 +143,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A <= Sailors.B")
   @Test
-  public void testSelectSailors4() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors04() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 3));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -173,7 +173,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A >= Sailors.B")
   @Test
-  public void testSelectSailors5() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors05() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 4));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -203,7 +203,7 @@ public class SelectTests {
    */
   @DisplayName("SELECT * FROM Sailors where Sailors.A <> Sailors.B")
   @Test
-  public void testSelectSailors6() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors06() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 5));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -230,7 +230,7 @@ public class SelectTests {
   /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=1" */
   @DisplayName("SELECT * FROM Sailors where 1=1 AND 1=1")
   @Test
-  public void testSelectSailors7() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors07() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 6));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -257,7 +257,7 @@ public class SelectTests {
   /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=1 AND 1=0" */
   @DisplayName("SELECT * FROM Sailors where 1=1 AND 1=0")
   @Test
-  public void testSelectSailors8() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors08() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 7));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -270,7 +270,7 @@ public class SelectTests {
   /** Test the select statement for Sailors table - "SELECT * FROM Sailors where 1=0 AND 1=0" */
   @DisplayName("SELECT * FROM Sailors where 1=0 AND 1=0")
   @Test
-  public void testSelectSailors9() throws ExecutionControl.NotImplementedException {
+  public void testSelectSailors09() throws ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 8));
 
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);

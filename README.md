@@ -1,4 +1,77 @@
-## Design Architecture
+# Design Architecture (Phase 2 - Visitor Pattern)
+
+## Logical Plan
+
+Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare to be traversed by Physical Plan
+
+- Parse data by necessary, and build corresponding OperatorNode
+- `outputSchema`: set selected column from table
+- `childNode`: the child node of each operator
+- `parentNode`: the parent node of each operator
+- `accept`: Visit the current class by the `operatorNodeVisitor`, next step should accept the child's node in
+
+### `OperatorNode` types
+
+- `DuplicateEliminationOperatorNode` for query `DISTINCT`, has child & parent nodes
+- `EmptyOperatorNode` for empty result, does not has child & parent nodes (LEAF)
+- `JoinOperatorNode` for table join, has left & right child & parent nodes
+- `ProjectOperatorNode` for projection, has child & parent nodes
+- `ScanOperatorNode` for scan, does not has child & parent nodes (LEAF)
+- `SelectOperatorNode` for select, has child & parent nodes
+- `SortOperatorNode` for sort, has child & parent nodes
+
+## Physical Plan
+
+- `visit`: Takes the `OperatorNode` from Logical plan and create `Operator` for data processing
+  - Utilized overloading to handle different `OperatorNode` types
+  - Create corresponding `Operator` types based on input tupes
+- `getResult`: return the `first` operator to be processed, for recursive processing purpose
+
+### `OperatorNode` types
+
+#### `ScanOperator(table)`: **Scan all info from the Table by Buffer Reader**
+
+- `Outputschema`: Set as all columns from table
+- Initialize buffer reader from file based on `tableName`
+- `reset()`: re-initialize buffer reader
+- `getNextTuple()`: read and return the row as tuple
+
+#### `SelectOperator(childOperator, whereExpression)`: **Process, Filter all comparators from where**
+
+- `outputSchema`: no needed to modify
+- Use childOperator's outputSchema to a map as `{columnName: index in outputSchema}`
+- Use the map and data rows from `childOperator` for `ExpressionEvaluator`
+- `reset()`: reset it's childOperator -> reset buffer reader
+- `getNextTuple()`: return satisfied row as tuple based on `ExpressionEvaluator`
+
+#### `ProjectOprtator(childOperator, selectedItems)` **Determine output format from selectedItems**
+
+- `outputSchema`: update by `selectedItems` - after SELECT before WHERE
+  - outputSchema had ALL columns before, now only store what is mentioned from selectedItems
+- Use childOperator's outputSchema to a map as `{columnName: index in outputSchema}`
+- `reset()`: call childOperator's reset()
+- `getNextTuple()`: based on filtered output, return only selected column as tuple
+
+#### `SortOperator(childOperator, elementOrders)`: **Order the output**
+
+- Fetch all values from `childOperator.getNextTuple()`
+- Implement a sort function and list iterator
+- `reset()`: reset iterator
+- `getNextTuple()`: trigger iterator
+
+#### `DuplicateEliminationOperator(childOperator)`: **Remove duplicates**
+
+- Initialize a set for duplication check from calling `childOperator's getNextTuple()`
+
+---
+
+---
+
+---
+
+---
+
+# Design Architecture (Phase 1)
 
 #### 1. **Parse** data by necessary
 

@@ -63,9 +63,9 @@ public class SortTest {
     // Check the first 3 tuple
     Tuple[] expectedFirstThreeTuples =
         new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
           new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-          new Tuple(new ArrayList<>(Arrays.asList(0, 135, 109))),
-          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120)))
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
         };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {

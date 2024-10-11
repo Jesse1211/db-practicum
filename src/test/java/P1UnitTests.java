@@ -285,11 +285,11 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-    //    for (int i = 0; i < expectedTuples.size(); i++) {
-    //      Tuple expectedTuple = expectedTuples.get(i);
-    //      Tuple actualTuple = tuples.get(i);
-    //      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-    //    }
+       for (int i = 0; i < expectedTuples.size(); i++) {
+         Tuple expectedTuple = expectedTuples.get(i);
+         Tuple actualTuple = tuples.get(i);
+         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+       }
   }
 
   @Test
@@ -304,11 +304,11 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-    //    for (int i = 0; i < expectedTuples.size(); i++) {
-    //      Tuple expectedTuple = expectedTuples.get(i);
-    //      Tuple actualTuple = tuples.get(i);
-    //      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-    //    }
+       for (int i = 0; i < expectedTuples.size(); i++) {
+         Tuple expectedTuple = expectedTuples.get(i);
+         Tuple actualTuple = tuples.get(i);
+         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+       }
   }
 
   @Test
@@ -323,10 +323,10 @@ public class P1UnitTests {
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
-    //    for (int i = 0; i < expectedTuples.size(); i++) {
-    //      Tuple expectedTuple = expectedTuples.get(i);
-    //      Tuple actualTuple = tuples.get(i);
-    //      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
-    //    }
+       for (int i = 0; i < expectedTuples.size(); i++) {
+         Tuple expectedTuple = expectedTuples.get(i);
+         Tuple actualTuple = tuples.get(i);
+         Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+       }
   }
 }

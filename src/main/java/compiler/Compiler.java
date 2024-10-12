@@ -21,21 +21,23 @@ public class Compiler {
 
   private static String outputDir;
   private static String inputDir;
+  private static String tempDir;
   private static final boolean outputToFiles = true;
 
   /**
    * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping
    * results to files or console as desired.
    *
-   * <p>If dumping to files result of ith query is in file named queryi, indexed stating at 1.
+   * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
    */
   public static void main(String[] args) {
 
     inputDir = args[0];
     outputDir = args[1];
+    tempDir = args[2];
     DBCatalog.getInstance().setDataDirectory(inputDir + "/db");
     try {
-      String str = Files.readString(Paths.get(inputDir + "/customized_queries.sql"));
+      String str = Files.readString(Paths.get(inputDir + "/queries.sql"));
       Statements statements = CCJSqlParserUtil.parseStatements(str);
       QueryPlanBuilder queryPlanBuilder = new QueryPlanBuilder();
 

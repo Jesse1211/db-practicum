@@ -200,12 +200,6 @@ public class LogicalPlanBuilder {
     }
 
     OperatorNode operatorNode = deque.poll().getRight();
-    //    assert (operatorNode != null);
-    //
-    //    if (joinWhereExpression != null) {
-    //      // if there is a join comparison, should evaluate.
-    //      operatorNode = new SelectOperatorNode(operatorNode, joinWhereExpression);
-    //    }
     return operatorNode;
   }
 }

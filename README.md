@@ -1,5 +1,13 @@
 # Design Architecture (Phase 2 - Visitor Pattern)
 
+### The top-level class is the `Compiler` class located in `/src/main/java/compiler/Compiler.java`
+
+## File locations
+- ### Logical operators are located at `/src/main/java/operator_node/` folder
+- ### Physical operators are located at `/src/main/java/physical_operator` folder
+- ### Physical plan builder is located at `/src/main/java/common/PhysicalPlanBuilder`
+- ### Logical plan builder is located at `/src/main/java/common/LogicalPlanBuilder`
+
 ## Logical Plan
 
 Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare to be traversed by Physical Plan
@@ -16,7 +24,7 @@ Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare 
 - `EmptyOperatorNode` for empty result, does not has child & parent nodes (LEAF)
 - `JoinOperatorNode` for table join, has left & right child & parent nodes
 - `ProjectOperatorNode` for projection, has child & parent nodes
-- `ScanOperatorNode` for scan, does not has child & parent nodes (LEAF)
+- `ScanOperatorNode` for scan, does not have child & parent nodes (LEAF)
 - `SelectOperatorNode` for select, has child & parent nodes
 - `SortOperatorNode` for sort, has child & parent nodes
 

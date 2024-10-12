@@ -1,3 +1,11 @@
+# Notes from P2 instruction:
+
+## How to run
+```
+\db-practicum> java -jar ./build/libs/db_practicum_early-bird-2.jar ./src/test/resources/samples/input ./src/test/resources/samples/expected_output_1
+```
+
+
 # Notes from P1 instruction:
 
 ## `inputdir` structure from db_practicum_early-bird-1.jar:

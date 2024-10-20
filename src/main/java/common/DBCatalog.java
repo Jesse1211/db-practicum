@@ -27,6 +27,12 @@ public class DBCatalog {
 
   private String dbDirectory;
 
+  // For Plan Builder Config
+  private String joinMethod;
+  private int joinBufferPageNumber = -1; // -1 means not set
+  private String sortMethod;
+  private int sortBufferPageNumber = -1; // -1 means not set
+
   /** Reads schemaFile and populates schema information */
   private DBCatalog() {
     tables = new HashMap<>();
@@ -105,5 +111,60 @@ public class DBCatalog {
       newColumns.add(column);
     }
     return newColumns;
+  }
+
+  /**
+   * Get join method & buffer page number from plan_builder_config.txt. First row: 0: TNLJ, 1: BNLJ,
+   * 2: SMJ Second row: 0: In-Memory Sort, 1: External Sort Only if the join method is BNLJ, the
+   * buffer page number is needed. Only if the sort method is External Sort, the buffer page number
+   * is needed.
+   *
+   * @param directory: The input directory.
+   * @return void
+   */
+  public void setPlanBuilderConfig(String directory) {
+    try {
+      BufferedReader br = new BufferedReader(new FileReader(directory));
+      String line;
+
+      // read first line
+      line = br.readLine();
+      String[] tokens = line.split(" ");
+      if (tokens.length > 1) {
+        this.joinBufferPageNumber = Integer.parseInt(tokens[1]);
+      }
+      this.joinMethod = tokens[0];
+      switch (tokens[0]) {
+        case "0":
+          this.joinMethod = "TNLJ";
+          break;
+        case "1":
+          this.joinMethod = "BNLJ";
+          break;
+        case "2":
+          this.joinMethod = "SMJ";
+          break;
+      }
+
+      // read second line
+      line = br.readLine();
+      tokens = line.split("\\s");
+      if (tokens.length > 1) {
+        this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
+      }
+      switch (tokens[0]) {
+        case "0":
+          this.sortMethod = "In-Memory Sort";
+          break;
+        case "1":
+          this.sortMethod = "External Sort";
+          break;
+      }
+      this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
+
+      br.close();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
   }
 }

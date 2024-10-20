@@ -1,8 +1,13 @@
 package common;
 
+import java.util.ArrayList;
+import java.util.List;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
 import operator_node.DuplicateEliminationOperatorNode;
 import operator_node.EmptyOperatorNode;
 import operator_node.JoinOperatorNode;
+import operator_node.OperatorNode;
 import operator_node.ProjectOperatorNode;
 import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
@@ -13,6 +18,7 @@ import physical_operator.EmptyOperator;
 import physical_operator.JoinOperator;
 import physical_operator.Operator;
 import physical_operator.ProjectOperator;
+import physical_operator.SMJOperator;
 import physical_operator.ScanOperator;
 import physical_operator.SelectOperator;
 import physical_operator.SortOperator;
@@ -29,7 +35,8 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra
    * query plan.
    */
-  public PhysicalPlanBuilder() {}
+  public PhysicalPlanBuilder() {
+  }
 
   /**
    * @param node
@@ -56,16 +63,44 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
         operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
         break;
       case "BNLJ":
-        operator =
-            new BNLJOperator(
+        operator = new BNLJOperator(
                 node.getOutputSchema(),
                 leftOperator,
                 rightOperator,
                 DBCatalog.getInstance().getJoinBufferPageNumber());
         break;
       case "SMJ":
-        // operator = new SMJOperator(node.getOutputSchema(), leftOperator,
-        // rightOperator);
+        OperatorNode parent = node.getParentNode();
+        if (parent == null || !(parent instanceof SelectOperatorNode)) {
+          System.err.println("SMJ join should provide at least equality condition");
+        }
+        Expression whereExpression = ((SelectOperatorNode) parent).getWhereExpression();
+
+        Pair<Column, Column> columnPair = HelperMethods.getEqualityConditionColumnPair(
+                whereExpression);
+        if (columnPair == null) {
+          System.err.println("SMJ join should provide at least equality condition");
+        }
+
+        //get equality condition, extract left and right columns
+        SortOperator leftSortOperator = new SortOperator(
+                leftOperator.getOutputSchema(),
+                leftOperator,
+                columnPair.getLeft()
+        );
+        SortOperator rightSortOperator = new SortOperator(
+                rightOperator.getOutputSchema(),
+                rightOperator,
+                columnPair.getRight()
+        );
+
+        operator = new SMJOperator(
+                node.getOutputSchema(),
+                leftSortOperator,
+                rightSortOperator,
+                columnPair.getLeft(),
+                columnPair.getRight()
+        );
         break;
       default:
         break;
@@ -95,7 +130,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   @Override
   public void visit(SortOperatorNode node) {
     node.getChildNode().accept(this);
-    operator = new SortOperator(node.getOutputSchema(), operator, node.getElementOrders());
+    operator = new SortOperator(node.getOutputSchema(), operator, node.getOrders());
   }
 
   /**

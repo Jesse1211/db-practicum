@@ -3,6 +3,7 @@ package physical_operator;
 import common.HelperMethods;
 import common.Tuple;
 import java.util.*;
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 
@@ -76,7 +77,12 @@ public class SortOperator extends Operator {
   /** Re-initialize iterator */
   @Override
   public void reset() {
-    it = tupleList.iterator();
+    it = tupleList.listIterator(0);
+  }
+
+  @Override
+  public void reset(int i) {
+    it = tupleList.listIterator(i);
   }
 
   /**

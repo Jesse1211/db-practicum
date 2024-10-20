@@ -5,6 +5,7 @@ import common.TupleWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import net.sf.jsqlparser.schema.Column;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +41,9 @@ public abstract class Operator {
 
   /** Resets cursor on the operator to the beginning */
   public abstract void reset();
+
+  /** Reset cursor on the operator to ith tuple */
+  public void reset(int i) throws NotImplementedException{}
 
   /**
    * Get next tuple from operator

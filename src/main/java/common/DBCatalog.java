@@ -129,7 +129,7 @@ public class DBCatalog {
 
       // read first line
       line = br.readLine();
-      String[] tokens = line.split(" ");
+      String[] tokens = line.split("\\s");
       if (tokens.length > 1) {
         this.joinBufferPageNumber = Integer.parseInt(tokens[1]);
       }
@@ -166,5 +166,41 @@ public class DBCatalog {
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
+  }
+
+  /**
+   * Get join method from plan_builder_config.txt.
+   *
+   * @return join method
+   */
+  public String getJoinMethod() {
+    return this.joinMethod;
+  }
+
+  /**
+   * Get join buffer page number from plan_builder_config.txt.
+   *
+   * @return join buffer page number
+   */
+  public int getJoinBufferPageNumber() {
+    return this.joinBufferPageNumber;
+  }
+
+  /**
+   * Get sort method from plan_builder_config.txt.
+   *
+   * @return sort method
+   */
+  public String getSortMethod() {
+    return this.sortMethod;
+  }
+
+  /**
+   * Get sort buffer page number from plan_builder_config.txt.
+   *
+   * @return sort buffer page number
+   */
+  public int getSortBufferPageNumber() {
+    return this.sortBufferPageNumber;
   }
 }

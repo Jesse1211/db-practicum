@@ -224,4 +224,34 @@ public class JoinTest {
       Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
     }
   }
+
+  /**
+   * Test the join statement
+   *
+   * @throws ExecutionControl.NotImplementedException
+   */
+  @Test
+  public void testJoinSailors7() throws ExecutionControl.NotImplementedException {
+    Operator plan = queryPlanBuilder.buildPlan(statementList.get(index + 6));
+
+    List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
+
+    int expectedSize = 1000000;
+
+    Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
+
+    // Check the first 3 tuple
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 2, 185))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 81, 12))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 162, 46)))
+        };
+
+    for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
+      Tuple expectedTuple = expectedFirstThreeTuples[i];
+      Tuple actualTuple = tuples.get(i);
+      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+    }
+  }
 }

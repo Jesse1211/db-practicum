@@ -12,7 +12,6 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  */
 public class ProjectOperator extends Operator {
   private Operator childOperator;
-  private List<SelectItem> selectItems;
   private Map<String, Integer> columnIndexMap;
 
   /**

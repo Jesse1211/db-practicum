@@ -11,11 +11,11 @@ import net.sf.jsqlparser.schema.Column;
 public class BNLJOperator extends Operator {
 
   private List<Tuple> leftTupleBlock;
-  Iterator<Tuple> it;
-
-  private int bufferSizeByte;
+  private int leftTupleBlockIndex;
+  private int maxSlotNum;
   private Operator leftChildOperator;
   private Operator rightChildOperator;
+  private Tuple rightTuple;
 
   public BNLJOperator(
       ArrayList<Column> outputSchema,
@@ -24,28 +24,35 @@ public class BNLJOperator extends Operator {
       int bufferSizeInPage) {
 
     super(outputSchema);
-    this.bufferSizeByte = bufferSizeInPage * 4096; // in Byte
+    this.maxSlotNum = bufferSizeInPage * 4096 / 4;
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
+
+    // Load for the first time
+    this.rightTuple = rightChildOperator.getNextTuple();
+    loadLeftChildBlock();
   }
 
-  private void loadLeftChildBlock() {
+  private boolean loadLeftChildBlock() {
     Tuple tuple = leftChildOperator.getNextTuple();
-    int maxTupleNum = bufferSizeByte / (tuple.getSize() * 4);
+
+    if (tuple == null) {
+      return false;
+    }
+
+    int maxTupleNum = maxSlotNum / tuple.getSize();
     leftTupleBlock = new ArrayList<>();
     leftTupleBlock.add(tuple);
 
-    int blockByteSize = 1;
-
-    while (blockByteSize < maxTupleNum) {
+    while (leftTupleBlock.size() < maxTupleNum) {
       tuple = leftChildOperator.getNextTuple();
       if (tuple == null) {
         break;
       }
       leftTupleBlock.add(tuple);
-      blockByteSize += tuple.getSize();
     }
-    it = leftTupleBlock.iterator();
+    this.leftTupleBlockIndex = 0;
+    return true;
   }
 
   /**
@@ -57,25 +64,26 @@ public class BNLJOperator extends Operator {
   @Override
   public Tuple getNextTuple() {
 
-    if (!it.hasNext()) { // Re-Traverse left block
-      it = leftTupleBlock.iterator();
+    // No more right tuple, return null
+    if (this.rightTuple == null) {
+      return null;
     }
 
-    Tuple rightTuple = rightChildOperator.getNextTuple();
-
-    if (rightTuple == null) { // Traversed ALL right tuples, move to next left tuple block
-      rightChildOperator.reset();
-      loadLeftChildBlock();
+    // Traversed ALL left tuples, reset left tuple block & load next right tuple
+    if (this.leftTupleBlockIndex >= this.leftTupleBlock.size()) {
+      if (!loadLeftChildBlock()) {
+        this.rightTuple = rightChildOperator.getNextTuple();
+        leftChildOperator.reset();
+      }
       return getNextTuple();
     }
 
-    return it.next().concat(rightTuple);
+    return this.leftTupleBlock.get(this.leftTupleBlockIndex++).concat(rightTuple);
   }
 
   @Override
   public void reset() {
     leftChildOperator.reset();
     rightChildOperator.reset();
-    loadLeftChildBlock();
   }
 }

@@ -4,6 +4,7 @@ import java.util.*;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
@@ -100,5 +101,19 @@ public class HelperMethods {
       rightTableName = ((Column) rightExpression).getTable().getName();
     }
     return new Pair<>(leftTableName, rightTableName);
+  }
+
+
+  public static Pair<Column, Column> getEqualityConditionColumnPair(Expression whereExpression){
+    ArrayList<ComparisonOperator> comparisons = flattenExpression(whereExpression);
+
+    for (ComparisonOperator comparison : comparisons) {
+      if (comparison instanceof EqualsTo) {
+        Column leftColumn = comparison.getLeftExpression(Column.class);
+        Column rightColumn = comparison.getRightExpression(Column.class);
+        return new Pair<>(leftColumn, rightColumn);
+      }
+    }
+    return null;
   }
 }

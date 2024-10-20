@@ -3,6 +3,7 @@ package physical_operator;
 import common.HelperMethods;
 import common.Tuple;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import net.sf.jsqlparser.schema.Column;
 
@@ -44,6 +45,7 @@ public class SMJOperator extends Operator {
 
     leftTuple = leftChildOperator.getNextTuple();
     rightCurrentIndex = -1;
+    rightResetIndexMap = new HashMap<>();
   }
 
 

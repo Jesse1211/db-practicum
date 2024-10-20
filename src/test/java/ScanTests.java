@@ -34,6 +34,7 @@ public class ScanTests {
     Path resourcePath = Paths.get(path);
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
+    DBCatalog.getInstance().setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
 
     URI queriesFile =
         Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))

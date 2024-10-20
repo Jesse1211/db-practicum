@@ -17,19 +17,30 @@ public class SortOperator extends Operator {
   Iterator<Tuple> it;
   private Map<String, Integer> columnIndexMap;
   private List<Tuple> tupleList;
-  private List<OrderByElement> elementOrders;
+  private List<Column> orders;
 
   /**
    * SelectOperator constructor
    *
    * @param operator scan | select | join operator
-   * @param elementOrders list of ORDER BY elements
+   * @param orders list of columns in ORDER BY elements
    */
   public SortOperator(
-      ArrayList<Column> outputSchema, Operator operator, List<OrderByElement> elementOrders) {
+      ArrayList<Column> outputSchema, Operator operator, List<Column> orders) {
     super(outputSchema);
     this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
-    this.elementOrders = elementOrders;
+    this.orders = orders;
+    // sort the tuples
+    this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(operator));
+    sort();
+    this.it = tupleList.iterator();
+  }
+
+  public SortOperator(ArrayList<Column> outputSchema, Operator operator, Column order) {
+    super(outputSchema);
+    this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
+    this.orders = new ArrayList<>();
+    this.orders.add(order);
     // sort the tuples
     this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(operator));
     sort();
@@ -46,8 +57,7 @@ public class SortOperator extends Operator {
         new Comparator<Tuple>() {
           @Override
           public int compare(Tuple t1, Tuple t2) {
-            for (OrderByElement elementOrder : elementOrders) {
-              Column column = (Column) elementOrder.getExpression();
+            for (Column column : orders) {
               int index = columnIndexMap.get(column.getName(true));
               int compare =
                   Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));

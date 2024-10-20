@@ -9,6 +9,7 @@ import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.AllColumns;
@@ -56,7 +57,9 @@ public class LogicalPlanBuilder {
     }
 
     if (plainSelect.getOrderByElements() != null) {
-      operatorNode = new SortOperatorNode(operatorNode, plainSelect.getOrderByElements());
+      List<Column> orders = plainSelect.getOrderByElements().stream().
+              map((orderByElement) -> (Column) orderByElement.getExpression()).toList();
+      operatorNode = new SortOperatorNode(operatorNode, orders);
     }
 
     if (plainSelect.getDistinct() != null) {

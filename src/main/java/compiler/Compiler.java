@@ -36,6 +36,7 @@ public class Compiler {
     outputDir = args[1];
     tempDir = args[2];
     DBCatalog.getInstance().setDataDirectory(inputDir + "/db");
+    DBCatalog.getInstance().setPlanBuilderConfig(inputDir + "/plan_builder_config.txt");
     try {
       String str = Files.readString(Paths.get(inputDir + "/queries.sql"));
       Statements statements = CCJSqlParserUtil.parseStatements(str);

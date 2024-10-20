@@ -15,6 +15,7 @@ import operator_node.SortOperatorNode;
 import physical_operator.BNLJOperator;
 import physical_operator.DuplicateEliminationOperator;
 import physical_operator.EmptyOperator;
+import physical_operator.ExternalSortOperator;
 import physical_operator.JoinOperator;
 import physical_operator.Operator;
 import physical_operator.ProjectOperator;
@@ -130,7 +131,20 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   @Override
   public void visit(SortOperatorNode node) {
     node.getChildNode().accept(this);
-    operator = new SortOperator(node.getOutputSchema(), operator, node.getOrders());
+
+    switch (DBCatalog.getInstance().getSortMethod()) {
+      case "In-Memory Sort":
+        operator = new SortOperator(node.getOutputSchema(), operator, node.getElementOrders());
+        break;
+      case "External Sort":
+        operator =
+            new ExternalSortOperator(
+                node.getOutputSchema(),
+                operator,
+                node.getElementOrders(),
+                DBCatalog.getInstance().getSortBufferPageNumber());
+        break;
+    }
   }
 
   /**

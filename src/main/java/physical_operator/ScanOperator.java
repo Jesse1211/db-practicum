@@ -31,11 +31,7 @@ public class ScanOperator extends Operator {
   /** re-initialize buffer reader */
   @Override
   public void reset() {
-    try {
-      this.tupleReader.reset();
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-    }
+    this.tupleReader.reset();
   }
 
   /**
@@ -43,7 +39,6 @@ public class ScanOperator extends Operator {
    */
   @Override
   public Tuple getNextTuple() {
-    Tuple tuple = this.tupleReader.readNextTuple();
-    return tuple;
+    return this.tupleReader.readNextTuple();
   }
 }

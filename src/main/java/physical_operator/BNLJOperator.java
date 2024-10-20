@@ -4,13 +4,9 @@ import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
-/**
- * Logic: procesdures BNLJ(outer R, inner S, bufferSize B): for each block B of R do: for each tuple
- * s of S do: for each tuple r of B do: if r and s join then: add r and s as tuple to the result
- */
 public class BNLJOperator extends Operator {
 
-  private List<Tuple> leftTupleBlock;
+  private Tuple[] leftTupleBlock;
   private int leftTupleBlockIndex;
   private int maxSlotNum;
   private Operator leftChildOperator;
@@ -41,15 +37,16 @@ public class BNLJOperator extends Operator {
     }
 
     int maxTupleNum = maxSlotNum / tuple.getSize();
-    leftTupleBlock = new ArrayList<>();
-    leftTupleBlock.add(tuple);
+    leftTupleBlock = new Tuple[maxTupleNum];
+    leftTupleBlock[0] = tuple;
+    int index = 1;
 
-    while (leftTupleBlock.size() < maxTupleNum) {
+    while (index < maxTupleNum) {
       tuple = leftChildOperator.getNextTuple();
       if (tuple == null) {
         break;
       }
-      leftTupleBlock.add(tuple);
+      leftTupleBlock[index++] = tuple;
     }
     this.leftTupleBlockIndex = 0;
     return true;
@@ -64,21 +61,27 @@ public class BNLJOperator extends Operator {
   @Override
   public Tuple getNextTuple() {
 
-    // No more right tuple, return null
+    // Traversed ONE left tuple block, reset index & load next right tuple
+    if (this.leftTupleBlockIndex >= this.leftTupleBlock.length
+        || this.leftTupleBlock[this.leftTupleBlockIndex] == null) {
+      this.leftTupleBlockIndex = 0;
+      this.rightTuple = rightChildOperator.getNextTuple();
+    }
+
+    // No more right tuple, reset right tuple & load next left tuple block
     if (this.rightTuple == null) {
+      if (!loadLeftChildBlock()) {
+        return null;
+      }
+      this.rightChildOperator.reset();
+      this.rightTuple = rightChildOperator.getNextTuple();
+    }
+
+    if (this.leftTupleBlock == null) {
       return null;
     }
 
-    // Traversed ALL left tuples, reset left tuple block & load next right tuple
-    if (this.leftTupleBlockIndex >= this.leftTupleBlock.size()) {
-      if (!loadLeftChildBlock()) {
-        this.rightTuple = rightChildOperator.getNextTuple();
-        leftChildOperator.reset();
-      }
-      return getNextTuple();
-    }
-
-    return this.leftTupleBlock.get(this.leftTupleBlockIndex++).concat(rightTuple);
+    return this.leftTupleBlock[this.leftTupleBlockIndex++].concat(rightTuple);
   }
 
   @Override

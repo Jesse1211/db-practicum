@@ -114,10 +114,15 @@ public class DBCatalog {
   }
 
   /**
-   * Get join method & buffer page number from plan_builder_config.txt. First row: 0: TNLJ, 1: BNLJ,
-   * 2: SMJ Second row: 0: In-Memory Sort, 1: External Sort Only if the join method is BNLJ, the
-   * buffer page number is needed. Only if the sort method is External Sort, the buffer page number
-   * is needed.
+   * Get join method & buffer page number from plan_builder_config.txt.
+   *
+   * <p>First row: 0: TNLJ, 1: BNLJ, 2: SMJ
+   *
+   * <p>Second row: 0: In-Memory Sort, 1: External Sort Only
+   *
+   * <p>if the join method is BNLJ, the buffer page number is needed.
+   *
+   * <p>if the sort method is External Sort, the buffer page number is needed.
    *
    * @param directory: The input directory.
    * @return void

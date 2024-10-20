@@ -47,3 +47,4 @@ select * FROM Reserves, Sailors, Boats WHERE Reserves.G = 20 AND Sailors.A = 20;
 select * FROM Reserves, Sailors, Boats WHERE Reserves.G = 20 AND Sailors.A = 20 AND Boats.D < 2 AND Boats.F = 99;
 select * FROM Sailors AS S1, Sailors AS S2 WHERE S1.A <> S2.A;
 select * FROM Sailors AS S1, Sailors AS S2 WHERE S1.A = S2.A;
+select * FROM Sailors, Boats ORDER BY Sailors.A, Boats.D;

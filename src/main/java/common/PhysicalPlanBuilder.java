@@ -7,6 +7,7 @@ import operator_node.ProjectOperatorNode;
 import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
+import physical_operator.BNLJOperator;
 import physical_operator.DuplicateEliminationOperator;
 import physical_operator.EmptyOperator;
 import physical_operator.JoinOperator;
@@ -48,7 +49,27 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     Operator leftOperator = operator;
     node.getRightChildNode().accept(this);
     Operator rightOperator = operator;
-    operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
+
+    // read from config.properties to select the join method
+    switch (DBCatalog.getInstance().getJoinMethod()) {
+      case "TNLJ":
+        operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
+        break;
+      case "BNLJ":
+        operator =
+            new BNLJOperator(
+                node.getOutputSchema(),
+                leftOperator,
+                rightOperator,
+                DBCatalog.getInstance().getJoinBufferPageNumber());
+        break;
+      case "SMJ":
+        // operator = new SMJOperator(node.getOutputSchema(), leftOperator,
+        // rightOperator);
+        break;
+      default:
+        break;
+    }
   }
 
   /**

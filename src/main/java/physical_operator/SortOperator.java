@@ -15,30 +15,27 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 public class SortOperator extends Operator {
 
   Iterator<Tuple> it;
-  private Map<String, Integer> columnIndexMap;
   private List<Tuple> tupleList;
   private List<Column> orders;
 
   /**
    * SelectOperator constructor
    *
-   * @param operator scan | select | join operator
+   * @param childOperator scan | select | join operator
    * @param orders list of columns in ORDER BY elements
    */
   public SortOperator(
-      ArrayList<Column> outputSchema, Operator operator, List<Column> orders) {
+      ArrayList<Column> outputSchema, Operator childOperator, List<Column> orders) {
     super(outputSchema);
-    this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
     this.orders = orders;
     // sort the tuples
-    this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(operator));
+    this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(childOperator));
     sort();
     this.it = tupleList.iterator();
   }
 
   public SortOperator(ArrayList<Column> outputSchema, Operator operator, Column order) {
     super(outputSchema);
-    this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
     this.orders = new ArrayList<>();
     this.orders.add(order);
     // sort the tuples
@@ -52,36 +49,7 @@ public class SortOperator extends Operator {
    * based on the subsequent columns to break ties.
    */
   private void sort() {
-    Collections.sort(
-        tupleList,
-        new Comparator<Tuple>() {
-          @Override
-          public int compare(Tuple t1, Tuple t2) {
-            for (Column column : orders) {
-              int index = columnIndexMap.get(column.getName(true));
-              int compare =
-                  Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
-
-              // if the attributes are not equal, return the comparison result
-              if (compare != 0) {
-                return compare;
-              }
-            }
-
-            // if the attributes are equal, traverse columnIndexMap to compare the next
-            // non-equal column
-            for (Column column : getOutputSchema()) {
-              String key = column.getName(true);
-              if (t1.getElementAtIndex(columnIndexMap.get(key))
-                  != t2.getElementAtIndex(columnIndexMap.get(key))) {
-                return Integer.compare(
-                    t1.getElementAtIndex(columnIndexMap.get(key)),
-                    t2.getElementAtIndex(columnIndexMap.get(key)));
-              }
-            }
-            return 0;
-          }
-        });
+    Collections.sort(tupleList, HelperMethods.getTupleComparator(orders, outputSchema));
   }
 
   /** Re-initialize iterator */

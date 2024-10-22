@@ -21,12 +21,12 @@ import org.apache.logging.log4j.Logger;
  */
 public class DBCatalog {
   private final Logger logger = LogManager.getLogger();
-
   private final HashMap<String, ArrayList<Column>> tables;
   private static DBCatalog db;
 
   private String dbDirectory;
 
+  private final int bufferCapacity = 4096;
   // For Plan Builder Config
   private String joinMethod;
   private int joinBufferPageNumber = -1; // -1 means not set
@@ -208,4 +208,6 @@ public class DBCatalog {
   public int getSortBufferPageNumber() {
     return this.sortBufferPageNumber;
   }
+
+  public int getBufferCapacity(){return this.bufferCapacity;}
 }

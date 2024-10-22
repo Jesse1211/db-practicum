@@ -131,20 +131,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   @Override
   public void visit(SortOperatorNode node) {
     node.getChildNode().accept(this);
-
-    switch (DBCatalog.getInstance().getSortMethod()) {
-      case "In-Memory Sort":
-        operator = new SortOperator(node.getOutputSchema(), operator, node.getElementOrders());
-        break;
-      case "External Sort":
-        operator =
-            new ExternalSortOperator(
-                node.getOutputSchema(),
-                operator,
-                node.getElementOrders(),
-                DBCatalog.getInstance().getSortBufferPageNumber());
-        break;
-    }
+    operator = getSortOperator(node, operator);
   }
 
   /**
@@ -169,5 +156,23 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    */
   public Operator getResult() {
     return operator;
+  }
+
+
+  private Operator getSortOperator(SortOperatorNode node, Operator childOpeartor) {
+    Operator sortOperator = null;
+    switch (DBCatalog.getInstance().getSortMethod()) {
+      case "In-Memory Sort":
+        sortOperator = new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
+        break;
+      case "External Sort":
+        sortOperator = new ExternalSortOperator(
+                node.getOutputSchema(),
+                childOpeartor,
+                node.getOrders(),
+                DBCatalog.getInstance().getSortBufferPageNumber());
+        break;
+    }
+    return sortOperator;
   }
 }

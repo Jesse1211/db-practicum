@@ -91,4 +91,28 @@ public abstract class Operator {
     }
     tupleWriter.close();
   }
+
+  protected static boolean loadTupleBlock(Operator operator, Tuple [] buffer){
+    if (buffer.length == 0){
+      return false;
+    }
+    Tuple tuple = operator.getNextTuple();
+    if (tuple == null){
+      return false;
+    }
+
+    buffer[0] = tuple;
+    int i = 1;
+    for (; i < buffer.length; i++) {
+      tuple = operator.getNextTuple();
+      if (tuple == null) break;
+      buffer[i] = tuple;
+    }
+
+    //empty the rest of the buffer
+    for (; i < buffer.length; i++) {
+      buffer[i] = null;
+    }
+    return true;
+  }
 }

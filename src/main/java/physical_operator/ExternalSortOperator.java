@@ -2,13 +2,13 @@ package physical_operator;
 
 import common.BinaryHandler;
 import common.HelperMethods;
+import common.Pair;
 import common.Tuple;
 import common.TupleReader;
 import common.TupleWriter;
 import java.io.File;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.OrderByElement;
 
 /**
  * An operator for ORDER BY. Create intermediate files to keep the partial sorted runs which are
@@ -17,139 +17,122 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
  * <p>Intermediate files are binary for production, human-readable for debugging.
  */
 public class ExternalSortOperator extends Operator {
-  private Map<String, Integer> columnIndexMap;
-  private List<OrderByElement> elementOrders;
-  private String tempDir = "temp";
-  private int maxSlotNum;
-  private int blockIndex;
-  private Operator operator;
+  private Operator childOperator;
+  private List<Column> orders;
   private Tuple[] tupleArray;
-  private List<TupleReader> blockReaders;
-  private Tuple[] tupleBuffer;
+  private TupleReader tupleReader;
 
   /**
    * SelectOperator constructor
    *
-   * @param operator scan | select | join operator
-   * @param elementOrders list of ORDER BY elements
+   * @param childOperator scan | select | join operator
+   * @param orders list of ORDER BY elements
    */
   public ExternalSortOperator(
-      ArrayList<Column> outputSchema,
-      Operator operator,
-      List<OrderByElement> elementOrders,
-      int bufferSizeInPage) {
+          ArrayList<Column> outputSchema,
+          Operator childOperator,
+          List<Column> orders,
+          int numPagePerBlock
+  ) {
+
     super(outputSchema);
-    this.maxSlotNum = bufferSizeInPage * 4096 / 4;
-    this.columnIndexMap = HelperMethods.mapColumnIndex(operator.getOutputSchema());
-    this.elementOrders = elementOrders;
-    this.blockReaders = new ArrayList<>();
-    this.blockIndex = 0;
-    this.operator = operator;
-    while (extractDataBlock()) {
-      sort();
-      writeDataBlock();
-    }
-    // 做一个heap for buffer
-    // merge
+
+    this.childOperator = childOperator;
+    this.orders = orders;
+
+    int maxTupleNum = numPagePerBlock * 4096 / 4 / childOperator.getOutputSchema().size();
+    this.tupleArray = new Tuple[maxTupleNum];
+
+    List<File> files = divideAndSort();
+    File mergedFile = mergeSortedFiles(files);
+    this.tupleReader = new BinaryHandler(mergedFile);
   }
 
-  /** Merge the sorted files */
-  private void merge() {}
+  public ExternalSortOperator(
+          ArrayList<Column> outputSchema,
+          Operator childOperator,
+          Column order,
+          int numPagePerBlock
+  ) {
 
-  /**
-   * Extract a block of data from the child operator.
-   *
-   * @return true if there are tuples to extract, false otherwise
-   */
-  private boolean extractDataBlock() {
-    Tuple tuple = operator.getNextTuple();
+    super(outputSchema);
 
-    if (tuple == null) {
-      return false;
+    this.childOperator = childOperator;
+    this.orders = new ArrayList<>();
+    this.orders.add(order);
+
+    int maxTupleNum = numPagePerBlock * 4096 / 4 / childOperator.getOutputSchema().size();
+    this.tupleArray = new Tuple[maxTupleNum];
+
+    List<File> files = divideAndSort();
+    File mergedFile = mergeSortedFiles(files);
+    this.tupleReader = new BinaryHandler(mergedFile);
+  }
+
+
+  private List<File> divideAndSort(){
+    List<File> externalFileList = new ArrayList<>();
+
+    while (Operator.loadTupleBlock(childOperator, tupleArray)) {
+      // sort the tuples
+      Arrays.sort(tupleArray, HelperMethods.getTupleComparator(orders, outputSchema));
+      File file = writeTupleBlock();
+      externalFileList.add(file);
     }
+    return externalFileList;
+  }
 
-    int maxTupleNum = maxSlotNum / tuple.getSize();
-    tupleArray = new Tuple[maxTupleNum];
-    int index = 1;
+  private File mergeSortedFiles(List<File> externalFileList){
+    PriorityQueue<Pair<TupleReader, Tuple>> pq = new PriorityQueue<>(
+            HelperMethods.getTupleComparator(orders, outputSchema)
+    );
 
-    while (index < maxTupleNum) {
-      tuple = operator.getNextTuple();
-      if (tuple == null) {
-        break;
+    File mergedFile = new File("_" + UUID.randomUUID() + "sorted.temp");
+    mergedFile.deleteOnExit();
+    TupleWriter writer = new BinaryHandler(mergedFile);
+
+    for(File file: externalFileList){
+      TupleReader reader = new BinaryHandler(file);
+      Tuple tuple = reader.readNextTuple();
+      if (tuple != null){
+        pq.offer(new Pair<>(reader, tuple));
       }
-      tupleArray[index++] = tuple;
     }
-    return true;
+
+    while (!pq.isEmpty()){
+      Pair<TupleReader, Tuple> pair = pq.poll();
+      writer.writeNextTuple(pair.getRight());
+
+      TupleReader reader = pair.getLeft();
+      Tuple tuple = reader.readNextTuple();
+      if (tuple != null) {
+        pq.offer(new Pair<>(reader, tuple));
+      }
+    }
+    writer.close();
+
+    return mergedFile;
   }
 
   /** Write the sorted tuples to temporary file. */
-  private void writeDataBlock() {
+  private File writeTupleBlock() {
     // write the data block to a file
-    String fileName = blockIndex + ".txt";
-    File file = new File(fileName);
+    File file = new File("_" + UUID.randomUUID() + ".temp");
     TupleWriter tupleWriter = new BinaryHandler(file);
-    this.blockReaders.add(new BinaryHandler(file));
     for (Tuple tuple : tupleArray) {
-      if (tuple == null) {
-        break;
-      }
+      if (tuple == null) break;
       tupleWriter.writeNextTuple(tuple);
     }
-    blockIndex++;
+    tupleWriter.close();
+    return file;
   }
 
-  /**
-   * Sort the tuples based on the column specified in the ORDER BY clause. Then sort the tuples
-   * based on the subsequent columns to break ties.
-   */
-  private void sort() {
-    Arrays.sort(
-        tupleArray,
-        new Comparator<Tuple>() {
-          @Override
-          public int compare(Tuple t1, Tuple t2) {
-            if (t1 == null && t2 == null) {
-              return 0;
-            } else if (t1 == null) {
-              return 1;
-            } else if (t2 == null) {
-              return -1;
-            }
 
-            for (OrderByElement elementOrder : elementOrders) {
-              Column column = (Column) elementOrder.getExpression();
-              int index = columnIndexMap.get(column.getName(true));
-              int compare =
-                  Integer.compare(t1.getElementAtIndex(index), t2.getElementAtIndex(index));
-
-              // if the attributes are not equal, return the comparison result
-              if (compare != 0) {
-                return compare;
-              }
-            }
-
-            // if the attributes are equal, traverse columnIndexMap to compare the next
-            // non-equal column
-            for (Column column : getOutputSchema()) {
-              String key = column.getName(true);
-              if (t1.getElementAtIndex(columnIndexMap.get(key))
-                  != t2.getElementAtIndex(columnIndexMap.get(key))) {
-                return Integer.compare(
-                    t1.getElementAtIndex(columnIndexMap.get(key)),
-                    t2.getElementAtIndex(columnIndexMap.get(key)));
-              }
-            }
-            return 0;
-          }
-        });
-  }
 
   /** Reset the TupleReader */
   @Override
   public void reset() {
-    for (TupleReader tupleReader : blockReaders) {
-      tupleReader.reset();
-    }
+    this.tupleReader.reset();
   }
 
   /**
@@ -159,52 +142,6 @@ public class ExternalSortOperator extends Operator {
    */
   @Override
   public Tuple getNextTuple() {
-    if (blockReaders.size() == 0) {
-      return null;
-    }
-
-    Tuple minTuple = null;
-    int minIndex = -1;
-    for (int i = 0; i < this.tupleBuffer.length; i++) {
-
-      // if the buffer is empty, read the next tuple
-      if (tupleBuffer[i] == null) {
-        tupleBuffer[i] = blockReaders.get(i).readNextTuple();
-
-        // if the buffer is still empty, this file is done
-        if (tupleBuffer[i] == null) {
-          continue;
-        }
-      }
-
-      // initialize the minTuple
-      if (minTuple == null) {
-        minTuple = tupleBuffer[i];
-        minIndex = i;
-      } else {
-        // compare the tuple with the minTuple
-        for (OrderByElement elementOrder : elementOrders) {
-          Column column = (Column) elementOrder.getExpression();
-          int index = columnIndexMap.get(column.getName(true));
-          int compare =
-              Integer.compare(
-                  minTuple.getElementAtIndex(index), tupleBuffer[i].getElementAtIndex(index));
-          if (compare != 0) {
-            if (compare > 0) {
-              minTuple = tupleBuffer[i];
-              minIndex = i;
-            }
-            break;
-          }
-        }
-      }
-    }
-
-    // if the minTuple is not null, remove it from the buffer
-    if (minTuple != null && minIndex != -1) {
-      tupleBuffer[minIndex] = blockReaders.get(minIndex).readNextTuple();
-    }
-
-    return minTuple;
+    return this.tupleReader.readNextTuple();
   }
 }

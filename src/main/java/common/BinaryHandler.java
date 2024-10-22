@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 /** A class to handle binary files. It reads OR writes (binary) tuples to a (binary) file. */
 public class BinaryHandler implements TupleWriter, TupleReader {
-  protected final Logger logger = LogManager.getLogger();
-  private final int bufferCapacity = 4096;
+  private final Logger logger = LogManager.getLogger();
+  private final int bufferCapacity = DBCatalog.getInstance().getBufferCapacity();
   private int attributeNum;
   private int tupleNum;
   private int offset;

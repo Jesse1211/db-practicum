@@ -8,7 +8,7 @@ public class BNLJOperator extends Operator {
 
   private Tuple[] leftTupleBlock;
   private int leftTupleBlockIndex;
-  private int maxSlotNum;
+  private int bufferSizeInPage;
   private Operator leftChildOperator;
   private Operator rightChildOperator;
   private Tuple rightTuple;
@@ -20,7 +20,7 @@ public class BNLJOperator extends Operator {
       int bufferSizeInPage) {
 
     super(outputSchema);
-    this.maxSlotNum = bufferSizeInPage * 4096 / 4;
+    this.bufferSizeInPage = bufferSizeInPage;
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
 
@@ -36,7 +36,7 @@ public class BNLJOperator extends Operator {
       return false;
     }
 
-    int maxTupleNum = maxSlotNum / tuple.getSize();
+    int maxTupleNum = bufferSizeInPage * 4096 / 4 / tuple.getSize();
     leftTupleBlock = new Tuple[maxTupleNum];
     leftTupleBlock[0] = tuple;
     int index = 1;

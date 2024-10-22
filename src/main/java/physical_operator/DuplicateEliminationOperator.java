@@ -9,22 +9,22 @@ import net.sf.jsqlparser.schema.Column;
  * tuples, and if a tuple is already in the set, skip the one.
  */
 public class DuplicateEliminationOperator extends Operator {
-  private Operator operator;
+  private Operator childOperator;
   private Set<Tuple> distinctSet = new HashSet<>();
 
   /**
    * DuplicateEliminationOperator constructor
    *
-   * @param operator child operator, this is invoked as last operator in plan builder
+   * @param childOperator child operator, this is invoked as last operator in plan builder
    */
-  public DuplicateEliminationOperator(ArrayList<Column> outputSchema, Operator operator) {
+  public DuplicateEliminationOperator(ArrayList<Column> outputSchema, Operator childOperator) {
     super(outputSchema);
-    this.operator = operator;
+    this.childOperator = childOperator;
   }
 
   @Override
   public void reset() {
-    operator.reset();
+    childOperator.reset();
     distinctSet.clear();
   }
 
@@ -32,7 +32,7 @@ public class DuplicateEliminationOperator extends Operator {
   public Tuple getNextTuple() {
     Tuple tuple;
 
-    if ((tuple = operator.getNextTuple()) != null) {
+    if ((tuple = childOperator.getNextTuple()) != null) {
       if (!distinctSet.contains(tuple)) {
         distinctSet.add(tuple);
         return tuple;

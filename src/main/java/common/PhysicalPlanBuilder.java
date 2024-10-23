@@ -45,6 +45,11 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   @Override
   public void visit(DuplicateEliminationOperatorNode node) {
     node.getChildNode().accept(this);
+
+    // Use sort to process distinct, if the child is not SortOperator, we create a sort node.
+    if(!(node.getChildNode() instanceof SortOperatorNode)){
+      operator = getSortOperator(new SortOperatorNode(node, new ArrayList<>()), operator);
+    }
     operator = new DuplicateEliminationOperator(node.getOutputSchema(), operator);
   }
 

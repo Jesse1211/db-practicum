@@ -179,7 +179,7 @@ public class DBCatalog {
    * @param tempDirectory
    */
   public void setTempDirectory(String tempDirectory) {
-    this.tempDirectory = tempDirectory + "/";
+    this.tempDirectory = tempDirectory;
   }
 
 

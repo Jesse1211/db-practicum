@@ -1,5 +1,6 @@
 package physical_operator;
 
+import common.ExpressionEvaluator;
 import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
@@ -10,7 +11,7 @@ import net.sf.jsqlparser.schema.Column;
  */
 public class DuplicateEliminationOperator extends Operator {
   private Operator childOperator;
-  private Set<Tuple> distinctSet = new HashSet<>();
+  private Tuple prevTuple = null;
 
   /**
    * DuplicateEliminationOperator constructor
@@ -25,21 +26,14 @@ public class DuplicateEliminationOperator extends Operator {
   @Override
   public void reset() {
     childOperator.reset();
-    distinctSet.clear();
   }
 
   @Override
   public Tuple getNextTuple() {
     Tuple tuple;
 
-    if ((tuple = childOperator.getNextTuple()) != null) {
-      if (!distinctSet.contains(tuple)) {
-        distinctSet.add(tuple);
-        return tuple;
-      } else {
-        return getNextTuple();
-      }
-    }
-    return null;
+    while ((tuple = childOperator.getNextTuple()) != null && tuple.equals(prevTuple));
+    prevTuple = tuple;
+    return tuple;
   }
 }

@@ -4,15 +4,27 @@ import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
+/**
+ * Block Nested Loop Join Operator
+ */
 public class BNLJOperator extends Operator {
 
-  private Tuple[] leftTupleBlock;
+  private Tuple[] tupleBuffer;
   private int leftTupleBlockIndex;
   private int bufferSizeInPage;
   private Operator leftChildOperator;
   private Operator rightChildOperator;
   private Tuple rightTuple;
 
+  /**
+   * Block Nested Loop Join Operator Constructor
+   * 
+   * @param outputSchema       output schema
+   * @param leftChildOperator  left child operator
+   * @param rightChildOperator right child operator
+   * @param bufferSizeInPage   buffer size in page unit, each page is 4096 bytes,
+   *                           buffer means the block size
+   */
   public BNLJOperator(
       ArrayList<Column> outputSchema,
       Operator leftChildOperator,
@@ -29,31 +41,22 @@ public class BNLJOperator extends Operator {
     loadLeftChildBlock();
   }
 
+  /**
+   * Load left child block into memory
+   * 
+   * @return true if there is at least one tuple in the block, false otherwise
+   */
   private boolean loadLeftChildBlock() {
-    Tuple tuple = leftChildOperator.getNextTuple();
-
-    if (tuple == null) {
-      return false;
-    }
-
-    int maxTupleNum = bufferSizeInPage * 4096 / 4 / tuple.getSize();
-    leftTupleBlock = new Tuple[maxTupleNum];
-    leftTupleBlock[0] = tuple;
-    int index = 1;
-
-    while (index < maxTupleNum) {
-      tuple = leftChildOperator.getNextTuple();
-      if (tuple == null) {
-        break;
-      }
-      leftTupleBlock[index++] = tuple;
-    }
+    // Pages per block * page size / integer size / tuple size
+    int maxTupleNum = bufferSizeInPage * 4096 / 4 / leftChildOperator.getOutputSchema().size();
+    tupleBuffer = new Tuple[maxTupleNum];
     this.leftTupleBlockIndex = 0;
-    return true;
+    return loadTupleBlock(leftChildOperator, tupleBuffer);
   }
 
   /**
-   * Output one tuple at a time, block buffer can be resumed. Traverse ALL right tuples for each
+   * Output one tuple at a time, block buffer can be resumed. Traverse ALL right
+   * tuples for each
    * left tuple in the block.
    *
    * @return a tuple that glues left and right tuples
@@ -62,8 +65,8 @@ public class BNLJOperator extends Operator {
   public Tuple getNextTuple() {
 
     // Traversed ONE left tuple block, reset index & load next right tuple
-    if (this.leftTupleBlockIndex >= this.leftTupleBlock.length
-        || this.leftTupleBlock[this.leftTupleBlockIndex] == null) {
+    if (this.leftTupleBlockIndex >= this.tupleBuffer.length
+        || this.tupleBuffer[this.leftTupleBlockIndex] == null) {
       this.leftTupleBlockIndex = 0;
       this.rightTuple = rightChildOperator.getNextTuple();
     }
@@ -77,11 +80,11 @@ public class BNLJOperator extends Operator {
       this.rightTuple = rightChildOperator.getNextTuple();
     }
 
-    if (this.leftTupleBlock == null) {
+    if (this.tupleBuffer == null) {
       return null;
     }
 
-    return this.leftTupleBlock[this.leftTupleBlockIndex++].concat(rightTuple);
+    return this.tupleBuffer[this.leftTupleBlockIndex++].concat(rightTuple);
   }
 
   @Override

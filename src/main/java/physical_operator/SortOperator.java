@@ -19,7 +19,7 @@ public class SortOperator extends Operator {
   private List<Column> orders;
 
   /**
-   * SelectOperator constructor
+   * Sort Operator constructor
    *
    * @param childOperator scan | select | join operator
    * @param orders list of columns in ORDER BY elements
@@ -34,14 +34,8 @@ public class SortOperator extends Operator {
     this.it = tupleList.iterator();
   }
 
-  public SortOperator(ArrayList<Column> outputSchema, Operator operator, Column order) {
-    super(outputSchema);
-    this.orders = new ArrayList<>();
-    this.orders.add(order);
-    // sort the tuples
-    this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(operator));
-    sort();
-    this.it = tupleList.iterator();
+  public SortOperator(ArrayList<Column> outputSchema, Operator childOperator, Column order) {
+    this(outputSchema, childOperator, new ArrayList<>(Collections.singletonList(order)));
   }
 
   /**

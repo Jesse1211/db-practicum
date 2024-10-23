@@ -106,7 +106,11 @@ public class HelperMethods {
     return new Pair<>(leftTableName, rightTableName);
   }
 
-
+  /**
+   * Get a pair of column names from a comparison operator
+   * @param whereExpression expect to be a EqualsTo expression
+   * @return pair of column names
+   */
   public static Pair<Column, Column> getEqualityConditionColumnPair(Expression whereExpression) {
     ArrayList<ComparisonOperator> comparisons = flattenExpression(whereExpression);
 

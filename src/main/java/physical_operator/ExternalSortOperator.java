@@ -19,7 +19,7 @@ import net.sf.jsqlparser.schema.Column;
 public class ExternalSortOperator extends Operator {
   private Operator childOperator;
   private List<Column> orders;
-  private Tuple[] tupleArray;
+  private Tuple[] tupleBuffer;
   private TupleReader tupleReader;
 
   /**
@@ -41,7 +41,7 @@ public class ExternalSortOperator extends Operator {
     this.orders = orders;
 
     int maxTupleNum = numPagePerBlock * 4096 / 4 / childOperator.getOutputSchema().size();
-    this.tupleArray = new Tuple[maxTupleNum];
+    this.tupleBuffer = new Tuple[maxTupleNum];
 
     List<File> files = divideAndSort();
     File mergedFile = mergeSortedFiles(files);
@@ -73,9 +73,9 @@ public class ExternalSortOperator extends Operator {
   private List<File> divideAndSort(){
     List<File> externalFileList = new ArrayList<>();
 
-    while (Operator.loadTupleBlock(childOperator, tupleArray)) {
+    while (Operator.loadTupleBlock(childOperator, tupleBuffer)) {
       // sort the tuples
-      Arrays.sort(tupleArray, HelperMethods.getTupleComparator(orders, outputSchema));
+      Arrays.sort(tupleBuffer, HelperMethods.getTupleComparator(orders, outputSchema));
       File file = writeTupleBlock();
       externalFileList.add(file);
     }
@@ -119,8 +119,9 @@ public class ExternalSortOperator extends Operator {
     // write the data block to a file
     File file = new File("_" + UUID.randomUUID() + ".temp");
     TupleWriter tupleWriter = new BinaryHandler(file);
-    for (Tuple tuple : tupleArray) {
-      if (tuple == null) break;
+    for (Tuple tuple : tupleBuffer) {
+      if (tuple == null)
+        break;
       tupleWriter.writeNextTuple(tuple);
     }
     tupleWriter.close();

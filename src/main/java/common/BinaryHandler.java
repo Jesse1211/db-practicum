@@ -83,10 +83,10 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       }
     }
 
-    int[] tupleArray = new int[this.attributeNum];
-    this.byteBuffer.asIntBuffer().get(this.offset, tupleArray);
+    int[] tupleBuffer = new int[this.attributeNum];
+    this.byteBuffer.asIntBuffer().get(this.offset, tupleBuffer);
     this.offset += this.attributeNum;
-    return new Tuple(tupleArray);
+    return new Tuple(tupleBuffer);
   }
 
   /**
@@ -139,9 +139,9 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       this.tupleNum = 0;
     }
 
-    int[] tupleArray = tuple.getAllElementsAsArray();
+    int[] tupleBuffer = tuple.getAllElementsAsArray();
 
-    this.byteBuffer.asIntBuffer().put(this.offset, tupleArray);
+    this.byteBuffer.asIntBuffer().put(this.offset, tupleBuffer);
     this.offset += this.attributeNum;
     this.tupleNum++;
 

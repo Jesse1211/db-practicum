@@ -62,8 +62,8 @@ public class BNLJOperator extends Operator {
   public Tuple getNextTuple() {
 
     // Traversed ONE left tuple block, reset index & load next right tuple
-    if (this.leftTupleBlockIndex >= this.leftTupleBlock.length
-        || this.leftTupleBlock[this.leftTupleBlockIndex] == null) {
+    if (this.leftTupleBlockIndex >= this.tupleBuffer.length
+        || this.tupleBuffer[this.leftTupleBlockIndex] == null) {
       this.leftTupleBlockIndex = 0;
       this.rightTuple = rightChildOperator.getNextTuple();
     }
@@ -77,11 +77,11 @@ public class BNLJOperator extends Operator {
       this.rightTuple = rightChildOperator.getNextTuple();
     }
 
-    if (this.leftTupleBlock == null) {
+    if (this.tupleBuffer == null) {
       return null;
     }
 
-    return this.leftTupleBlock[this.leftTupleBlockIndex++].concat(rightTuple);
+    return this.tupleBuffer[this.leftTupleBlockIndex++].concat(rightTuple);
   }
 
   @Override

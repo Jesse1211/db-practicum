@@ -49,28 +49,19 @@ public class ExternalSortOperator extends Operator {
   }
 
   public ExternalSortOperator(
-          ArrayList<Column> outputSchema,
-          Operator childOperator,
-          Column order,
-          int numPagePerBlock
-  ) {
-
-    super(outputSchema);
-
-    this.childOperator = childOperator;
-    this.orders = new ArrayList<>();
-    this.orders.add(order);
-
-    int maxTupleNum = numPagePerBlock * 4096 / 4 / childOperator.getOutputSchema().size();
-    this.tupleArray = new Tuple[maxTupleNum];
-
-    List<File> files = divideAndSort();
-    File mergedFile = mergeSortedFiles(files);
-    this.tupleReader = new BinaryHandler(mergedFile);
+      ArrayList<Column> outputSchema,
+      Operator childOperator,
+      Column order,
+      int numPagePerBlock) {
+    this(outputSchema, childOperator, Collections.singletonList(order), numPagePerBlock);
   }
 
-
-  private List<File> divideAndSort(){
+  /**
+   * For each block, Load, sort then write the tuples temporary files.
+   * 
+   * @return
+   */
+  private List<File> divideAndSort() {
     List<File> externalFileList = new ArrayList<>();
 
     while (Operator.loadTupleBlock(childOperator, tupleBuffer)) {

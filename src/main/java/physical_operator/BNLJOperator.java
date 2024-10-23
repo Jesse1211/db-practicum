@@ -30,26 +30,11 @@ public class BNLJOperator extends Operator {
   }
 
   private boolean loadLeftChildBlock() {
-    Tuple tuple = leftChildOperator.getNextTuple();
-
-    if (tuple == null) {
-      return false;
-    }
-
-    int maxTupleNum = bufferSizeInPage * 4096 / 4 / tuple.getSize();
-    leftTupleBlock = new Tuple[maxTupleNum];
-    leftTupleBlock[0] = tuple;
-    int index = 1;
-
-    while (index < maxTupleNum) {
-      tuple = leftChildOperator.getNextTuple();
-      if (tuple == null) {
-        break;
-      }
-      leftTupleBlock[index++] = tuple;
-    }
+    // Pages per block * page size / integer size / tuple size
+    int maxTupleNum = bufferSizeInPage * 4096 / 4 / leftChildOperator.getOutputSchema().size();
+    tupleBuffer = new Tuple[maxTupleNum];
     this.leftTupleBlockIndex = 0;
-    return true;
+    return loadTupleBlock(leftChildOperator, tupleBuffer);
   }
 
   /**

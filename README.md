@@ -74,7 +74,7 @@ Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare 
 
 #### `ExternalSortOperator(outputSchema, childOperator, orderColumns, bufferSize)`: **External Sort**
 
-- `divideAndSort()`:Load buffer size of tuples, then sort and store to a File named with _UUID.temp
+- `divideAndSort()`:Load buffer size of tuples, then sort and store to a File named with \_UUID.temp
 - `mergedFile = mergeSortedFiles()`: Utilize Priority Queue to find 'best' tuple among all files, then write to ONE merged file
 - delete files on exiting the temp files
 - `reset()`: reset iterator
@@ -92,6 +92,15 @@ Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare 
 
 #### `SMJOperator(outputSchema, leftOperator, rightOperator, leftColumn, rightColumn)`: **SMJ**
 
+- Restriction: check if join has at least equality condition
+- Get equality condition, extract left and right columns as `leftSortOperator` and `rightSortOperator`
+- Use `leftColumnMap` and `rightColumnMap` to keep track of the value and index for index resting purpose
+- `getNextTuple()`: Find the match tuples by comparing the values in columns.
+  - if tuples have same value:
+    - Add tuple and value into map for record if map doesn't have
+  - if tuples value are different
+    - load next tuple, and check and reset the index from map to solve duplication values
+
 ### config.properties
 
 **We are expecting the input format is alway correct.**
@@ -105,7 +114,7 @@ Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare 
 #### second line - sort algorithms:
 
 - `0`: In-Memory Sort
-- `1`: External Sort
+- `1 x`: External Sort with buffer size as x page
 
 ---
 

@@ -25,6 +25,7 @@ public class DBCatalog {
   private static DBCatalog db;
 
   private String dbDirectory;
+  private String tempDirectory;
 
   private final int bufferCapacity = 4096;
   // For Plan Builder Config
@@ -171,6 +172,19 @@ public class DBCatalog {
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
+  }
+
+  /**
+   * Set temporary directory
+   * @param tempDirectory
+   */
+  public void setTempDirectory(String tempDirectory) {
+    this.tempDirectory = tempDirectory + "/";
+  }
+
+
+  public String getTempDirectory() {
+    return tempDirectory;
   }
 
   /**

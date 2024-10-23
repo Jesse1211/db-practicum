@@ -37,6 +37,7 @@ public class Compiler {
     tempDir = args[2];
     DBCatalog.getInstance().setDataDirectory(inputDir + "/db");
     DBCatalog.getInstance().setPlanBuilderConfig(inputDir + "/plan_builder_config.txt");
+    DBCatalog.getInstance().setTempDirectory(tempDir);
     try {
       String str = Files.readString(Paths.get(inputDir + "/queries.sql"));
       Statements statements = CCJSqlParserUtil.parseStatements(str);
@@ -56,6 +57,7 @@ public class Compiler {
 
           if (outputToFiles) {
             File outfile = new File(outputDir + "/query" + counter);
+            outfile.createNewFile();
             System.currentTimeMillis();
             plan.dump(new BinaryHandler(outfile));
             System.currentTimeMillis();

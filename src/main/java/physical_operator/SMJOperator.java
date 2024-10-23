@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import net.sf.jsqlparser.schema.Column;
 
+/**
+ * Sort Merge Join Operator
+ */
 public class SMJOperator extends Operator {
 
   private SortOperator leftChildOperator;
@@ -21,8 +24,11 @@ public class SMJOperator extends Operator {
   /**
    * SMJOperator Constructor
    *
+   * @param outputSchema       output schema
    * @param leftChildOperator  leftChildOperator that needs to perform to join
    * @param rightChildOperator rightChildOperator that needs to perform to join
+   * @param leftColumn         left column to join
+   * @param rightColumn        right column to join
    */
   public SMJOperator(
           ArrayList<Column> outputSchema,
@@ -48,10 +54,6 @@ public class SMJOperator extends Operator {
     rightResetIndexMap = new HashMap<>();
   }
 
-
-  /**
-   *
-   */
   @Override
   public void reset() {
     leftChildOperator.reset();
@@ -61,10 +63,6 @@ public class SMJOperator extends Operator {
     rightResetIndexMap.clear();
   }
 
-
-  /**
-   * @return
-   */
   @Override
   public Tuple getNextTuple() {
     // merge sorted tuples
@@ -117,6 +115,10 @@ public class SMJOperator extends Operator {
     return null;
   }
 
+  /**
+   * Check if the index needs to be reset and reset the index
+   * @return
+   */
   private boolean checkAndResetIndex() {
     int value = leftTuple.getElementAtIndex(leftColumnIndex);
     if (!rightResetIndexMap.containsKey(value)) {

@@ -11,10 +11,13 @@ import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
 /**
- * An operator for ORDER BY. Create intermediate files to keep the partial sorted runs which are
- * pending a merge in the next pass. Will clean up the intermediate files after the query is done.
+ * An operator for ORDER BY. Create intermediate files to keep the partial
+ * sorted runs which are
+ * pending a merge in the next pass. Will clean up the intermediate files after
+ * the query is done.
  *
- * <p>Intermediate files are binary for production, human-readable for debugging.
+ * <p>
+ * Intermediate files are binary for production, human-readable for debugging.
  */
 public class ExternalSortOperator extends Operator {
   private Operator childOperator;
@@ -23,17 +26,19 @@ public class ExternalSortOperator extends Operator {
   private TupleReader tupleReader;
 
   /**
-   * SelectOperator constructor
-   *
-   * @param childOperator scan | select | join operator
-   * @param orders list of ORDER BY elements
+   * External Sort constructor, sort the tuples from the child operator by more
+   * than one column.
+   * 
+   * @param outputSchema    output schema
+   * @param childOperator   child operator
+   * @param orders          2+ orders
+   * @param numPagePerBlock number of pages per block
    */
   public ExternalSortOperator(
-          ArrayList<Column> outputSchema,
-          Operator childOperator,
-          List<Column> orders,
-          int numPagePerBlock
-  ) {
+      ArrayList<Column> outputSchema,
+      Operator childOperator,
+      List<Column> orders,
+      int numPagePerBlock) {
 
     super(outputSchema);
 
@@ -43,11 +48,22 @@ public class ExternalSortOperator extends Operator {
     int maxTupleNum = numPagePerBlock * 4096 / 4 / childOperator.getOutputSchema().size();
     this.tupleBuffer = new Tuple[maxTupleNum];
 
+    // Divide to files and sort the tuples inside files
     List<File> files = divideAndSort();
     File mergedFile = mergeSortedFiles(files);
+    // prepare for reading the sorted tuples
     this.tupleReader = new BinaryHandler(mergedFile);
   }
 
+  /**
+   * External Sort constructor, sort the tuples from the child operator by only
+   * one column.
+   * 
+   * @param outputSchema
+   * @param childOperator
+   * @param order
+   * @param numPagePerBlock
+   */
   public ExternalSortOperator(
       ArrayList<Column> outputSchema,
       Operator childOperator,
@@ -73,24 +89,33 @@ public class ExternalSortOperator extends Operator {
     return externalFileList;
   }
 
-  private File mergeSortedFiles(List<File> externalFileList){
+  /**
+   * Merge the sorted files.
+   * Delete the files on exit.
+   * 
+   * @param externalFileList list of sorted files
+   * @return
+   */
+  private File mergeSortedFiles(List<File> externalFileList) {
     PriorityQueue<Pair<TupleReader, Tuple>> pq = new PriorityQueue<>(
-            HelperMethods.getTupleComparator(orders, outputSchema)
-    );
+        HelperMethods.getTupleComparator(orders, outputSchema));
 
     File mergedFile = new File("_" + UUID.randomUUID() + "sorted.temp");
     mergedFile.deleteOnExit();
     TupleWriter writer = new BinaryHandler(mergedFile);
 
-    for(File file: externalFileList){
+    // Load top tuple from each file
+    for (File file : externalFileList) {
       TupleReader reader = new BinaryHandler(file);
       Tuple tuple = reader.readNextTuple();
-      if (tuple != null){
+      if (tuple != null) {
         pq.offer(new Pair<>(reader, tuple));
       }
     }
 
-    while (!pq.isEmpty()){
+    // Get the smallest tuple and write it to the merged file
+    // Offer the next tuple from the file to PQ
+    while (!pq.isEmpty()) {
       Pair<TupleReader, Tuple> pair = pq.poll();
       writer.writeNextTuple(pair.getRight());
 
@@ -105,10 +130,14 @@ public class ExternalSortOperator extends Operator {
     return mergedFile;
   }
 
-  /** Write the sorted tuples to temporary file. */
+  /**
+   * Write the sorted tuples to temporary file.
+   * Delete the file on exit.
+   */
   private File writeTupleBlock() {
     // write the data block to a file
     File file = new File("_" + UUID.randomUUID() + ".temp");
+    file.deleteOnExit();
     TupleWriter tupleWriter = new BinaryHandler(file);
     for (Tuple tuple : tupleBuffer) {
       if (tuple == null)
@@ -119,9 +148,9 @@ public class ExternalSortOperator extends Operator {
     return file;
   }
 
-
-
-  /** Reset the TupleReader */
+  /**
+   * Reset the TupleReader
+   */
   @Override
   public void reset() {
     this.tupleReader.reset();

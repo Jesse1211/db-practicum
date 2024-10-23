@@ -19,7 +19,7 @@ public class SortOperator extends Operator {
   private List<Column> orders;
 
   /**
-   * SelectOperator constructor
+   * Sort Operator constructor
    *
    * @param childOperator scan | select | join operator
    * @param orders list of columns in ORDER BY elements

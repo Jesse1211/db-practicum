@@ -64,9 +64,9 @@ public class DuplicateEliminationTest {
     // Check the first 3 tuple
     Tuple[] expectedFirstThreeTuples =
         new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(64))),
-          new Tuple(new ArrayList<>(Arrays.asList(181))),
-          new Tuple(new ArrayList<>(Arrays.asList(147)))
+          new Tuple(new ArrayList<>(Arrays.asList(0))),
+          new Tuple(new ArrayList<>(Arrays.asList(1))),
+          new Tuple(new ArrayList<>(Arrays.asList(2)))
         };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {

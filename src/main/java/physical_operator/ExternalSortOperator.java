@@ -1,6 +1,7 @@
 package physical_operator;
 
 import common.BinaryHandler;
+import common.DBCatalog;
 import common.HelperMethods;
 import common.Pair;
 import common.Tuple;
@@ -100,7 +101,8 @@ public class ExternalSortOperator extends Operator {
     PriorityQueue<Pair<TupleReader, Tuple>> pq = new PriorityQueue<>(
         HelperMethods.getTupleComparator(orders, outputSchema));
 
-    File mergedFile = new File("_" + UUID.randomUUID() + "sorted.temp");
+    File mergedFile = new File(
+            DBCatalog.getInstance().getTempDirectory() + UUID.randomUUID() + "sorted.temp");
     mergedFile.deleteOnExit();
     TupleWriter writer = new BinaryHandler(mergedFile);
 
@@ -136,7 +138,9 @@ public class ExternalSortOperator extends Operator {
    */
   private File writeTupleBlock() {
     // write the data block to a file
-    File file = new File("_" + UUID.randomUUID() + ".temp");
+
+    File file = new File(
+            DBCatalog.getInstance().getTempDirectory() + "_" + UUID.randomUUID() + ".temp");
     file.deleteOnExit();
     TupleWriter tupleWriter = new BinaryHandler(file);
     for (Tuple tuple : tupleBuffer) {

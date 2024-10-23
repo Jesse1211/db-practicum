@@ -58,9 +58,12 @@ public class Compiler {
           if (outputToFiles) {
             File outfile = new File(outputDir + "/query" + counter);
             outfile.createNewFile();
-            System.currentTimeMillis();
+            // long time;
+            // System.out.println(time = System.currentTimeMillis());
+            System.out.println(System.currentTimeMillis());
             plan.dump(new BinaryHandler(outfile));
-            System.currentTimeMillis();
+            System.out.println(System.currentTimeMillis());
+            // System.out.println(time - System.currentTimeMillis());
           } else {
             plan.dump(System.out);
           }

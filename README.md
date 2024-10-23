@@ -1,8 +1,9 @@
-# Design Architecture (Phase 2 - Visitor Pattern)
+# Design Architecture (Phase 2 final - Visitor Pattern)
 
 ### The top-level class is the `Compiler` class located in `/src/main/java/compiler/Compiler.java`
 
 ## File locations
+
 - ### Logical operators are located at `/src/main/java/operator_node/` folder
 - ### Physical operators are located at `/src/main/java/physical_operator` folder
 - ### Physical plan builder is located at `/src/main/java/common/PhysicalPlanBuilder`
@@ -60,16 +61,51 @@ Construct a `Tree` by `OperatorNode` with relational algebra intuition, prepare 
 - `reset()`: call childOperator's reset()
 - `getNextTuple()`: based on filtered output, return only selected column as tuple
 
-#### `SortOperator(childOperator, elementOrders)`: **Order the output**
+#### `DuplicateEliminationOperator(childOperator)`: **Remove duplicates**
+
+- Initialize a set for duplication check from calling `childOperator's getNextTuple()`
+
+#### `SortOperator(childOperator, elementOrders)`: **In memory sort**
 
 - Fetch all values from `childOperator.getNextTuple()`
 - Implement a sort function and list iterator
 - `reset()`: reset iterator
 - `getNextTuple()`: trigger iterator
 
-#### `DuplicateEliminationOperator(childOperator)`: **Remove duplicates**
+#### `ExternalSortOperator(outputSchema, childOperator, orderColumns, bufferSize)`: **External Sort**
 
-- Initialize a set for duplication check from calling `childOperator's getNextTuple()`
+- `divideAndSort()`:Load buffer size of tuples, then sort and store to a File named with _UUID.temp
+- `mergedFile = mergeSortedFiles()`: Utilize Priority Queue to find 'best' tuple among all files, then write to ONE merged file
+- delete files on exiting the temp files
+- `reset()`: reset iterator
+- `getNextTuple()`: Find next tuple from mergedFile by using BinaryHandler
+
+#### `JoinOperator(outputSchema, leftOperator, rightOperator)`: **TNLJ**
+
+- Fetch one tuple from both operators, return the gluded tuple
+
+#### `BNLJOperator(outputSchema, leftOperator, rightOperator, bufferSize)`: **BNLJ**
+
+- `leftTupleBlockIndex`: used to keep in track of last visited tuple from left child block
+- `loadLeftChildBlock()`: Load ONE left child block into memory, this is being called once all tuples in block is traversed
+- `getNextTuple()`: Traverse block from updated leftTupleBlockIndex. If traversed all blocks, jump to next tuple from right child.
+
+#### `SMJOperator(outputSchema, leftOperator, rightOperator, leftColumn, rightColumn)`: **SMJ**
+
+### config.properties
+
+**We are expecting the input format is alway correct.**
+
+#### first line - Join algorithms:
+
+- `0`: TNLJ
+- `1 x`: BNLJ with buffer size as x page
+- `2`: SMJ
+
+#### second line - sort algorithms:
+
+- `0`: In-Memory Sort
+- `1`: External Sort
 
 ---
 

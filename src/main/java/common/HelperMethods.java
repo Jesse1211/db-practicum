@@ -110,14 +110,28 @@ public class HelperMethods {
    * @param whereExpression expect to be a EqualsTo expression
    * @return pair of column names
    */
-  public static Pair<Column, Column> getEqualityConditionColumnPair(Expression whereExpression) {
+  public static Pair<Column, Column> getEqualityConditionColumnPair(
+      Expression whereExpression, Operator leftOperator, Operator rightOperator) {
     ArrayList<ComparisonOperator> comparisons = flattenExpression(whereExpression);
 
     for (ComparisonOperator comparison : comparisons) {
       if (comparison instanceof EqualsTo) {
         Column leftColumn = comparison.getLeftExpression(Column.class);
         Column rightColumn = comparison.getRightExpression(Column.class);
-        return new Pair<>(leftColumn, rightColumn);
+
+        Map<String, Integer> leftMap = HelperMethods.mapColumnIndex(leftOperator.getOutputSchema());
+        Map<String, Integer> rightMap =
+            HelperMethods.mapColumnIndex(rightOperator.getOutputSchema());
+
+        if (leftMap.containsKey(leftColumn.getName(true))
+            && rightMap.containsKey(rightColumn.getName(true))) {
+          return new Pair<>(leftColumn, rightColumn);
+        }
+
+        if (leftMap.containsKey(rightColumn.getName(true))
+            && rightMap.containsKey(leftColumn.getName(true))) {
+          return new Pair<>(rightColumn, leftColumn);
+        }
       }
     }
     return null;
@@ -129,8 +143,8 @@ public class HelperMethods {
    *
    * @param orders list of columns
    * @param outputSchema list of all columns
-   * @return a Comparator<T>
    * @param <T> tuple or Pair<?, Tuple>
+   * @return a Comparator<T>
    */
   public static <T> Comparator<T> getTupleComparator(
       List<Column> orders, List<Column> outputSchema) {

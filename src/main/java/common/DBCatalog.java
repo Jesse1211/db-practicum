@@ -166,7 +166,6 @@ public class DBCatalog {
           this.sortMethod = "External Sort";
           break;
       }
-      this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
 
       br.close();
     } catch (Exception e) {

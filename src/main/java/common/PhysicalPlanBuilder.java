@@ -1,5 +1,7 @@
 package common;
 
+import static java.lang.System.exit;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import net.sf.jsqlparser.expression.Expression;
@@ -83,9 +85,11 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
         Expression whereExpression = ((SelectOperatorNode) parent).getWhereExpression();
 
         Pair<Column, Column> columnPair =
-            HelperMethods.getEqualityConditionColumnPair(whereExpression);
+            HelperMethods.getEqualityConditionColumnPair(
+                whereExpression, leftOperator, rightOperator);
         if (columnPair == null) {
           System.err.println("SMJ join should provide at least equality condition");
+          exit(-1);
         }
 
         // get equality condition, extract left and right columns

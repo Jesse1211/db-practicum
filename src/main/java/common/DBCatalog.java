@@ -176,12 +176,12 @@ public class DBCatalog {
 
   /**
    * Set temporary directory
+   *
    * @param tempDirectory
    */
   public void setTempDirectory(String tempDirectory) {
     this.tempDirectory = tempDirectory;
   }
-
 
   public String getTempDirectory() {
     return tempDirectory;
@@ -223,5 +223,7 @@ public class DBCatalog {
     return this.sortBufferPageNumber;
   }
 
-  public int getBufferCapacity(){return this.bufferCapacity;}
+  public int getBufferCapacity() {
+    return this.bufferCapacity;
+  }
 }

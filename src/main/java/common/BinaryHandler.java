@@ -223,4 +223,27 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       logger.error(e.getMessage());
     }
   }
+
+  @Override
+  public void reset(int i) {
+    if (this.offset == 0) return;
+    try {
+      fileChannel.position(0);
+      // get tuple number from page
+      ByteBuffer tupleNumBuffer = ByteBuffer.allocate(8);
+      fileChannel.read(tupleNumBuffer);
+      tupleNumBuffer.flip();
+      int tupleNum = tupleNumBuffer.asIntBuffer().get(1);
+
+      int pageIndex = i / tupleNum;
+      int tupleIndex = i % tupleNum;
+
+      fileChannel.position(bufferCapacity * pageIndex);
+      loadNextPage();
+      this.offset = 2 + tupleIndex * this.attributeNum;
+
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+    }
+  }
 }

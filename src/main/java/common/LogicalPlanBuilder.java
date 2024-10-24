@@ -57,8 +57,10 @@ public class LogicalPlanBuilder {
     }
 
     if (plainSelect.getOrderByElements() != null) {
-      List<Column> orders = plainSelect.getOrderByElements().stream().
-              map((orderByElement) -> (Column) orderByElement.getExpression()).toList();
+      List<Column> orders =
+          plainSelect.getOrderByElements().stream()
+              .map((orderByElement) -> (Column) orderByElement.getExpression())
+              .toList();
       operatorNode = new SortOperatorNode(operatorNode, orders);
     }
 

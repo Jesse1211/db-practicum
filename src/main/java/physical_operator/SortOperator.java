@@ -3,9 +3,7 @@ package physical_operator;
 import common.HelperMethods;
 import common.Tuple;
 import java.util.*;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.OrderByElement;
 
 /**
  * An operator for ORDER BY. Sort the tuples based on the column provided. If there are multiple
@@ -24,18 +22,13 @@ public class SortOperator extends Operator {
    * @param childOperator scan | select | join operator
    * @param orders list of columns in ORDER BY elements
    */
-  public SortOperator(
-      ArrayList<Column> outputSchema, Operator childOperator, List<Column> orders) {
+  public SortOperator(ArrayList<Column> outputSchema, Operator childOperator, List<Column> orders) {
     super(outputSchema);
     this.orders = orders;
     // sort the tuples
     this.tupleList = new ArrayList<>(HelperMethods.getAllTuples(childOperator));
     sort();
     this.it = tupleList.iterator();
-  }
-
-  public SortOperator(ArrayList<Column> outputSchema, Operator childOperator, Column order) {
-    this(outputSchema, childOperator, new ArrayList<>(Collections.singletonList(order)));
   }
 
   /**

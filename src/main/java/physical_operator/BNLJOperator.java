@@ -4,9 +4,7 @@ import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
-/**
- * Block Nested Loop Join Operator
- */
+/** Block Nested Loop Join Operator */
 public class BNLJOperator extends Operator {
 
   private Tuple[] tupleBuffer;
@@ -18,12 +16,12 @@ public class BNLJOperator extends Operator {
 
   /**
    * Block Nested Loop Join Operator Constructor
-   * 
-   * @param outputSchema       output schema
-   * @param leftChildOperator  left child operator
+   *
+   * @param outputSchema output schema
+   * @param leftChildOperator left child operator
    * @param rightChildOperator right child operator
-   * @param bufferSizeInPage   buffer size in page unit, each page is 4096 bytes,
-   *                           buffer means the block size
+   * @param bufferSizeInPage buffer size in page unit, each page is 4096 bytes, buffer means the
+   *     block size
    */
   public BNLJOperator(
       ArrayList<Column> outputSchema,
@@ -43,7 +41,7 @@ public class BNLJOperator extends Operator {
 
   /**
    * Load left child block into memory
-   * 
+   *
    * @return true if there is at least one tuple in the block, false otherwise
    */
   private boolean loadLeftChildBlock() {
@@ -55,8 +53,7 @@ public class BNLJOperator extends Operator {
   }
 
   /**
-   * Output one tuple at a time, block buffer can be resumed. Traverse ALL right
-   * tuples for each
+   * Output one tuple at a time, block buffer can be resumed. Traverse ALL right tuples for each
    * left tuple in the block.
    *
    * @return a tuple that glues left and right tuples

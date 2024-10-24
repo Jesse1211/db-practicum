@@ -36,7 +36,8 @@ public class SelectTests {
     Path resourcePath = Paths.get(path);
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
-    DBCatalog.getInstance().setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
+    DBCatalog.getInstance()
+        .setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
     DBCatalog.getInstance().setTempDirectory(resourcePath.resolve("../temp").toString());
     URI queriesFile =
         Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))

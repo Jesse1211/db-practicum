@@ -1,6 +1,5 @@
 package physical_operator;
 
-import common.ExpressionEvaluator;
 import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
@@ -32,7 +31,8 @@ public class DuplicateEliminationOperator extends Operator {
   public Tuple getNextTuple() {
     Tuple tuple;
 
-    while ((tuple = childOperator.getNextTuple()) != null && tuple.equals(prevTuple));
+    while ((tuple = childOperator.getNextTuple()) != null && tuple.equals(prevTuple))
+      ;
     prevTuple = tuple;
     return tuple;
   }

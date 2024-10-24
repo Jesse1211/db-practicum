@@ -127,4 +127,7 @@ public class TextHandler implements TupleWriter, TupleReader {
       logger.error(e.getMessage());
     }
   }
+
+  @Override
+  public void reset(int i) {}
 }

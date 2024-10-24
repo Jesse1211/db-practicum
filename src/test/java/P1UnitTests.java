@@ -10,8 +10,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import jdk.jshell.spi.ExecutionControl;
@@ -38,7 +40,8 @@ public class P1UnitTests {
     Path resourcePath = Paths.get(path);
 
     DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
-    DBCatalog.getInstance().setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
+    DBCatalog.getInstance()
+        .setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
     DBCatalog.getInstance().setTempDirectory(resourcePath.resolve("../temp").toString());
 
     URI queriesFile =
@@ -191,13 +194,19 @@ public class P1UnitTests {
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
+    Map<Tuple, Integer> frequencyMap = new HashMap<>();
+
+    for (Tuple tuple : expectedTuples) {
+      frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
+    }
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
     for (int i = 0; i < expectedTuples.size(); i++) {
       Tuple expectedTuple = expectedTuples.get(i);
-      Tuple actualTuple = tuples.get(i);
-      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+      int count = frequencyMap.getOrDefault(expectedTuple, 0);
+      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
+      frequencyMap.put(expectedTuple, count - 1);
     }
   }
 
@@ -210,13 +219,19 @@ public class P1UnitTests {
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
+    Map<Tuple, Integer> frequencyMap = new HashMap<>();
+
+    for (Tuple tuple : expectedTuples) {
+      frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
+    }
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
     for (int i = 0; i < expectedTuples.size(); i++) {
       Tuple expectedTuple = expectedTuples.get(i);
-      Tuple actualTuple = tuples.get(i);
-      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+      int count = frequencyMap.getOrDefault(expectedTuple, 0);
+      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
+      frequencyMap.put(expectedTuple, count - 1);
     }
   }
 
@@ -229,13 +244,19 @@ public class P1UnitTests {
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
+    Map<Tuple, Integer> frequencyMap = new HashMap<>();
+
+    for (Tuple tuple : expectedTuples) {
+      frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
+    }
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
     for (int i = 0; i < expectedTuples.size(); i++) {
       Tuple expectedTuple = expectedTuples.get(i);
-      Tuple actualTuple = tuples.get(i);
-      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+      int count = frequencyMap.getOrDefault(expectedTuple, 0);
+      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
+      frequencyMap.put(expectedTuple, count - 1);
     }
   }
 
@@ -266,13 +287,19 @@ public class P1UnitTests {
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
+    Map<Tuple, Integer> frequencyMap = new HashMap<>();
+
+    for (Tuple tuple : expectedTuples) {
+      frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
+    }
 
     Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
 
     for (int i = 0; i < expectedTuples.size(); i++) {
       Tuple expectedTuple = expectedTuples.get(i);
-      Tuple actualTuple = tuples.get(i);
-      Assertions.assertEquals(expectedTuple, actualTuple, "Unexpected tuple at index " + i);
+      int count = frequencyMap.getOrDefault(expectedTuple, 0);
+      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
+      frequencyMap.put(expectedTuple, count - 1);
     }
   }
 

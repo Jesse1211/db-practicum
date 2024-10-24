@@ -38,8 +38,8 @@ public class SortOperatorNode extends OperatorNode {
    * @param orders the expected order by elements of the sort operator node
    */
   public void setOrders(List<OrderByElement> orders) {
-    this.orders = orders.stream().
-            map((orderByElement) -> (Column) orderByElement.getExpression()).toList();
+    this.orders =
+        orders.stream().map((orderByElement) -> (Column) orderByElement.getExpression()).toList();
   }
 
   @Override

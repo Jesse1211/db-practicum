@@ -4,7 +4,6 @@ import common.HelperMethods;
 import common.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.SelectItem;
 
 /**
  * An operator for SELECT, only returns the columns stated in the select expression. It will also

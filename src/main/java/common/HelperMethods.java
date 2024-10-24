@@ -10,9 +10,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
 import physical_operator.Operator;
 
-/**
- * Helper methods for query plan builder
- */
+/** Helper methods for query plan builder */
 public class HelperMethods {
 
   /**
@@ -50,7 +48,7 @@ public class HelperMethods {
    * @param table main table
    * @param joins list of joins
    * @return list of all tables, if there is an alias of the same table, it will be treated as a
-   * separate table because alias will be treated as table names.
+   *     separate table because alias will be treated as table names.
    */
   public static ArrayList<Table> getAllTables(Table table, List<Join> joins) {
     ArrayList<Table> allTables = new ArrayList<>();
@@ -108,6 +106,7 @@ public class HelperMethods {
 
   /**
    * Get a pair of column names from a comparison operator
+   *
    * @param whereExpression expect to be a EqualsTo expression
    * @return pair of column names
    */
@@ -125,14 +124,16 @@ public class HelperMethods {
   }
 
   /**
-   * A comparator that sorts the tuples based on the column specified in the orders list.
-   * Then by the tuples based on the subsequent columns to break ties.
+   * A comparator that sorts the tuples based on the column specified in the orders list. Then by
+   * the tuples based on the subsequent columns to break ties.
+   *
    * @param orders list of columns
    * @param outputSchema list of all columns
    * @return a Comparator<T>
    * @param <T> tuple or Pair<?, Tuple>
    */
-  public static <T> Comparator<T> getTupleComparator(List<Column> orders, List<Column> outputSchema) {
+  public static <T> Comparator<T> getTupleComparator(
+      List<Column> orders, List<Column> outputSchema) {
     Map<String, Integer> columnIndexMap = HelperMethods.mapColumnIndex(outputSchema);
     return new Comparator<T>() {
       @Override
@@ -173,10 +174,10 @@ public class HelperMethods {
         for (Column column : outputSchema) {
           String key = column.getName(true);
           if (t1.getElementAtIndex(columnIndexMap.get(key))
-                  != t2.getElementAtIndex(columnIndexMap.get(key))) {
+              != t2.getElementAtIndex(columnIndexMap.get(key))) {
             return Integer.compare(
-                    t1.getElementAtIndex(columnIndexMap.get(key)),
-                    t2.getElementAtIndex(columnIndexMap.get(key)));
+                t1.getElementAtIndex(columnIndexMap.get(key)),
+                t2.getElementAtIndex(columnIndexMap.get(key)));
           }
         }
         return 0;

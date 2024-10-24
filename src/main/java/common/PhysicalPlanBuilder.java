@@ -1,7 +1,7 @@
 package common;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import operator_node.DuplicateEliminationOperatorNode;
@@ -36,8 +36,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra
    * query plan.
    */
-  public PhysicalPlanBuilder() {
-  }
+  public PhysicalPlanBuilder() {}
 
   /**
    * @param node
@@ -47,7 +46,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     node.getChildNode().accept(this);
 
     // Use sort to process distinct, if the child is not SortOperator, we create a sort node.
-    if(!(node.getChildNode() instanceof SortOperatorNode)){
+    if (!(node.getChildNode() instanceof SortOperatorNode)) {
       operator = getSortOperator(new SortOperatorNode(node, new ArrayList<>()), operator);
     }
     operator = new DuplicateEliminationOperator(node.getOutputSchema(), operator);
@@ -69,7 +68,8 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
         operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
         break;
       case "BNLJ":
-        operator = new BNLJOperator(
+        operator =
+            new BNLJOperator(
                 node.getOutputSchema(),
                 leftOperator,
                 rightOperator,
@@ -82,33 +82,31 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
         }
         Expression whereExpression = ((SelectOperatorNode) parent).getWhereExpression();
 
-        Pair<Column, Column> columnPair = HelperMethods.getEqualityConditionColumnPair(
-                whereExpression);
+        Pair<Column, Column> columnPair =
+            HelperMethods.getEqualityConditionColumnPair(whereExpression);
         if (columnPair == null) {
           System.err.println("SMJ join should provide at least equality condition");
         }
 
-        //get equality condition, extract left and right columns
-        SortOperator leftSortOperator = new SortOperator(
-                leftOperator.getOutputSchema(),
-                leftOperator,
-                columnPair.getLeft()
-        );
-        SortOperator rightSortOperator = new SortOperator(
-                rightOperator.getOutputSchema(),
-                rightOperator,
-                columnPair.getRight()
-        );
+        // get equality condition, extract left and right columns
+        Operator leftSortOperator =
+            getSortOperator(
+                new SortOperatorNode(
+                    node.getLeftChildNode(), Collections.singletonList(columnPair.getLeft())),
+                leftOperator);
+        Operator rightSortOperator =
+            getSortOperator(
+                new SortOperatorNode(
+                    node.getRightChildNode(), Collections.singletonList(columnPair.getRight())),
+                rightOperator);
 
-        operator = new SMJOperator(
+        operator =
+            new SMJOperator(
                 node.getOutputSchema(),
                 leftSortOperator,
                 rightSortOperator,
                 columnPair.getLeft(),
-                columnPair.getRight()
-        );
-        break;
-      default:
+                columnPair.getRight());
         break;
     }
   }
@@ -163,21 +161,17 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     return operator;
   }
 
-
   private Operator getSortOperator(SortOperatorNode node, Operator childOpeartor) {
-    Operator sortOperator = null;
     switch (DBCatalog.getInstance().getSortMethod()) {
       case "In-Memory Sort":
-        sortOperator = new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
-        break;
+        return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
       case "External Sort":
-        sortOperator = new ExternalSortOperator(
-                node.getOutputSchema(),
-                childOpeartor,
-                node.getOrders(),
-                DBCatalog.getInstance().getSortBufferPageNumber());
-        break;
+        return new ExternalSortOperator(
+            node.getOutputSchema(),
+            childOpeartor,
+            node.getOrders(),
+            DBCatalog.getInstance().getSortBufferPageNumber());
     }
-    return sortOperator;
+    return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
   }
 }

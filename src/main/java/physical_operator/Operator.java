@@ -11,12 +11,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Abstract class to represent relational operators for physical query plans.
- * Every operator has a
- * reference to an outputSchema which represents the schema of the output tuples
- * from the operator.
- * This is a list of Column objects. Each Column has an embedded Table object
- * with the name and
+ * Abstract class to represent relational operators for physical query plans. Every operator has a
+ * reference to an outputSchema which represents the schema of the output tuples from the operator.
+ * This is a list of Column objects. Each Column has an embedded Table object with the name and
  * alias (if required) fields set appropriately.
  */
 public abstract class Operator {
@@ -46,8 +43,7 @@ public abstract class Operator {
   public abstract void reset();
 
   /** Reset cursor on the operator to ith tuple */
-  public void reset(int i) throws NotImplementedException {
-  }
+  public void reset(int i) throws NotImplementedException {}
 
   /**
    * Get next tuple from operator
@@ -72,8 +68,7 @@ public abstract class Operator {
   }
 
   /**
-   * Iterate through output of operator and send it all to the specified
-   * printStream)
+   * Iterate through output of operator and send it all to the specified printStream)
    *
    * @param printStream stream to receive output, one tuple per line.
    */
@@ -85,8 +80,7 @@ public abstract class Operator {
   }
 
   /**
-   * Iterate through output of operator and send it all to the specified file by
-   * tupleWriter
+   * Iterate through output of operator and send it all to the specified file by tupleWriter
    *
    * @param tupleWriter TupleWriter to receive output
    */
@@ -100,7 +94,7 @@ public abstract class Operator {
 
   /**
    * Load a block of tuples from the operator into the buffer
-   * 
+   *
    * @param operator
    * @param buffer
    * @return true if there are more tuples loaded, false otherwise
@@ -122,8 +116,7 @@ public abstract class Operator {
       tuple = operator.getNextTuple();
 
       // Stop loading when there are no more tuples
-      if (tuple == null)
-        break;
+      if (tuple == null) break;
       buffer[i] = tuple;
     }
 

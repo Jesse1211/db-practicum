@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import net.sf.jsqlparser.schema.Column;
 
-/**
- * Sort Merge Join Operator
- */
+/** Sort Merge Join Operator */
 public class SMJOperator extends Operator {
 
-  private SortOperator leftChildOperator;
-  private SortOperator rightChildOperator;
+  private Operator leftChildOperator;
+  private Operator rightChildOperator;
   private int leftColumnIndex;
   private int rightColumnIndex;
 
@@ -24,27 +22,26 @@ public class SMJOperator extends Operator {
   /**
    * SMJOperator Constructor
    *
-   * @param outputSchema       output schema
-   * @param leftChildOperator  leftChildOperator that needs to perform to join
+   * @param outputSchema output schema
+   * @param leftChildOperator leftChildOperator that needs to perform to join
    * @param rightChildOperator rightChildOperator that needs to perform to join
-   * @param leftColumn         left column to join
-   * @param rightColumn        right column to join
+   * @param leftColumn left column to join
+   * @param rightColumn right column to join
    */
   public SMJOperator(
-          ArrayList<Column> outputSchema,
-          SortOperator leftChildOperator,
-          SortOperator rightChildOperator,
-          Column leftColumn,
-          Column rightColumn
-  ) {
+      ArrayList<Column> outputSchema,
+      Operator leftChildOperator,
+      Operator rightChildOperator,
+      Column leftColumn,
+      Column rightColumn) {
     super(outputSchema);
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
 
-    Map<String, Integer> leftColumnMap = HelperMethods.mapColumnIndex(
-            leftChildOperator.getOutputSchema());
-    Map<String, Integer> rightColumnMap = HelperMethods.mapColumnIndex(
-            rightChildOperator.getOutputSchema());
+    Map<String, Integer> leftColumnMap =
+        HelperMethods.mapColumnIndex(leftChildOperator.getOutputSchema());
+    Map<String, Integer> rightColumnMap =
+        HelperMethods.mapColumnIndex(rightChildOperator.getOutputSchema());
 
     leftColumnIndex = leftColumnMap.get(leftColumn.getName(true));
     rightColumnIndex = rightColumnMap.get(rightColumn.getName(true));
@@ -117,6 +114,7 @@ public class SMJOperator extends Operator {
 
   /**
    * Check if the index needs to be reset and reset the index
+   *
    * @return
    */
   private boolean checkAndResetIndex() {
@@ -125,9 +123,12 @@ public class SMJOperator extends Operator {
       return false;
     }
     int index = rightResetIndexMap.get(value);
-    rightChildOperator.reset(index);
+    if (rightChildOperator instanceof SortOperator) {
+      ((SortOperator) rightChildOperator).reset(index);
+    } else if (rightChildOperator instanceof ExternalSortOperator) {
+      ((ExternalSortOperator) rightChildOperator).reset(index);
+    }
     rightCurrentIndex = index - 1;
     return true;
   }
-
 }

@@ -12,13 +12,10 @@ import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 
 /**
- * An operator for ORDER BY. Create intermediate files to keep the partial
- * sorted runs which are
- * pending a merge in the next pass. Will clean up the intermediate files after
- * the query is done.
+ * An operator for ORDER BY. Create intermediate files to keep the partial sorted runs which are
+ * pending a merge in the next pass. Will clean up the intermediate files after the query is done.
  *
- * <p>
- * Intermediate files are binary for production, human-readable for debugging.
+ * <p>Intermediate files are binary for production, human-readable for debugging.
  */
 public class ExternalSortOperator extends Operator {
   private Operator childOperator;
@@ -27,12 +24,11 @@ public class ExternalSortOperator extends Operator {
   private TupleReader tupleReader;
 
   /**
-   * External Sort constructor, sort the tuples from the child operator by more
-   * than one column.
-   * 
-   * @param outputSchema    output schema
-   * @param childOperator   child operator
-   * @param orders          2+ orders
+   * External Sort constructor, sort the tuples from the child operator by more than one column.
+   *
+   * @param outputSchema output schema
+   * @param childOperator child operator
+   * @param orders 2+ orders
    * @param numPagePerBlock number of pages per block
    */
   public ExternalSortOperator(
@@ -57,25 +53,8 @@ public class ExternalSortOperator extends Operator {
   }
 
   /**
-   * External Sort constructor, sort the tuples from the child operator by only
-   * one column.
-   * 
-   * @param outputSchema
-   * @param childOperator
-   * @param order
-   * @param numPagePerBlock
-   */
-  public ExternalSortOperator(
-      ArrayList<Column> outputSchema,
-      Operator childOperator,
-      Column order,
-      int numPagePerBlock) {
-    this(outputSchema, childOperator, Collections.singletonList(order), numPagePerBlock);
-  }
-
-  /**
    * For each block, Load, sort then write the tuples temporary files.
-   * 
+   *
    * @return
    */
   private List<File> divideAndSort() {
@@ -91,18 +70,17 @@ public class ExternalSortOperator extends Operator {
   }
 
   /**
-   * Merge the sorted files.
-   * Delete the files on exit.
-   * 
+   * Merge the sorted files. Delete the files on exit.
+   *
    * @param externalFileList list of sorted files
    * @return
    */
   private File mergeSortedFiles(List<File> externalFileList) {
-    PriorityQueue<Pair<TupleReader, Tuple>> pq = new PriorityQueue<>(
-        HelperMethods.getTupleComparator(orders, outputSchema));
+    PriorityQueue<Pair<TupleReader, Tuple>> pq =
+        new PriorityQueue<>(HelperMethods.getTupleComparator(orders, outputSchema));
 
-    File mergedFile = new File(
-            DBCatalog.getInstance().getTempDirectory() + UUID.randomUUID() + "sorted.temp");
+    File mergedFile =
+        new File(DBCatalog.getInstance().getTempDirectory() + UUID.randomUUID() + "sorted.temp");
     mergedFile.deleteOnExit();
     TupleWriter writer = new BinaryHandler(mergedFile);
 
@@ -132,32 +110,31 @@ public class ExternalSortOperator extends Operator {
     return mergedFile;
   }
 
-  /**
-   * Write the sorted tuples to temporary file.
-   * Delete the file on exit.
-   */
+  /** Write the sorted tuples to temporary file. Delete the file on exit. */
   private File writeTupleBlock() {
     // write the data block to a file
 
-    File file = new File(
-            DBCatalog.getInstance().getTempDirectory() + "_" + UUID.randomUUID() + ".temp");
+    File file =
+        new File(DBCatalog.getInstance().getTempDirectory() + "_" + UUID.randomUUID() + ".temp");
     file.deleteOnExit();
     TupleWriter tupleWriter = new BinaryHandler(file);
     for (Tuple tuple : tupleBuffer) {
-      if (tuple == null)
-        break;
+      if (tuple == null) break;
       tupleWriter.writeNextTuple(tuple);
     }
     tupleWriter.close();
     return file;
   }
 
-  /**
-   * Reset the TupleReader
-   */
+  /** Reset the TupleReader */
   @Override
   public void reset() {
     this.tupleReader.reset();
+  }
+
+  @Override
+  public void reset(int i) {
+    this.tupleReader.reset(i);
   }
 
   /**

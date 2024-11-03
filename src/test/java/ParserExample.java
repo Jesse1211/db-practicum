@@ -32,11 +32,11 @@ public class ParserExample {
   public void parserExampleTest() throws IOException, JSQLParserException, URISyntaxException {
     ClassLoader classLoader = P1UnitTests.class.getClassLoader();
 
-    URI resourceUri = Objects.requireNonNull(classLoader.getResource("samples/input")).toURI();
+    URI resourceUri = Objects.requireNonNull(classLoader.getResource("samples")).toURI();
 
     Path resourcePath = Paths.get(resourceUri);
 
-    DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
+    DBCatalog.getInstance().setInterpreterConfig(resourcePath.toString());
 
     URI queriesUri =
         Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))

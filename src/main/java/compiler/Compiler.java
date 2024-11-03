@@ -13,7 +13,8 @@ import org.apache.logging.log4j.*;
 import physical_operator.Operator;
 
 /**
- * Top level harness class; reads queries from an input file one at a time, processes them and sends
+ * Top level harness class; reads queries from an input file one at a time,
+ * processes them and sends
  * output to file or to System depending on flag.
  */
 public class Compiler {
@@ -22,29 +23,31 @@ public class Compiler {
   private static String outputDir;
   private static String inputDir;
   private static String tempDir;
+
   private static final boolean outputToFiles = true;
 
   /**
-   * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping
+   * Reads statements from queriesFile one at a time, builds query plan and
+   * evaluates, dumping
    * results to files or console as desired.
    *
-   * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
+   * <p>
+   * If dumping to files result of ith query is in file named query i, indexed
+   * stating at 1.
    */
   public static void main(String[] args) {
-
-    inputDir = args[0];
-    outputDir = args[1];
-    tempDir = args[2];
-    DBCatalog.getInstance().setDataDirectory(inputDir + "/db");
-    DBCatalog.getInstance().setPlanBuilderConfig(inputDir + "/plan_builder_config.txt");
-    DBCatalog.getInstance().setTempDirectory(tempDir + "/");
+    DBCatalog.getInstance().setInterpreterConfig(args[0]);
+    inputDir = DBCatalog.getInstance().getInputDir();
+    outputDir = DBCatalog.getInstance().getOutputDir();
+    tempDir = DBCatalog.getInstance().getTempDir();
     try {
       String str = Files.readString(Paths.get(inputDir + "/queries.sql"));
       Statements statements = CCJSqlParserUtil.parseStatements(str);
       QueryPlanBuilder queryPlanBuilder = new QueryPlanBuilder();
 
       if (outputToFiles) {
-        for (File file : (new File(outputDir).listFiles())) file.delete(); // clean output directory
+        for (File file : (new File(outputDir).listFiles()))
+          file.delete(); // clean output directory
       }
 
       int counter = 1; // for numbering output files
@@ -58,12 +61,12 @@ public class Compiler {
           if (outputToFiles) {
             File outfile = new File(outputDir + "/query" + counter);
             outfile.createNewFile();
-            // long time;
-            // System.out.println(time = System.currentTimeMillis());
-            System.out.println(System.currentTimeMillis());
+            long time;
+            System.out.println(time = System.currentTimeMillis());
+            // System.out.println(System.currentTimeMillis());
             plan.dump(new BinaryHandler(outfile));
-            System.out.println(System.currentTimeMillis());
-            // System.out.println(time - System.currentTimeMillis());
+            // System.out.println(System.currentTimeMillis());
+            System.out.println(time - System.currentTimeMillis());
           } else {
             plan.dump(System.out);
           }

@@ -31,16 +31,12 @@ public class JoinTest {
   @BeforeAll
   static void setupBeforeAllTests() throws IOException, JSQLParserException, URISyntaxException {
     ClassLoader classLoader = JoinTest.class.getClassLoader();
-    URI path = Objects.requireNonNull(classLoader.getResource("samples/input")).toURI();
+    URI path = Objects.requireNonNull(classLoader.getResource("samples")).toURI();
     Path resourcePath = Paths.get(path);
 
-    DBCatalog.getInstance().setDataDirectory(resourcePath.resolve("db").toString());
-    DBCatalog.getInstance()
-        .setPlanBuilderConfig(resourcePath.resolve("plan_builder_config.txt").toString());
-    DBCatalog.getInstance().setTempDirectory(resourcePath.resolve("../temp").toString());
-    URI queriesFile =
-        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
-            .toURI();
+    DBCatalog.getInstance().setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
+    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
+        .toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -63,12 +59,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 12, 143, 196))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 30, 63, 101))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 57, 24, 130)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 12, 143, 196))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 30, 63, 101))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 57, 24, 130)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -93,12 +88,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 113, 139))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 181, 128, 129))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 147, 45, 118)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 113, 139))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 181, 128, 129))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 147, 45, 118)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -123,12 +117,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 12, 143, 196))),
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 30, 63, 101))),
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 57, 24, 130)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 12, 143, 196))),
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 30, 63, 101))),
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 57, 24, 130)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -153,12 +146,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 1, 172, 99))),
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 3, 173, 1, 172, 99))),
-          new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 135, 28, 1, 172, 99)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 128, 42, 1, 172, 99))),
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 3, 173, 1, 172, 99))),
+        new Tuple(new ArrayList<>(Arrays.asList(20, 156, 20, 135, 28, 1, 172, 99)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -183,12 +175,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 181, 128, 129))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 147, 45, 118))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 81, 1, 195)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 181, 128, 129))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 147, 45, 118))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 81, 1, 195)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -213,12 +204,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 113, 139))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 30, 176))),
-          new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 4, 76)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 113, 139))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 30, 176))),
+        new Tuple(new ArrayList<>(Arrays.asList(64, 113, 139, 64, 4, 76)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -243,12 +233,11 @@ public class JoinTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples =
-        new Tuple[] {
-          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 2, 185))),
-          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 81, 12))),
-          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 162, 46)))
-        };
+    Tuple[] expectedFirstThreeTuples = new Tuple[] {
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 2, 185))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 81, 12))),
+        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120, 0, 162, 46)))
+    };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];

@@ -161,10 +161,8 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     try {
       this.byteBuffer.asIntBuffer().put(1, this.tupleNum);
 
-      // Fill the page with 0
-      for (int i = offset; i < this.bufferCapacity / 4; i++) {
-        this.byteBuffer.asIntBuffer().slice(i, 0);
-      }
+      // Fill the rest of the page with 0
+      this.byteBuffer.put(new byte[this.byteBuffer.remaining()]);
 
       fileChannel.write(this.byteBuffer);
 

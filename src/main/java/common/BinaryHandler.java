@@ -17,6 +17,7 @@ public class BinaryHandler implements TupleWriter, TupleReader {
   private int attributeNum;
   private int tupleNum;
   private int offset;
+  private int pageIndex;
 
   private File file;
   private FileInputStream fileInputStream;
@@ -89,6 +90,16 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     return new Tuple(tupleBuffer);
   }
 
+
+  @Override
+  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid(){
+    int pid = this.pageIndex;
+    int tid = (this.offset - 2) / this.attributeNum;
+    Tuple tuple = readNextTuple();
+    if (tuple == null) return null;
+    return new Pair<>(tuple, new Pair<>(pid, tid));
+  }
+
   /**
    * Load the next page of the file for reading, update the attributeNum, tupleNum, and offset
    *
@@ -105,6 +116,8 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       this.byteBuffer.flip();
       this.attributeNum = this.byteBuffer.asIntBuffer().get(0);
       this.tupleNum = this.byteBuffer.asIntBuffer().get(1);
+
+      this.pageIndex++;
       this.offset = 2;
       return true;
     } catch (Exception e) {
@@ -217,6 +230,9 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       // Reset the offset
       this.offset = 0;
 
+      // Reset the pageIndex
+      this.pageIndex = 0;
+
     } catch (IOException e) {
       logger.error(e.getMessage());
     }
@@ -245,6 +261,8 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       fileChannel.position(bufferCapacity * pageIndex);
       loadNextPage();
       this.offset = 2 + tupleIndex * this.attributeNum;
+
+      this.pageIndex = pageIndex;
 
     } catch (IOException e) {
       logger.error(e.getMessage());

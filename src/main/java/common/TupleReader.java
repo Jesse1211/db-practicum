@@ -1,11 +1,14 @@
 package common;
 
 import java.util.ArrayList;
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 /** An interface to read tuples from a file. */
 public interface TupleReader {
 
   public Tuple readNextTuple();
+
+  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid();
 
   public ArrayList<Tuple> readAllTuples();
 

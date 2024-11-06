@@ -16,6 +16,7 @@ public class TextHandler implements TupleWriter, TupleReader {
   protected final Logger logger = LogManager.getLogger();
   private BufferedReader bufferedReader;
   private BufferedWriter bufferedWriter;
+  private int currentLine = 0;
 
   /**
    * Use TextHandler to read/write (human-readable) tuples to a (human-readable) file according to
@@ -73,6 +74,7 @@ public class TextHandler implements TupleWriter, TupleReader {
     try {
       String line;
       if ((line = this.bufferedReader.readLine()) != null) {
+        currentLine ++;
         return new Tuple(line);
       } else {
         bufferedReader.close();
@@ -82,6 +84,15 @@ public class TextHandler implements TupleWriter, TupleReader {
     }
     return null;
   }
+
+  @Override
+  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid(){
+    int lineNumber = currentLine;
+    Tuple tuple = readNextTuple();
+    if (tuple == null) return null;
+    return new Pair<>(tuple, new Pair<>(0, lineNumber));
+  }
+
 
   /**
    * Write a tuple to the file
@@ -123,14 +134,19 @@ public class TextHandler implements TupleWriter, TupleReader {
   public void reset() {
     try {
       this.bufferedReader.reset();
+      this.currentLine = 0;
     } catch (IOException e) {
       logger.error(e.getMessage());
     }
   }
 
   @Override
-  public void reset(int i) {}
+  public void reset(int i) {
+    this.currentLine = i;
+  }
 
   @Override
-  public void reset(int pageIndex, int tupleIndex) {}
+  public void reset(int pageIndex, int tupleIndex) {
+    this.currentLine = tupleIndex;
+  }
 }

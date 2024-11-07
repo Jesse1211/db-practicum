@@ -224,9 +224,15 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     }
   }
 
+  /**
+   * Reset the file to the beginning of the tuple at page index i
+   *
+   * @param i the index of the tuple to reset to
+   * @return void
+   * @throws IOException caused by file reading or byte buffer
+   */
   @Override
   public void reset(int i) {
-    if (this.offset == 0) return;
     try {
       fileChannel.position(0);
       // get tuple number from page
@@ -237,6 +243,31 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
       int pageIndex = i / tupleNum;
       int tupleIndex = i % tupleNum;
+
+      fileChannel.position(bufferCapacity * pageIndex);
+      loadNextPage();
+      this.offset = 2 + tupleIndex * this.attributeNum;
+
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+    }
+  }
+
+  /**
+   * Reset the file to the beginning of the tuple at page index i and tuple index j
+   *
+   * @param pageIndex the index of the page to reset to
+   * @param tupleIndex the index of the tuple to reset to
+   * @return void
+   * @throws IOException caused by file reading or byte buffer
+   */
+  @Override
+  public void reset(int pageIndex, int tupleIndex) {
+    try {
+      fileChannel.position(0);
+      ByteBuffer tupleNumBuffer = ByteBuffer.allocate(8);
+      fileChannel.read(tupleNumBuffer);
+      tupleNumBuffer.flip();
 
       fileChannel.position(bufferCapacity * pageIndex);
       loadNextPage();

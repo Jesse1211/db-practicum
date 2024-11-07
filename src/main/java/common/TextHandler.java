@@ -130,4 +130,7 @@ public class TextHandler implements TupleWriter, TupleReader {
 
   @Override
   public void reset(int i) {}
+
+  @Override
+  public void reset(int pageIndex, int tupleIndex) {}
 }

@@ -14,4 +14,6 @@ public interface TupleReader {
   public void reset();
 
   public void reset(int i);
+
+  public void reset(int pageIndex, int tupleIndex);
 }

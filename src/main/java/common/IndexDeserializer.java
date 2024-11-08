@@ -113,8 +113,8 @@ public class IndexDeserializer {
 
     // find the key in the index node
     int left = 2;
-    int right = 2 + numKeys;
-    if (this.byteBuffer.asIntBuffer().get(left) < this.lowKey) {
+    int right = 2 + numKeys - 1;
+    if (this.byteBuffer.asIntBuffer().get(left) < this.lowKey || this.lowKey == Integer.MAX_VALUE) {
       loadPageByOffset(this.byteBuffer.asIntBuffer().get(left + numKeys));
       return;
     }
@@ -133,7 +133,7 @@ public class IndexDeserializer {
     }
 
     // find the address of the child and load the child page
-    loadPageByOffset(this.byteBuffer.asIntBuffer().get(left + numKeys + 1));
+    loadPageByOffset(this.byteBuffer.asIntBuffer().get(left + numKeys));
   }
 
   /**

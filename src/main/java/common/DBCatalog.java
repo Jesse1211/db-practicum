@@ -289,7 +289,7 @@ public class DBCatalog {
    * @return file where index is found on disk
    */
   public File getFileForIndex(String tableName, String attributeName) {
-    return new File(inputDir + "/db/" + tableName + "." + attributeName);
+    return new File(inputDir + "/db/indexes/" + tableName + "." + attributeName);
   }
 
 

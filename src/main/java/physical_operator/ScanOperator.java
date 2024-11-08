@@ -11,6 +11,8 @@ import net.sf.jsqlparser.schema.Table;
 public class ScanOperator extends Operator {
   // private BufferedReader bufferedReader;
   private TupleReader tupleReader;
+  private IndexDeserializer indexDeserializer;
+  private boolean useIndex;
 
   /**
    * ScanOperator constructor
@@ -19,13 +21,16 @@ public class ScanOperator extends Operator {
    */
   public ScanOperator(Table table) {
     super(new ArrayList<>());
-    try {
-      this.tupleReader = new BinaryHandler(table.getName());
+      this.useIndex = DBCatalog.getInstance().getUseIndex();
+      if (useIndex) {
+        indexDeserializer = new IndexDeserializer(Integer.MAX_VALUE, Integer.MAX_VALUE, table.getName());
+      } else {
+        this.tupleReader = new BinaryHandler(table.getName());
+      }
+
       // this.tupleReader = new TextHandler(table.getName());
       this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-    }
+    
   }
 
   /** re-initialize buffer reader */
@@ -39,6 +44,9 @@ public class ScanOperator extends Operator {
    */
   @Override
   public Tuple getNextTuple() {
+    if (useIndex) {
+      return indexDeserializer.next();
+    }
     return this.tupleReader.readNextTuple();
   }
 }

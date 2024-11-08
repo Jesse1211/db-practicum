@@ -5,10 +5,10 @@ package common;
  * whether it is clustered and order of the index.
  */
 public class IndexInfo {
-  String relationName;
-  String attributeName;
-  boolean isClustered;
-  int order;
+  public String relationName;
+  public String attributeName;
+  public boolean isClustered;
+  public int order;
 
   /**
    * Constructor for IndexInfo

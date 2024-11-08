@@ -93,11 +93,11 @@ public class BinaryHandler implements TupleWriter, TupleReader {
 
   @Override
   public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid(){
-    int pid = this.pageIndex;
-    int tid = (this.offset - 2) / this.attributeNum;
+    int pageIndex = this.pageIndex;
+    int offset = this.offset;
     Tuple tuple = readNextTuple();
     if (tuple == null) return null;
-    return new Pair<>(tuple, new Pair<>(pid, tid));
+    return new Pair<>(tuple, new Pair<>(pageIndex, (offset - 2) / this.attributeNum));
   }
 
   /**
@@ -172,10 +172,14 @@ public class BinaryHandler implements TupleWriter, TupleReader {
    */
   private void writePage() {
     try {
+      // set tuple number
       this.byteBuffer.asIntBuffer().put(1, this.tupleNum);
 
       // Fill the rest of the page with 0
-      this.byteBuffer.put(new byte[this.byteBuffer.remaining()]);
+      for (int i = offset; i < this.bufferCapacity / 4; i++) {
+        this.byteBuffer.asIntBuffer().put(i, 0);
+      }
+
 
       fileChannel.write(this.byteBuffer);
 

@@ -19,6 +19,8 @@ public abstract class TreeNode {
   protected ArrayList<Integer> keys = new ArrayList<>();
 
 
+  public abstract int getFirstKey();
+
   public abstract List<Integer> getActualKeys();
 
   public abstract void serialize(ByteBuffer buffer);

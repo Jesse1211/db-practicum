@@ -9,12 +9,14 @@ public class IndexNode extends TreeNode{
   private List<Integer> keys = new ArrayList<>();
   private List<TreeNode> children = new ArrayList<>();
   private final NodeType nodeType = NodeType.INDEX_NODE;
-  private final int bufferCapacity = DBCatalog.getInstance().getBufferCapacity();
 
   public void setChild(TreeNode child) {
-    this.keys.add(child.keys.get(0));
+    this.keys.add(child.getFirstKey());
     this.children.add(child);
   }
+
+  @Override
+  public int getFirstKey() {return keys.getFirst();}
 
   @Override
   public List<Integer> getActualKeys() {
@@ -54,6 +56,8 @@ public class IndexNode extends TreeNode{
     }
 
     // Fill the rest of the page with 0
-    buffer.put(new byte[buffer.remaining()]);
+    for (int i = offset; i < buffer.capacity() / 4; i++) {
+      buffer.asIntBuffer().put(i, 0);
+    }
   }
 }

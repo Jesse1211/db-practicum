@@ -16,6 +16,9 @@ public class LeafNode extends TreeNode {
   }
 
   @Override
+  public int getFirstKey() {return keys.getFirst();}
+
+  @Override
   public List<Integer> getActualKeys(){
     return this.keys;
   }
@@ -48,6 +51,8 @@ public class LeafNode extends TreeNode {
     }
 
     // Fill the rest of the page with 0
-    buffer.put(new byte[buffer.remaining()]);
+    for (int i = offset; i < buffer.capacity() / 4; i++) {
+      buffer.asIntBuffer().put(i, 0);
+    }
   }
 }

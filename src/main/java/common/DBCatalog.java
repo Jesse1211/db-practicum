@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -92,18 +93,10 @@ public class DBCatalog {
             tempDir = tokens[0];
             break;
           case 3:
-            if (tokens[0].equals("1")) {
-              isBuildIndex = true;
-            } else {
-              isBuildIndex = false;
-            }
+            isBuildIndex = tokens[0].equals("1");
             break;
           case 4:
-            if (tokens[0].equals("1")) {
-              isEvaluateSQL = true;
-            } else {
-              isEvaluateSQL = false;
-            }
+            isEvaluateSQL = tokens[0].equals("1");
             break;
         }
         index++;
@@ -167,52 +160,30 @@ public class DBCatalog {
     try {
       BufferedReader br = new BufferedReader(new FileReader(directory));
       String line;
+      String[] joinMethods = new String[]{"TNLJ", "BNLJ", "SMJ"};
+      String[] sortMethods = new String[]{"In-Memory Sort", "External Sort"};
 
       // read first line
       line = br.readLine();
       String[] tokens = line.split("\\s");
+      this.joinMethod = joinMethods[Integer.parseInt(tokens[0])];
       if (tokens.length > 1) {
         this.joinBufferPageNumber = Integer.parseInt(tokens[1]);
-      }
-      this.joinMethod = tokens[0];
-      switch (tokens[0]) {
-        case "0":
-          this.joinMethod = "TNLJ";
-          break;
-        case "1":
-          this.joinMethod = "BNLJ";
-          break;
-        case "2":
-          this.joinMethod = "SMJ";
-          break;
       }
 
       // read second line
       line = br.readLine();
       tokens = line.split("\\s");
+      this.sortMethod = sortMethods[Integer.parseInt(tokens[0])];
+
       if (tokens.length > 1) {
         this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
-      }
-      switch (tokens[0]) {
-        case "0":
-          this.sortMethod = "In-Memory Sort";
-          break;
-        case "1":
-          this.sortMethod = "External Sort";
-          break;
       }
 
       // read third line
       line = br.readLine();
       tokens = line.split("\\s");
-      switch (tokens[0]) {
-        case "0":
-          this.useIndex = false;
-          break;
-        case "1":
-          this.useIndex = true;
-          break;
-      }
+      this.useIndex = tokens[0].equals("1");
 
       br.close();
     } catch (Exception e) {
@@ -229,15 +200,14 @@ public class DBCatalog {
     try {
       BufferedReader br = new BufferedReader(new FileReader(directory));
       String line;
-      indexInfo = new HashMap();
+      indexInfo = new HashMap<>();
       while ((line = br.readLine()) != null) {
         String[] tokens = line.split("\\s");
         String relationName = tokens[0];
         String attributeName = tokens[1];
         boolean isClustered = tokens[2].equals("1");
         int order = Integer.parseInt(tokens[3]);
-        indexInfo.put(
-            attributeName, new IndexInfo(relationName, attributeName, isClustered, order));
+        indexInfo.put(attributeName, new IndexInfo(relationName, attributeName, isClustered, order));
       }
       br.close();
     } catch (Exception e) {
@@ -410,5 +380,9 @@ public class DBCatalog {
    */
   public IndexInfo getIndexInfo(String name) {
     return this.indexInfo.get(name);
+  }
+
+  public List<IndexInfo> getAllIndexInfo(){
+    return this.indexInfo.values().stream().toList();
   }
 }

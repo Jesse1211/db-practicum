@@ -302,6 +302,7 @@ public class DBCatalog {
     }
     return newColumns;
   }
+
   /**
    * Get join method from plan_builder_config.txt.
    *

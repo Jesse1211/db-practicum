@@ -131,8 +131,7 @@ public class HelperMethods {
               || comparison instanceof MinorThan
               || comparison instanceof MinorThanEquals)
           && (comparison.getLeftExpression() instanceof LongValue
-              || comparison.getRightExpression() instanceof LongValue)
-      ) {
+              || comparison.getRightExpression() instanceof LongValue)) {
         indexedComparisons.add(comparison);
       }
     }

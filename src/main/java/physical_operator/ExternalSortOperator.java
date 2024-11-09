@@ -114,8 +114,7 @@ public class ExternalSortOperator extends Operator {
   private File writeTupleBlock() {
     // write the data block to a file
 
-    File file =
-        new File(DBCatalog.getInstance().getTempDir() + "/_" + UUID.randomUUID() + ".temp");
+    File file = new File(DBCatalog.getInstance().getTempDir() + "/_" + UUID.randomUUID() + ".temp");
     file.deleteOnExit();
     TupleWriter tupleWriter = new BinaryHandler(file);
     for (Tuple tuple : tupleBuffer) {

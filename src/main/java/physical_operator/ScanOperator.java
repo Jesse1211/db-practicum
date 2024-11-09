@@ -21,7 +21,6 @@ public class ScanOperator extends Operator {
     this.tupleReader = new BinaryHandler(table.getName());
     // this.tupleReader = new TextHandler(table.getName());
     this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
-
   }
 
   /** re-initialize buffer reader */

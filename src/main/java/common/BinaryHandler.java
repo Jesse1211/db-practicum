@@ -90,9 +90,8 @@ public class BinaryHandler implements TupleWriter, TupleReader {
     return new Tuple(tupleBuffer);
   }
 
-
   @Override
-  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid(){
+  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid() {
     Tuple tuple = readNextTuple();
     if (tuple == null) return null;
 
@@ -182,7 +181,6 @@ public class BinaryHandler implements TupleWriter, TupleReader {
       for (int i = offset; i < this.bufferCapacity / 4; i++) {
         this.byteBuffer.asIntBuffer().put(i, 0);
       }
-
 
       fileChannel.write(this.byteBuffer);
 

@@ -74,7 +74,7 @@ public class TextHandler implements TupleWriter, TupleReader {
     try {
       String line;
       if ((line = this.bufferedReader.readLine()) != null) {
-        currentLine ++;
+        currentLine++;
         return new Tuple(line);
       } else {
         bufferedReader.close();
@@ -86,13 +86,12 @@ public class TextHandler implements TupleWriter, TupleReader {
   }
 
   @Override
-  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid(){
+  public Pair<Tuple, Pair<Integer, Integer>> readNextTupleAndRid() {
     int lineNumber = currentLine;
     Tuple tuple = readNextTuple();
     if (tuple == null) return null;
     return new Pair<>(tuple, new Pair<>(0, lineNumber));
   }
-
 
   /**
    * Write a tuple to the file

@@ -1,3 +1,11 @@
+# Notes from P3 instruction:
+
+## How to run
+```
+\db-practicum> java -jar ./build/libs/db_practicum_early-bird-3.jar ./src/test/resources/samples/interpreter_config_file.txt
+```
+
+
 # Notes from P2 instruction:
 
 ## How to run

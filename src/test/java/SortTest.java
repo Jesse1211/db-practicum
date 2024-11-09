@@ -34,9 +34,11 @@ public class SortTest {
     URI path = Objects.requireNonNull(classLoader.getResource("samples")).toURI();
     Path resourcePath = Paths.get(path);
 
-    DBCatalog.getInstance().setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
-        .toURI();
+    DBCatalog.getInstance()
+        .setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
+            .toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -59,11 +61,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -88,11 +91,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];
@@ -117,11 +121,12 @@ public class SortTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
-        new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0, 47, 120))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 49, 176))),
+          new Tuple(new ArrayList<>(Arrays.asList(0, 58, 191)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];

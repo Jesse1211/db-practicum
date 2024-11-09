@@ -35,7 +35,8 @@ public class IndexDeserializer {
   public IndexDeserializer(int lowKey, int highKey, IndexInfo indexInfo, int attributeIndex) {
     this.isClustered = indexInfo.isClustered;
     this.tupleReader = new BinaryHandler(indexInfo.relationName);
-    this.file = DBCatalog.getInstance().getFileForIndex(indexInfo.relationName, indexInfo.attributeName);
+    this.file =
+        DBCatalog.getInstance().getFileForIndex(indexInfo.relationName, indexInfo.attributeName);
     this.bufferCapacity = DBCatalog.getInstance().getBufferCapacity();
     this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
     this.lowKey = lowKey;
@@ -59,13 +60,14 @@ public class IndexDeserializer {
         this.fileInputStream = new FileInputStream(file);
         this.fileChannel = fileInputStream.getChannel();
       }
+      this.fileChannel.position(0);
       this.byteBuffer.clear();
       this.fileChannel.read(byteBuffer);
       this.byteBuffer.flip();
 
       return this.byteBuffer.asIntBuffer().get(0);
-//      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
-//      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
+      //      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
+      //      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -159,7 +161,7 @@ public class IndexDeserializer {
     }
   }
 
-  public void reset(){
+  public void reset() {
     try {
       // Reset the file position to the start of the file
       fileChannel.position(0);
@@ -189,7 +191,7 @@ public class IndexDeserializer {
     // For non-Clustered index, retrieve tuple from the data file
     // For Clustered index, scan the sorted data file sequentially
     if (!this.isClustered || !this.isLoaded) {
-      if(this.numKeys == 0){
+      if (this.numKeys == 0) {
         loadNodeById(this.nodeId + 1);
       }
       if (this.ridCount == 0) {
@@ -208,7 +210,7 @@ public class IndexDeserializer {
     Tuple tuple = this.tupleReader.readNextTuple();
 
     // key > high key return null else return next tuple\
-    if(tuple != null && tuple.getElementAtIndex(attributeIndex) > highKey){
+    if (tuple != null && tuple.getElementAtIndex(attributeIndex) > highKey) {
       return null;
     }
     return tuple;

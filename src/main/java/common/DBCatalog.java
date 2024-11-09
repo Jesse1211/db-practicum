@@ -13,17 +13,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Class to contain information about database - names of tables, schema of each
- * table and file
+ * Class to contain information about database - names of tables, schema of each table and file
  * where each table is located. Uses singleton pattern.
  *
- * <p>
- * Assumes dbDir has a schema.txt file and a /data subdirectory containing
- * one file per
- * relation, named "relname".
+ * <p>Assumes dbDir has a schema.txt file and a /data subdirectory containing one file per relation,
+ * named "relname".
  *
- * <p>
- * Call by using DBCatalog.getInstance();
+ * <p>Call by using DBCatalog.getInstance();
  */
 public class DBCatalog {
   private final Logger logger = LogManager.getLogger();
@@ -54,8 +50,7 @@ public class DBCatalog {
   }
 
   /**
-   * Instance getter for singleton pattern, lazy initialization on first
-   * invocation
+   * Instance getter for singleton pattern, lazy initialization on first invocation
    *
    * @return unique DB catalog instance
    */
@@ -67,9 +62,9 @@ public class DBCatalog {
   }
 
   /**
-   * Read the configuration file and parse input directory, output directory,
-   * temporary directory, isBuildIndex, and isEvaluateSQL.
-   * 
+   * Read the configuration file and parse input directory, output directory, temporary directory,
+   * isBuildIndex, and isEvaluateSQL.
+   *
    * @param directory
    */
   public void setInterpreterConfig(String directory) {
@@ -131,27 +126,19 @@ public class DBCatalog {
   /**
    * Get join method & buffer page number from plan_builder_config.txt.
    *
-   * <p>
-   * First row: 0: TNLJ, 1: BNLJ, 2: SMJ
+   * <p>First row: 0: TNLJ, 1: BNLJ, 2: SMJ
    *
-   * <p>
-   * Second row: 0: In-Memory Sort, 1: External Sort Only
+   * <p>Second row: 0: In-Memory Sort, 1: External Sort Only
    *
-   * <p>
-   * if the join method is BNLJ, the buffer page number is needed.
+   * <p>if the join method is BNLJ, the buffer page number is needed.
    *
-   * <p>
-   * if the sort method is External Sort, the buffer page number is needed.
-   * 
-   * <p>
-   * Third row: 0: No Index, 1: Use Index
-   * 
-   * <p>
-   * if not using index, then use the full-scan implementation
-   * 
-   * <p>
-   * if using index, then parse info from index_info.txt and use the index
-   * implementation
+   * <p>if the sort method is External Sort, the buffer page number is needed.
+   *
+   * <p>Third row: 0: No Index, 1: Use Index
+   *
+   * <p>if not using index, then use the full-scan implementation
+   *
+   * <p>if using index, then parse info from index_info.txt and use the index implementation
    *
    * @param directory: The input directory.
    * @return void
@@ -160,8 +147,8 @@ public class DBCatalog {
     try {
       BufferedReader br = new BufferedReader(new FileReader(directory));
       String line;
-      String[] joinMethods = new String[]{"TNLJ", "BNLJ", "SMJ"};
-      String[] sortMethods = new String[]{"In-Memory Sort", "External Sort"};
+      String[] joinMethods = new String[] {"TNLJ", "BNLJ", "SMJ"};
+      String[] sortMethods = new String[] {"In-Memory Sort", "External Sort"};
 
       // read first line
       line = br.readLine();
@@ -235,7 +222,7 @@ public class DBCatalog {
 
   /**
    * Get the temporary directory.
-   * 
+   *
    * @return temporary directory
    */
   public String getTempDir() {
@@ -244,12 +231,11 @@ public class DBCatalog {
 
   /**
    * Get the isBuildIndex flag: Flags to determine whether to build index
-   * 
-   * <p>
-   * isBuildIndex = true: build indexes
-   * <p>
-   * isBuildIndex = false: not build indexes
-   * 
+   *
+   * <p>isBuildIndex = true: build indexes
+   *
+   * <p>isBuildIndex = false: not build indexes
+   *
    * @return isBuildIndex flag
    */
   public boolean getIsBuildIndex() {
@@ -257,14 +243,12 @@ public class DBCatalog {
   }
 
   /**
-   * Get the isEvaluateSQL flag: Flags to determine whether to build evaluate SQL
-   * queries.
-   * 
-   * <p>
-   * isEvaluateSQL = false: not run queries
-   * <p>
-   * isEvaluateSQL = true: run queries
-   * 
+   * Get the isEvaluateSQL flag: Flags to determine whether to build evaluate SQL queries.
+   *
+   * <p>isEvaluateSQL = false: not run queries
+   *
+   * <p>isEvaluateSQL = true: run queries
+   *
    * @return isEvaluateSQL flag
    */
   public boolean getIsEvaluateSQL() {
@@ -291,7 +275,6 @@ public class DBCatalog {
   public File getFileForIndex(String tableName, String attributeName) {
     return new File(inputDir + "/db/indexes/" + tableName + "." + attributeName);
   }
-
 
   /**
    * Get columns for a table
@@ -382,7 +365,7 @@ public class DBCatalog {
     return this.indexInfo.get(name);
   }
 
-  public List<IndexInfo> getAllIndexInfo(){
+  public List<IndexInfo> getAllIndexInfo() {
     return this.indexInfo.values().stream().toList();
   }
 }

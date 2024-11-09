@@ -39,9 +39,10 @@ public class P1UnitTests {
     URI path = Objects.requireNonNull(classLoader.getResource("samples")).toURI();
     Path resourcePath = Paths.get(path);
 
-    DBCatalog.getInstance().setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql"))
-        .toURI();
+    DBCatalog.getInstance()
+        .setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/queries.sql")).toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -51,7 +52,8 @@ public class P1UnitTests {
   @Test
   public void testQuery01() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(0));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query1")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query1")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -69,7 +71,8 @@ public class P1UnitTests {
   @Test
   public void testQuery02() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(1));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query2")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query2")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -87,7 +90,8 @@ public class P1UnitTests {
   @Test
   public void testQuery03() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(2));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query3")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query3")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -105,7 +109,8 @@ public class P1UnitTests {
   @Test
   public void testQuery04() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(3));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query4")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query4")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -123,7 +128,8 @@ public class P1UnitTests {
   @Test
   public void testQuery05() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(4));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query5")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query5")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -141,7 +147,8 @@ public class P1UnitTests {
   @Test
   public void testQuery06() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(5));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query6")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query6")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -159,7 +166,8 @@ public class P1UnitTests {
   @Test
   public void testQuery07() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(6));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query7")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query7")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -177,7 +185,8 @@ public class P1UnitTests {
   @Test
   public void testQuery08() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(7));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query8")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query8")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -201,7 +210,8 @@ public class P1UnitTests {
   @Test
   public void testQuery09() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(8));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query9")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query9")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -225,7 +235,8 @@ public class P1UnitTests {
   @Test
   public void testQuery10() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(9));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query10")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query10")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -249,7 +260,8 @@ public class P1UnitTests {
   @Test
   public void testQuery11() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(10));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query11")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query11")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -266,7 +278,8 @@ public class P1UnitTests {
   @Test
   public void testQuery12() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(11));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query12")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query12")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -290,7 +303,8 @@ public class P1UnitTests {
   @Test
   public void testQuery13() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(12));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query13")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query13")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -308,7 +322,8 @@ public class P1UnitTests {
   @Test
   public void testQuery14() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(13));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query14")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query14")).toURI();
 
     TupleReader tupleReader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
@@ -326,7 +341,8 @@ public class P1UnitTests {
   @Test
   public void testQuery15() throws URISyntaxException, ExecutionControl.NotImplementedException {
     Operator plan = queryPlanBuilder.buildPlan(statementList.get(14));
-    URI expectedOutputFile = Objects.requireNonNull(classLoader.getResource("samples/expected_output/query15")).toURI();
+    URI expectedOutputFile =
+        Objects.requireNonNull(classLoader.getResource("samples/expected_output/query15")).toURI();
 
     TupleReader reader = new BinaryHandler(new File(expectedOutputFile));
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);

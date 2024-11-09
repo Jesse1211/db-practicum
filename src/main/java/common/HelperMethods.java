@@ -20,8 +20,7 @@ import physical_operator.Operator;
 public class HelperMethods {
 
   /**
-   * Map column name to index as columnName : index
-   * Default will use alias
+   * Map column name to index as columnName : index Default will use alias
    *
    * @param columns list of columns
    * @return map of <column name, column index>
@@ -101,7 +100,8 @@ public class HelperMethods {
     return expressions;
   }
 
-  public static Expression getNonIndexedComparisons(List<ComparisonOperator> comparisons, List<ComparisonOperator> indexedComparisons) {
+  public static Expression getNonIndexedComparisons(
+      List<ComparisonOperator> comparisons, List<ComparisonOperator> indexedComparisons) {
     Expression expression = null;
     for (ComparisonOperator comparison : comparisons) {
       if (!indexedComparisons.contains(comparison)) {
@@ -115,7 +115,8 @@ public class HelperMethods {
     return expression;
   }
 
-  public static List<ComparisonOperator> getIndexedComparisons(List<ComparisonOperator> comparisons, Table table){
+  public static List<ComparisonOperator> getIndexedComparisons(
+      List<ComparisonOperator> comparisons, Table table) {
     List<ComparisonOperator> indexedComparisons = new ArrayList<>();
     IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
     if (indexInfo == null) {
@@ -123,20 +124,19 @@ public class HelperMethods {
     }
     for (ComparisonOperator comparison : comparisons) {
       // Only these comparisons can be used with indexes
-      if (isComparisonIndexed(comparison, indexInfo) && (
-        comparison instanceof EqualsTo ||
-        comparison instanceof  GreaterThan ||
-        comparison instanceof GreaterThanEquals ||
-        comparison instanceof  MinorThan ||
-        comparison instanceof  MinorThanEquals
-      )){
+      if (isComparisonIndexed(comparison, indexInfo)
+          && (comparison instanceof EqualsTo
+              || comparison instanceof GreaterThan
+              || comparison instanceof GreaterThanEquals
+              || comparison instanceof MinorThan
+              || comparison instanceof MinorThanEquals)) {
         indexedComparisons.add(comparison);
       }
     }
     return indexedComparisons;
   }
 
-  private static boolean isComparisonIndexed(ComparisonOperator comparison, IndexInfo indexInfo){
+  private static boolean isComparisonIndexed(ComparisonOperator comparison, IndexInfo indexInfo) {
     Expression leftExpression = comparison.getLeftExpression();
     Expression rightExpression = comparison.getRightExpression();
 
@@ -153,19 +153,19 @@ public class HelperMethods {
   }
 
   // First element in the pair represents the number is <= or = or >= using -1, 0, 1 respectively
-  public static Pair<Integer, Integer> getComparisonValue(ComparisonOperator comparison){
+  public static Pair<Integer, Integer> getComparisonValue(ComparisonOperator comparison) {
     Expression leftExpression = comparison.getLeftExpression();
     Expression rightExpression = comparison.getRightExpression();
 
     if (leftExpression instanceof LongValue) {
-      return new Pair<>(-1, (int)((LongValue) leftExpression).getValue());
-    }else{
-      return new Pair<>(1, (int)((LongValue) rightExpression).getValue());
+      return new Pair<>(-1, (int) ((LongValue) leftExpression).getValue());
+    } else {
+      return new Pair<>(1, (int) ((LongValue) rightExpression).getValue());
     }
   }
 
-
-  public static Pair<Integer, Integer> getLowKeyHighKey(List<ComparisonOperator> indexedComparisons) {
+  public static Pair<Integer, Integer> getLowKeyHighKey(
+      List<ComparisonOperator> indexedComparisons) {
     int lowKey = Integer.MIN_VALUE;
     int highKey = Integer.MAX_VALUE;
 

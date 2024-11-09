@@ -1,11 +1,10 @@
 package common.tree;
 
-import common.DBCatalog;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IndexNode extends TreeNode{
+public class IndexNode extends TreeNode {
   private List<Integer> keys = new ArrayList<>();
   private List<TreeNode> children = new ArrayList<>();
   private final NodeType nodeType = NodeType.INDEX_NODE;
@@ -16,7 +15,9 @@ public class IndexNode extends TreeNode{
   }
 
   @Override
-  public int getFirstKey() {return keys.getFirst();}
+  public int getFirstKey() {
+    return keys.getFirst();
+  }
 
   @Override
   public List<Integer> getActualKeys() {
@@ -27,13 +28,11 @@ public class IndexNode extends TreeNode{
     return children;
   }
 
-  private int getActualKeySize(){
-    return this.keys.size()-1;
+  private int getActualKeySize() {
+    return this.keys.size() - 1;
   }
 
-  /**
-   * dump to buffer
-   */
+  /** dump to buffer */
   @Override
   public void serialize(ByteBuffer buffer) {
     buffer.clear();
@@ -46,12 +45,12 @@ public class IndexNode extends TreeNode{
     buffer.asIntBuffer().put(offset++, getActualKeySize());
 
     // the actual keys in the node, in order
-    for(int key: getActualKeys()){
+    for (int key : getActualKeys()) {
       buffer.asIntBuffer().put(offset++, key);
     }
 
     // the addresses of all the children of the node, in order
-    for(TreeNode child: getChildren()){
+    for (TreeNode child : getChildren()) {
       buffer.asIntBuffer().put(offset++, child.index);
     }
 

@@ -3,7 +3,6 @@ package common;
 import common.tree.IndexNode;
 import common.tree.LeafNode;
 import common.tree.TreeNode;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -35,7 +34,7 @@ public class IndexBuilder {
 
   /**
    * IndexBuilder constructor
-   * 
+   *
    * @param indexInfo index information
    */
   public IndexBuilder(IndexInfo indexInfo) {
@@ -48,7 +47,7 @@ public class IndexBuilder {
 
   /**
    * Build the index tree
-   * 
+   *
    * @return A list of TreeNode, ordered by [Leaf Nodes..., Index Nodes..., root]
    */
   public List<TreeNode> build() {
@@ -60,7 +59,7 @@ public class IndexBuilder {
 
   /**
    * Write the header of the index file
-   * 
+   *
    * @param buffer ByteBuffer
    */
   public void writeHeader(ByteBuffer buffer) {
@@ -77,13 +76,14 @@ public class IndexBuilder {
     buffer.asIntBuffer().put(offset, this.order);
   }
 
-  /**
-   * Sort the data and replace original relation file
-   */
+  /** Sort the data and replace original relation file */
   private void preprocessClusteredIndex() {
     // scan first, then sort by the attribute
-    Column attributeColumn = columns.stream().filter(
-        c -> c.getColumnName().equals(attributeName)).findFirst().orElse(null);
+    Column attributeColumn =
+        columns.stream()
+            .filter(c -> c.getColumnName().equals(attributeName))
+            .findFirst()
+            .orElse(null);
 
     OperatorNode operatorNode = new ScanOperatorNode(attributeColumn.getTable());
     operatorNode = new SortOperatorNode(operatorNode, Collections.singletonList(attributeColumn));
@@ -105,7 +105,7 @@ public class IndexBuilder {
 
   /**
    * Get all entries in the table
-   * 
+   *
    * @return TreeMap<Integer, List<Pair<Integer, Integer>>>
    */
   private TreeMap<Integer, List<Pair<Integer, Integer>>> getAllEntries() {
@@ -131,8 +131,8 @@ public class IndexBuilder {
    * @return A list of TreeNode, ordered by [Leaf Nodes..., Index Nodes..., root]
    */
   private List<TreeNode> buildTree() {
-    List<Entry<Integer, List<Pair<Integer, Integer>>>> entryList = new ArrayList<>(
-        getAllEntries().entrySet());
+    List<Entry<Integer, List<Pair<Integer, Integer>>>> entryList =
+        new ArrayList<>(getAllEntries().entrySet());
     List<TreeNode> nodes = new ArrayList<>();
     int nodeIndex = 1;
 

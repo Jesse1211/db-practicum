@@ -13,7 +13,6 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
@@ -77,7 +76,6 @@ public class Compiler {
     }
   }
 
-
   private static void buildIndex() {
     for (IndexInfo indexInfo : DBCatalog.getInstance().getAllIndexInfo()) {
       IndexBuilder ib = new IndexBuilder(indexInfo);
@@ -85,7 +83,9 @@ public class Compiler {
       try {
 
         // Initialize file and file channel
-        File indexFile = new File(inputDir + "/db/indexes/" + indexInfo.relationName + "." + indexInfo.attributeName);
+        File indexFile =
+            new File(
+                inputDir + "/db/indexes/" + indexInfo.relationName + "." + indexInfo.attributeName);
         indexFile.createNewFile();
         FileOutputStream fileOutputStream = new FileOutputStream(indexFile);
         FileChannel fileChannel = fileOutputStream.getChannel();
@@ -113,13 +113,11 @@ public class Compiler {
     }
   }
 
-
   /**
    * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping
    * results to files or console as desired.
    *
-   * <p>
-   * If dumping to files result of ith query is in file named query i, indexed stating at 1.
+   * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
    */
   public static void main(String[] args) {
     DBCatalog.getInstance().setInterpreterConfig(args[0]);

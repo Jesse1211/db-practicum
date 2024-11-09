@@ -16,16 +16,16 @@ public class LeafNode extends TreeNode {
   }
 
   @Override
-  public int getFirstKey() {return keys.getFirst();}
+  public int getFirstKey() {
+    return keys.getFirst();
+  }
 
   @Override
-  public List<Integer> getActualKeys(){
+  public List<Integer> getActualKeys() {
     return this.keys;
   }
 
-  /**
-   * dump to buffer
-   */
+  /** dump to buffer */
   @Override
   public void serialize(ByteBuffer buffer) {
     buffer.clear();
@@ -38,7 +38,7 @@ public class LeafNode extends TreeNode {
     buffer.asIntBuffer().put(offset++, this.entries.size());
 
     // the actual keys in the node, in order
-    for(Entry<Integer, List<Pair<Integer, Integer>>> entry: entries) {
+    for (Entry<Integer, List<Pair<Integer, Integer>>> entry : entries) {
       int key = entry.getKey();
       List<Pair<Integer, Integer>> ridList = entry.getValue();
 

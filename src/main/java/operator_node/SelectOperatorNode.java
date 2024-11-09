@@ -1,6 +1,5 @@
 package operator_node;
 
-import common.HelperMethods;
 import common.OperatorNodeVisitor;
 import net.sf.jsqlparser.expression.Expression;
 

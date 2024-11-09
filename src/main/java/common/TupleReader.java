@@ -1,7 +1,6 @@
 package common;
 
 import java.util.ArrayList;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 /** An interface to read tuples from a file. */
 public interface TupleReader {

@@ -34,9 +34,11 @@ public class DuplicateEliminationTest {
     URI path = Objects.requireNonNull(classLoader.getResource("samples")).toURI();
     Path resourcePath = Paths.get(path);
 
-    DBCatalog.getInstance().setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
-    URI queriesFile = Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
-        .toURI();
+    DBCatalog.getInstance()
+        .setInterpreterConfig(resourcePath.resolve("interpreter_config_file.txt").toString());
+    URI queriesFile =
+        Objects.requireNonNull(classLoader.getResource("samples/input/customized_queries.sql"))
+            .toURI();
 
     statements = CCJSqlParserUtil.parseStatements(Files.readString(Paths.get(queriesFile)));
     queryPlanBuilder = new QueryPlanBuilder();
@@ -59,11 +61,12 @@ public class DuplicateEliminationTest {
     Assertions.assertEquals(expectedSize, tuples.size(), "Unexpected number of rows.");
 
     // Check the first 3 tuple
-    Tuple[] expectedFirstThreeTuples = new Tuple[] {
-        new Tuple(new ArrayList<>(Arrays.asList(0))),
-        new Tuple(new ArrayList<>(Arrays.asList(1))),
-        new Tuple(new ArrayList<>(Arrays.asList(2)))
-    };
+    Tuple[] expectedFirstThreeTuples =
+        new Tuple[] {
+          new Tuple(new ArrayList<>(Arrays.asList(0))),
+          new Tuple(new ArrayList<>(Arrays.asList(1))),
+          new Tuple(new ArrayList<>(Arrays.asList(2)))
+        };
 
     for (int i = 0; i < expectedFirstThreeTuples.length; i++) {
       Tuple expectedTuple = expectedFirstThreeTuples[i];

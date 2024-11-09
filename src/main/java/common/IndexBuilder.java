@@ -33,6 +33,11 @@ public class IndexBuilder {
   private int rootIndex;
   private int numLeaf;
 
+  /**
+   * IndexBuilder constructor
+   * 
+   * @param indexInfo index information
+   */
   public IndexBuilder(IndexInfo indexInfo) {
     this.tableName = indexInfo.relationName;
     this.attributeName = indexInfo.attributeName;
@@ -41,6 +46,11 @@ public class IndexBuilder {
     this.order = indexInfo.order;
   }
 
+  /**
+   * Build the index tree
+   * 
+   * @return A list of TreeNode, ordered by [Leaf Nodes..., Index Nodes..., root]
+   */
   public List<TreeNode> build() {
     if (isClustered) {
       preprocessClusteredIndex();
@@ -48,6 +58,11 @@ public class IndexBuilder {
     return buildTree();
   }
 
+  /**
+   * Write the header of the index file
+   * 
+   * @param buffer ByteBuffer
+   */
   public void writeHeader(ByteBuffer buffer) {
     buffer.clear();
     int offset = 0;
@@ -68,8 +83,7 @@ public class IndexBuilder {
   private void preprocessClusteredIndex() {
     // scan first, then sort by the attribute
     Column attributeColumn = columns.stream().filter(
-            c -> c.getColumnName().equals(attributeName)
-    ).findFirst().orElse(null);
+        c -> c.getColumnName().equals(attributeName)).findFirst().orElse(null);
 
     OperatorNode operatorNode = new ScanOperatorNode(attributeColumn.getTable());
     operatorNode = new SortOperatorNode(operatorNode, Collections.singletonList(attributeColumn));
@@ -89,7 +103,11 @@ public class IndexBuilder {
     }
   }
 
-
+  /**
+   * Get all entries in the table
+   * 
+   * @return TreeMap<Integer, List<Pair<Integer, Integer>>>
+   */
   private TreeMap<Integer, List<Pair<Integer, Integer>>> getAllEntries() {
     TreeMap<Integer, List<Pair<Integer, Integer>>> treeMap = new TreeMap<>();
     TupleReader tupleReader = new BinaryHandler(this.tableName);
@@ -107,7 +125,6 @@ public class IndexBuilder {
     return treeMap;
   }
 
-
   /**
    * build tree in the order by using the treemap
    *
@@ -115,7 +132,7 @@ public class IndexBuilder {
    */
   private List<TreeNode> buildTree() {
     List<Entry<Integer, List<Pair<Integer, Integer>>>> entryList = new ArrayList<>(
-            getAllEntries().entrySet());
+        getAllEntries().entrySet());
     List<TreeNode> nodes = new ArrayList<>();
     int nodeIndex = 1;
 
@@ -148,11 +165,13 @@ public class IndexBuilder {
 
     this.numLeaf = nodes.size();
 
-    /* At this point, we have parsed all the leaf nodes.
-       Continue to build all index nodes using the leaf nodes we have.
+    /*
+     * At this point, we have parsed all the leaf nodes.
+     * Continue to build all index nodes using the leaf nodes we have.
      */
     childIndex = 0;
-    // if current layer is more than 2*order + 1, that means we need to have additional layers before setting the root.
+    // if current layer is more than 2*order + 1, that means we need to have
+    // additional layers before setting the root.
     while (nodes.size() - childIndex > 2 * order + 1) {
       childCount = nodes.size();
       while (childIndex < childCount) {
@@ -189,5 +208,3 @@ public class IndexBuilder {
     return nodes;
   }
 }
-
-

@@ -1,4 +1,4 @@
-SELECT * FROM Sailors;
+SELECT * FROM Sailors ORDER BY Sailors.B;
 SELECT Sailors.A FROM Sailors;
 SELECT Boats.F, Boats.D FROM Boats;
 SELECT Reserves.G, Reserves.H FROM Reserves;
@@ -7,7 +7,7 @@ SELECT Sailors.A FROM Sailors WHERE Sailors.B >= Sailors.C;
 SELECT Sailors.A FROM Sailors WHERE Sailors.B >= Sailors.C AND Sailors.B < Sailors.C;
 SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;
 SELECT * FROM Sailors, Reserves, Boats WHERE Sailors.A = Reserves.G AND Reserves.H = Boats.D;
-SELECT * FROM Sailors, Reserves, Boats WHERE Sailors.A = Reserves.G AND Reserves.H = Boats.D AND Sailors.B < 150;
+SELECT * FROM Sailors S1, Reserves, Boats WHERE S1.A = Reserves.G AND Reserves.H = Boats.D AND S1.B < 150;
 SELECT DISTINCT * FROM Sailors; -- Order Unmatched
 SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A;
 SELECT B.F, B.D FROM Boats B ORDER BY B.D;

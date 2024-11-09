@@ -207,7 +207,7 @@ public class DBCatalog {
         String attributeName = tokens[1];
         boolean isClustered = tokens[2].equals("1");
         int order = Integer.parseInt(tokens[3]);
-        indexInfo.put(attributeName, new IndexInfo(relationName, attributeName, isClustered, order));
+        indexInfo.put(relationName, new IndexInfo(relationName, attributeName, isClustered, order));
       }
       br.close();
     } catch (Exception e) {

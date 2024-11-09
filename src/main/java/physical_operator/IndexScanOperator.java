@@ -22,7 +22,7 @@ public class IndexScanOperator extends Operator {
   public IndexScanOperator(ArrayList<Column> outputSchema, int lowKey, int highKey, Table table) {
     super(outputSchema);
     IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
-    int attributeIndex = HelperMethods.mapColumnIndex(outputSchema, false).get(indexInfo.attributeName);
+    int attributeIndex = HelperMethods.mapColumnIndex(outputSchema, false).get(indexInfo.relationName + "." + indexInfo.attributeName);
     this.indexDeserializer = new IndexDeserializer(lowKey, highKey, indexInfo, attributeIndex);
   }
 

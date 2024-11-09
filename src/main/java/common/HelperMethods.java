@@ -141,15 +141,13 @@ public class HelperMethods {
     Expression rightExpression = comparison.getRightExpression();
 
     if (leftExpression instanceof Column) {
-      String tableName = ((Column) leftExpression).getTable().getName();
       String columnName = ((Column) leftExpression).getColumnName();
-      return tableName == indexInfo.relationName && columnName == indexInfo.attributeName;
+      return columnName.equals(indexInfo.attributeName);
     }
 
     if (rightExpression instanceof Column) {
-      String tableName = ((Column) rightExpression).getTable().getName();
       String columnName = ((Column) rightExpression).getColumnName();
-      return tableName == indexInfo.relationName && columnName == indexInfo.attributeName;
+      return columnName.equals(indexInfo.attributeName);
     }
     return false;
   }

@@ -285,22 +285,19 @@ public class BinaryHandler implements TupleWriter, TupleReader {
    */
   @Override
   public void reset(int pageIndex, int tupleIndex) {
-    if (this.fileInputStream == null) {
-      try {
-        this.fileInputStream = new FileInputStream(file);
-        this.fileChannel = this.fileInputStream.getChannel();
-      } catch (Exception e) {
-        logger.error(e.getMessage());
-      }
-    }
     try {
-      fileChannel.position(0);
-      ByteBuffer tupleNumBuffer = ByteBuffer.allocate(8);
-      fileChannel.read(tupleNumBuffer);
-      tupleNumBuffer.flip();
+      if (this.fileInputStream == null) {
+        try {
+          this.fileInputStream = new FileInputStream(file);
+          this.fileChannel = this.fileInputStream.getChannel();
+        } catch (Exception e) {
+          logger.error(e.getMessage());
+        }
+      }
 
       fileChannel.position(bufferCapacity * pageIndex);
       loadNextPage();
+      this.pageIndex = pageIndex;
       this.offset = 2 + tupleIndex * this.attributeNum;
 
     } catch (IOException e) {

@@ -208,7 +208,7 @@ public class IndexDeserializer {
     Tuple tuple = this.tupleReader.readNextTuple();
 
     // key > high key return null else return next tuple\
-    if(tuple.getElementAtIndex(attributeIndex) > highKey){
+    if(tuple != null && tuple.getElementAtIndex(attributeIndex) > highKey){
       return null;
     }
     return tuple;

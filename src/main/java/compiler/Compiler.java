@@ -65,10 +65,13 @@ public class Compiler {
         } catch (Exception e) {
           logger.error(e.getMessage());
         }
-        System.err.println("------------------------");
+        System.out.println("------------------------");
         ++counter;
       }
     } catch (Exception e) {
+      for (StackTraceElement ste : e.getStackTrace()) {
+        System.out.println(ste + "\n");
+      }
       System.err.println("Exception occurred in interpreter");
       logger.error(e.getMessage());
     }

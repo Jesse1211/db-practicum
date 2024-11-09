@@ -302,11 +302,6 @@ public class DBCatalog {
     }
     return newColumns;
   }
-
-  public String getTempDirectory() {
-    return tempDir;
-  }
-
   /**
    * Get join method from plan_builder_config.txt.
    *

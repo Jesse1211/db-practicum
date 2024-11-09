@@ -80,7 +80,7 @@ public class ExternalSortOperator extends Operator {
         new PriorityQueue<>(HelperMethods.getTupleComparator(orders, outputSchema));
 
     File mergedFile =
-        new File(DBCatalog.getInstance().getTempDirectory() + UUID.randomUUID() + "sorted.temp");
+        new File(DBCatalog.getInstance().getTempDir() + "/" + UUID.randomUUID() + "sorted.temp");
     mergedFile.deleteOnExit();
     TupleWriter writer = new BinaryHandler(mergedFile);
 
@@ -115,7 +115,7 @@ public class ExternalSortOperator extends Operator {
     // write the data block to a file
 
     File file =
-        new File(DBCatalog.getInstance().getTempDirectory() + "_" + UUID.randomUUID() + ".temp");
+        new File(DBCatalog.getInstance().getTempDir() + "/_" + UUID.randomUUID() + ".temp");
     file.deleteOnExit();
     TupleWriter tupleWriter = new BinaryHandler(file);
     for (Tuple tuple : tupleBuffer) {

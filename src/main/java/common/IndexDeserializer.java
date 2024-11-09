@@ -25,6 +25,7 @@ public class IndexDeserializer {
   private int numKeys;
   private int entryKey;
   private int ridCount;
+  private int leafNodeNum;
 
   /**
    * IndexDeserializer constructor
@@ -65,8 +66,8 @@ public class IndexDeserializer {
       this.fileChannel.read(byteBuffer);
       this.byteBuffer.flip();
 
+      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
       return this.byteBuffer.asIntBuffer().get(0);
-      //      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
       //      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
     } catch (Exception e) {
       e.printStackTrace();
@@ -191,7 +192,8 @@ public class IndexDeserializer {
     // For non-Clustered index, retrieve tuple from the data file
     // For Clustered index, scan the sorted data file sequentially
     if (!this.isClustered || !this.isLoaded) {
-      if (this.numKeys == 0) {
+      if (this.numKeys == 0 && this.ridCount == 0) {
+        if (this.nodeId == leafNodeNum) return null;
         loadNodeById(this.nodeId + 1);
       }
       if (this.ridCount == 0) {

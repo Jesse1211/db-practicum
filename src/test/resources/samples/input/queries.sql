@@ -1,10 +1,10 @@
-SELECT * FROM Sailors;
+SELECT * FROM Boats;
 SELECT Sailors.A FROM Sailors;
 SELECT Boats.F, Boats.D FROM Boats;
-SELECT Reserves.G, Reserves.H FROM Reserves;
-SELECT * FROM Sailors WHERE Sailors.B >= Sailors.C;
-SELECT Sailors.A FROM Sailors WHERE Sailors.B >= Sailors.C;
-SELECT Sailors.A FROM Sailors WHERE Sailors.B >= Sailors.C AND Sailors.B < Sailors.C;
+SELECT Sailors.A FROM Sailors WHERE Sailors.A < 50;
+SELECT * FROM Sailors, Boats WHERE Sailors.A = Boats.D AND Sailors.A < 500 AND Boat.E > 30 ORDER BY Sailors.A, Boats.D;
+SELECT * FROM Boats WHERE Boats.E > 20 AND Boats.D < 2000 ORDER BY Boats.E;
+SELECT Boats.E FROM Boats WHERE Boats.D < 2000;
 SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;
 SELECT * FROM Sailors, Reserves, Boats WHERE Sailors.A = Reserves.G AND Reserves.H = Boats.D;
 SELECT * FROM Sailors S1, Reserves, Boats WHERE S1.A = Reserves.G AND Reserves.H = Boats.D AND S1.B < 150;

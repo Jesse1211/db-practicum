@@ -1,9 +1,13 @@
 package physical_operator;
 
+import common.DBCatalog;
+import common.HelperMethods;
 import common.IndexDeserializer;
+import common.IndexInfo;
 import common.Tuple;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
 
 /** file scan with retrieving a range of tuples from the table by using B+ tree index */
 public class IndexScanOperator extends Operator {
@@ -15,16 +19,16 @@ public class IndexScanOperator extends Operator {
    * @param lowKey low key of the range, can be null
    * @param highKey high key of the range, can be null
    */
-  public IndexScanOperator(
-      ArrayList<Column> outputSchema, int lowKey, int highKey, String tableName) {
+  public IndexScanOperator(ArrayList<Column> outputSchema, int lowKey, int highKey, Table table) {
     super(outputSchema);
-    this.indexDeserializer = new IndexDeserializer(lowKey, highKey, tableName);
+    IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
+    int attributeIndex = HelperMethods.mapColumnIndex(outputSchema, false).get(indexInfo.attributeName);
+    this.indexDeserializer = new IndexDeserializer(lowKey, highKey, indexInfo, attributeIndex);
   }
 
   @Override
   public void reset() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'reset'");
+    this.indexDeserializer.reset();
   }
 
   @Override

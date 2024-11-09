@@ -2,7 +2,6 @@ package physical_operator;
 
 import common.BinaryHandler;
 import common.DBCatalog;
-import common.IndexDeserializer;
 import common.Tuple;
 import common.TupleReader;
 import java.util.ArrayList;

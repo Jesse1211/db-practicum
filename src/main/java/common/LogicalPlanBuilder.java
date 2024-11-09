@@ -164,6 +164,7 @@ public class LogicalPlanBuilder {
       Expression expression = tableWhereExpressionMap.getOrDefault(name, null);
       if (expression != null) {
         // process same-table column comparisons.
+        // Where Sailer.A < 50 AND Sailer.A > 30
         operatorNode = new SelectOperatorNode(operatorNode, expression);
       }
       deque.offer(new Pair<>(name, operatorNode));
@@ -176,7 +177,7 @@ public class LogicalPlanBuilder {
       Pair<String, OperatorNode> rightPair = deque.poll();
       assert (leftPair != null && rightPair != null);
       OperatorNode operatorNode = new JoinOperatorNode(leftPair.getRight(), rightPair.getRight());
-      // if left is a single table, usually happens during first iteration, add to the list.
+      // if left is a single table selection (not a join node), usually happens during first iteration, add to the list.
       if (leftPair.getLeft() != null) {
         names.add(leftPair.getLeft());
       }
@@ -184,6 +185,7 @@ public class LogicalPlanBuilder {
       String rightName = rightPair.getLeft();
       assert (rightName != null);
 
+      // for each of name in names arr, concat all expressions that have tables of name and rightname
       Expression expression = null;
       for (String name : names) {
         Expression _expression =

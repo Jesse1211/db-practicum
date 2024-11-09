@@ -3,8 +3,14 @@ package common;
 import java.util.*;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.Join;
@@ -15,14 +21,26 @@ public class HelperMethods {
 
   /**
    * Map column name to index as columnName : index
+   * Default will use alias
    *
    * @param columns list of columns
    * @return map of <column name, column index>
    */
   public static Map<String, Integer> mapColumnIndex(List<Column> columns) {
+    return mapColumnIndex(columns, true);
+  }
+
+  /**
+   * Map column name to index as columnName : index
+   *
+   * @param columns list of columns
+   * @param useAlias useAlias to parse
+   * @return
+   */
+  public static Map<String, Integer> mapColumnIndex(List<Column> columns, boolean useAlias) {
     Map<String, Integer> map = new HashMap<>();
     for (int i = 0; i < columns.size(); i++) {
-      map.put(columns.get(i).getName(true), i);
+      map.put(columns.get(i).getName(useAlias), i);
     }
     return map;
   }
@@ -83,6 +101,122 @@ public class HelperMethods {
     return expressions;
   }
 
+  public static Expression getNonIndexedComparisons(List<ComparisonOperator> comparisons, List<ComparisonOperator> indexedComparisons) {
+    Expression expression = null;
+    for (ComparisonOperator comparison : comparisons) {
+      if (!indexedComparisons.contains(comparison)) {
+        if (expression == null) {
+          expression = comparison;
+        } else {
+          expression = new AndExpression(expression, comparison);
+        }
+      }
+    }
+    return expression;
+  }
+
+  public static List<ComparisonOperator> getIndexedComparisons(List<ComparisonOperator> comparisons, Table table){
+    List<ComparisonOperator> indexedComparisons = new ArrayList<>();
+    IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
+    if (indexInfo == null) {
+      return indexedComparisons;
+    }
+    for (ComparisonOperator comparison : comparisons) {
+      // Only these comparisons can be used with indexes
+      if (isComparisonIndexed(comparison, indexInfo) && (
+        comparison instanceof EqualsTo ||
+        comparison instanceof  GreaterThan ||
+        comparison instanceof GreaterThanEquals ||
+        comparison instanceof  MinorThan ||
+        comparison instanceof  MinorThanEquals
+      )){
+        indexedComparisons.add(comparison);
+      }
+    }
+    return indexedComparisons;
+  }
+
+  private static boolean isComparisonIndexed(ComparisonOperator comparison, IndexInfo indexInfo){
+    Expression leftExpression = comparison.getLeftExpression();
+    Expression rightExpression = comparison.getRightExpression();
+
+    if (leftExpression instanceof Column) {
+      String tableName = ((Column) leftExpression).getTable().getName();
+      String columnName = ((Column) leftExpression).getColumnName();
+      return tableName == indexInfo.relationName && columnName == indexInfo.attributeName;
+    }
+
+    if (rightExpression instanceof Column) {
+      String tableName = ((Column) rightExpression).getTable().getName();
+      String columnName = ((Column) rightExpression).getColumnName();
+      return tableName == indexInfo.relationName && columnName == indexInfo.attributeName;
+    }
+    return false;
+  }
+
+  // First element in the pair represents the number is <= or = or >= using -1, 0, 1 respectively
+  public static Pair<Integer, Integer> getComparisonValue(ComparisonOperator comparison){
+    Expression leftExpression = comparison.getLeftExpression();
+    Expression rightExpression = comparison.getRightExpression();
+
+    if (leftExpression instanceof LongValue) {
+      return new Pair<>(-1, (int)((LongValue) leftExpression).getValue());
+    }else{
+      return new Pair<>(1, (int)((LongValue) rightExpression).getValue());
+    }
+  }
+
+
+  public static Pair<Integer, Integer> getLowKeyHighKey(List<ComparisonOperator> indexedComparisons) {
+    int lowKey = Integer.MIN_VALUE;
+    int highKey = Integer.MAX_VALUE;
+
+    for (ComparisonOperator comparison : indexedComparisons) {
+      Pair<Integer, Integer> pair = getComparisonValue(comparison);
+      int side = pair.getLeft();
+      int value = pair.getRight();
+
+      if (comparison instanceof GreaterThan) {
+        if (side == 1) {
+          // x > value
+          lowKey = Math.max(lowKey, value + 1);
+        } else {
+          // value > x => x < value
+          highKey = Math.min(highKey, value - 1);
+        }
+      } else if (comparison instanceof GreaterThanEquals) {
+        if (side == 1) {
+          // x >= value
+          lowKey = Math.max(lowKey, value);
+        } else {
+          // value >= x => x <= value
+          highKey = Math.min(highKey, value);
+        }
+      } else if (comparison instanceof MinorThan) {
+        if (side == 1) {
+          // x < value
+          highKey = Math.min(highKey, value - 1);
+        } else {
+          // value < x => x > value
+          lowKey = Math.max(lowKey, value + 1);
+        }
+      } else if (comparison instanceof MinorThanEquals) {
+        if (side == 1) {
+          // x <= value
+          highKey = Math.min(highKey, value);
+        } else {
+          // value <= x => x >= value
+          lowKey = Math.max(lowKey, value);
+        }
+      } else if (comparison instanceof EqualsTo) {
+        // x = value or value = x
+        lowKey = highKey = value;
+        return new Pair<>(lowKey, highKey);
+      }
+    }
+    return new Pair<>(lowKey, highKey);
+  }
+
   /**
    * Get a pair of table names from a comparison operator
    *
@@ -119,6 +253,7 @@ public class HelperMethods {
         Column leftColumn = comparison.getLeftExpression(Column.class);
         Column rightColumn = comparison.getRightExpression(Column.class);
 
+        // we need the map to distinguish left and right
         Map<String, Integer> leftMap = HelperMethods.mapColumnIndex(leftOperator.getOutputSchema());
         Map<String, Integer> rightMap =
             HelperMethods.mapColumnIndex(rightOperator.getOutputSchema());

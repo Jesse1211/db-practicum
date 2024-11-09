@@ -10,25 +10,21 @@ public class IndexDeserializer {
 
   private boolean isClustered;
   private boolean isLoaded = false;
-  private int bufferCapacity;
+  private final int bufferCapacity;
+  private final int attributeIndex;
+  private final int lowKey;
+  private final int highKey;
 
   private File file;
   private FileInputStream fileInputStream;
   private FileChannel fileChannel;
   private ByteBuffer byteBuffer;
 
-  private int lowKey;
-  private int highKey;
-
-  // content of header page
-  private int treeOrder;
-  private int leafNodeNum;
-
   private int offset;
-  private int count;
-  private int value;
+  private int nodeId;
   private int numKeys;
-  private int rootOffset;
+  private int entryKey;
+  private int ridCount;
 
   /**
    * IndexDeserializer constructor
@@ -36,23 +32,20 @@ public class IndexDeserializer {
    * @param lowKey low key of the range
    * @param highKey high key of the range
    */
-  public IndexDeserializer(int lowKey, int highKey, String tableName) {
-    IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(tableName);
+  public IndexDeserializer(int lowKey, int highKey, IndexInfo indexInfo, int attributeIndex) {
     this.isClustered = indexInfo.isClustered;
-
-    this.tupleReader = new BinaryHandler(tableName);
-    this.file =
-        DBCatalog.getInstance().getFileForIndex(indexInfo.relationName, indexInfo.attributeName);
+    this.tupleReader = new BinaryHandler(indexInfo.relationName);
+    this.file = DBCatalog.getInstance().getFileForIndex(indexInfo.relationName, indexInfo.attributeName);
     this.bufferCapacity = DBCatalog.getInstance().getBufferCapacity();
     this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
     this.lowKey = lowKey;
     this.highKey = highKey;
-    loadHeaderPage();
-    loadPageByOffset(this.rootOffset);
+    this.attributeIndex = attributeIndex;
+    loadNodeById(loadHeaderNode());
   }
 
   /**
-   * Load 3 integers in header page:
+   * Load 3 integers in header node:
    *
    * <p>Address of the root
    *
@@ -60,39 +53,42 @@ public class IndexDeserializer {
    *
    * <p>Tree order: number of keys in the node
    */
-  private void loadHeaderPage() {
+  private int loadHeaderNode() {
     try {
-      this.fileInputStream = new FileInputStream(file);
-      this.fileChannel = fileInputStream.getChannel();
+      if (this.fileInputStream == null) {
+        this.fileInputStream = new FileInputStream(file);
+        this.fileChannel = fileInputStream.getChannel();
+      }
       this.byteBuffer.clear();
       this.fileChannel.read(byteBuffer);
       this.byteBuffer.flip();
 
-      this.rootOffset = this.byteBuffer.asIntBuffer().get(0);
-      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
-      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
+      return this.byteBuffer.asIntBuffer().get(0);
+//      this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
+//      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return -1;
   }
 
   /**
-   * Load a new page from the index file
+   * Load a new node from the index file
    *
    * <p>Flag to indicate if index or leaf node
    */
-  private void loadPageByOffset(int offset) {
+  private void loadNodeById(int nodeId) {
     try {
       this.byteBuffer.clear();
-      this.fileChannel.position(offset * 4096);
+      this.fileChannel.position(nodeId * bufferCapacity);
       this.fileChannel.read(byteBuffer);
       this.byteBuffer.flip();
-
-      boolean isIndexNode = this.byteBuffer.asIntBuffer().get(0) == 1;
-      if (isIndexNode) {
-        loadIndexPage();
+      this.nodeId = nodeId;
+      // isIndexNode-- 1: index node, 0: leaf node
+      if (this.byteBuffer.asIntBuffer().get(0) == 1) {
+        loadIndexNode();
       } else {
-        loadLeafPage();
+        loadLeafNode();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -100,7 +96,7 @@ public class IndexDeserializer {
   }
 
   /**
-   * Load the index page:
+   * Load the index node:
    *
    * <p>Number of keys in the node
    *
@@ -108,16 +104,12 @@ public class IndexDeserializer {
    *
    * <p>Address of the child nodes
    */
-  private void loadIndexPage() {
+  private void loadIndexNode() {
     int numKeys = this.byteBuffer.asIntBuffer().get(1);
 
     // find the key in the index node
     int left = 2;
-    int right = 2 + numKeys - 1;
-    if (this.byteBuffer.asIntBuffer().get(left) < this.lowKey || this.lowKey == Integer.MAX_VALUE) {
-      loadPageByOffset(this.byteBuffer.asIntBuffer().get(left + numKeys));
-      return;
-    }
+    int right = 2 + numKeys;
 
     while (left < right) {
       int mid = left + (right - left) / 2;
@@ -125,19 +117,20 @@ public class IndexDeserializer {
 
       // if lowKey is valid, find the leftmost key that is greater than or equal to
       // lowKey
-      if (key < this.lowKey) {
+      if (key <= this.lowKey) {
         left = mid + 1;
       } else {
         right = mid;
       }
     }
 
-    // find the address of the child and load the child page
-    loadPageByOffset(this.byteBuffer.asIntBuffer().get(left + numKeys));
+    // find the address of the child and load the child node
+    // left - 1 + numKeys + 1 = left + numKeys
+    loadNodeById(this.byteBuffer.asIntBuffer().get(left + numKeys));
   }
 
   /**
-   * Load the leaf page:
+   * Load the leaf node:
    *
    * <p>Number of data entries in the node
    *
@@ -145,41 +138,45 @@ public class IndexDeserializer {
    *
    * <p>
    */
-  private void loadLeafPage() {
+  private void loadLeafNode() {
     this.numKeys = this.byteBuffer.asIntBuffer().get(1);
-    offset = 2;
-    loadSingleDataEntryList();
+    this.offset = 2;
+    this.ridCount = 0;
   }
 
-  /** After loaded the leaf page, load the next entry list from the leaf page */
-  private void loadSingleDataEntryList() {
-    while (true) {
-      if (this.numKeys == 0) {
-        loadPageByOffset(this.offset);
-        return;
-      }
-
-      this.value = this.byteBuffer.asIntBuffer().get(offset++);
-      this.count = this.byteBuffer.asIntBuffer().get(offset++);
+  /** After loaded the leaf node, load the next entry list from the leaf node */
+  private void loadNextEntry() {
+    while (this.numKeys > 0) {
+      this.entryKey = this.byteBuffer.asIntBuffer().get(offset++);
+      this.ridCount = this.byteBuffer.asIntBuffer().get(offset++);
       this.numKeys--;
 
-      if (this.lowKey == Integer.MAX_VALUE && this.highKey == Integer.MAX_VALUE) {
-        // no low key and high key
-        break;
-      } else if (this.highKey == Integer.MAX_VALUE) {
-        // no high key
-        if (this.value >= this.lowKey) {
-          break;
-        }
-      } else if (this.lowKey == Integer.MAX_VALUE) {
-        // no low key
-        if (this.value <= this.highKey) {
-          break;
-        }
-      } else if (this.value >= this.lowKey && this.value <= this.highKey) {
-        break;
+      if (this.entryKey >= lowKey) {
+        return;
       }
-      this.offset += this.count * 2;
+      // go to next entry's offset
+      this.offset += this.ridCount * 2;
+    }
+  }
+
+  public void reset(){
+    try {
+      // Reset the file position to the start of the file
+      fileChannel.position(0);
+
+      // Clear the byteBuffer to make it ready for new data
+      this.byteBuffer.clear();
+
+      // reset tuple reader
+      this.tupleReader.reset();
+
+      // Reset the offset
+      this.offset = 0;
+
+      // Load header node
+      loadNodeById(loadHeaderNode());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -189,23 +186,31 @@ public class IndexDeserializer {
    * @return the next tuple
    */
   public Tuple next() {
-
-    if (count == 0) {
-      loadSingleDataEntryList();
-    }
-    count--;
-
-    Pair<Integer, Integer> pair =
-        new Pair<Integer, Integer>(
-            this.byteBuffer.asIntBuffer().get(offset++),
-            this.byteBuffer.asIntBuffer().get(offset++));
-
     // For non-Clustered index, retrieve tuple from the data file
     // For Clustered index, scan the sorted data file sequentially
     if (!this.isClustered || !this.isLoaded) {
+      if(this.numKeys == 0){
+        loadNodeById(this.nodeId + 1);
+      }
+      if (this.ridCount == 0) {
+        loadNextEntry();
+      }
+      this.ridCount--;
+
+      Pair<Integer, Integer> pair =
+          new Pair<>(
+              this.byteBuffer.asIntBuffer().get(offset++),
+              this.byteBuffer.asIntBuffer().get(offset++));
+
       this.isLoaded = true;
       this.tupleReader.reset(pair.getLeft(), pair.getRight());
     }
-    return this.tupleReader.readNextTuple();
+    Tuple tuple = this.tupleReader.readNextTuple();
+
+    // key > high key return null else return next tuple\
+    if(tuple.getElementAtIndex(attributeIndex) > highKey){
+      return null;
+    }
+    return tuple;
   }
 }

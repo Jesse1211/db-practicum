@@ -8,12 +8,17 @@ import common.tree.TreeNode;
 import io_handler.BinaryHandler;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import org.apache.logging.log4j.*;
@@ -113,6 +118,21 @@ public class Compiler {
     }
   }
 
+  private static void buildStats() {
+    StringBuilder sb = new StringBuilder();
+    StatsBuilder statsBuilder = new StatsBuilder(sb);
+    HashMap<String, ArrayList<Column>> tables = DBCatalog.getInstance().getTables();
+    tables.forEach((table, tableSchema) -> {
+      statsBuilder.processTable(table, tableSchema);
+    });
+
+    try (FileWriter fileWriter = new FileWriter(DBCatalog.getInstance().getInputDir() + "/db/stats.txt")) {
+      fileWriter.write(sb.toString());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Reads statements from queriesFile one at a time, builds query plan and
    * evaluates, dumping
@@ -123,11 +143,12 @@ public class Compiler {
    * stating at 1.
    */
   public static void main(String[] args) {
+    // DBCatalog.getInstance().setInterpreterConfig(args[0]);
     DBCatalog.getInstance().setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
     inputDir = DBCatalog.getInstance().getInputDir();
     outputDir = DBCatalog.getInstance().getOutputDir();
 
-    new StatsBuilder();
+    buildStats();
 
     if (DBCatalog.getInstance().getIsBuildIndex()) {
       buildIndex();

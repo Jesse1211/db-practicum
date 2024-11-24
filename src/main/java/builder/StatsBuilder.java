@@ -1,10 +1,6 @@
 package builder;
 
 import common.tuple.Tuple;
-import compiler.DBCatalog;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,28 +10,20 @@ import physical_operator.Operator;
 import physical_operator.ScanOperator;
 
 public class StatsBuilder {
-  HashMap<String, ArrayList<Column>> tables; // table name -> schema
+
   StringBuilder sb;
 
-  /** Gather statistics from tables to stats.txt file. */
-  public StatsBuilder() {
-    this.tables = DBCatalog.getInstance().getTables();
-    resetStatsFile();
-
-    this.sb = new StringBuilder();
-    tables.keySet().forEach((table) -> processTable(table));
-
-    writeToStatsFile();
+  public StatsBuilder(StringBuilder sb) {
+    this.sb = sb;
   }
 
-  private void processTable(String table) {
+  public void processTable(String table, List<Column> tableSchema) {
 
-    Operator scanOperator = new ScanOperator(tables.get(table).get(0).getTable());
-    List<Column> tableSchema = tables.get(table);
+    Operator scanOperator = new ScanOperator(tableSchema.get(0).getTable());
 
     Map<String, int[]> columnStats = new HashMap<>(); // column name -> [min, max]
 
-    for (Column column : tables.get(table)) {
+    for (Column column : tableSchema) {
       String colName = column.getColumnName();
       columnStats.put(colName, new int[] { Integer.MAX_VALUE, Integer.MIN_VALUE });
     }
@@ -70,21 +58,5 @@ public class StatsBuilder {
       sb.append(maxArray[i]).append("\s");
     }
     sb.append("\n");
-  }
-
-  private void resetStatsFile() {
-    try (FileWriter fileWriter = new FileWriter("src/test/resources/samples/input/db/stats.txt")) {
-      fileWriter.write("");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void writeToStatsFile() {
-    try (FileWriter fileWriter = new FileWriter("src/test/resources/samples/input/db/stats.txt")) {
-      fileWriter.append(sb.toString());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }

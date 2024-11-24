@@ -1,10 +1,11 @@
 package compiler;
 
-import io_handler.BinaryHandler;
 import builder.IndexBuilder;
-import common.index.IndexInfo;
 import builder.QueryPlanBuilder;
+import builder.StatsBuilder;
+import common.index.IndexInfo;
 import common.tree.TreeNode;
+import io_handler.BinaryHandler;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
@@ -19,7 +20,8 @@ import org.apache.logging.log4j.*;
 import physical_operator.Operator;
 
 /**
- * Top level harness class; reads queries from an input file one at a time, processes them and sends
+ * Top level harness class; reads queries from an input file one at a time,
+ * processes them and sends
  * output to file or to System depending on flag.
  */
 public class Compiler {
@@ -82,9 +84,8 @@ public class Compiler {
       try {
 
         // Initialize file and file channel
-        File indexFile =
-            new File(
-                inputDir + "/db/indexes/" + indexInfo.relationName + "." + indexInfo.attributeName);
+        File indexFile = new File(
+            inputDir + "/db/indexes/" + indexInfo.relationName + "." + indexInfo.attributeName);
         indexFile.createNewFile();
         FileOutputStream fileOutputStream = new FileOutputStream(indexFile);
         FileChannel fileChannel = fileOutputStream.getChannel();
@@ -113,15 +114,20 @@ public class Compiler {
   }
 
   /**
-   * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping
+   * Reads statements from queriesFile one at a time, builds query plan and
+   * evaluates, dumping
    * results to files or console as desired.
    *
-   * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
+   * <p>
+   * If dumping to files result of ith query is in file named query i, indexed
+   * stating at 1.
    */
   public static void main(String[] args) {
-    DBCatalog.getInstance().setInterpreterConfig(args[0]);
+    DBCatalog.getInstance().setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
     inputDir = DBCatalog.getInstance().getInputDir();
     outputDir = DBCatalog.getInstance().getOutputDir();
+
+    new StatsBuilder();
 
     if (DBCatalog.getInstance().getIsBuildIndex()) {
       buildIndex();

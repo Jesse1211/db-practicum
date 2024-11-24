@@ -362,7 +362,21 @@ public class DBCatalog {
     return this.indexInfo.get(name);
   }
 
+  /**
+   * Get all index information
+   *
+   * @return List<IndexInfo>
+   */
   public List<IndexInfo> getAllIndexInfo() {
     return this.indexInfo.values().stream().toList();
+  }
+
+  /**
+   * Get all tables
+   *
+   * @return HashMap<String, ArrayList<Column>>
+   */
+  public HashMap<String, ArrayList<Column>> getTables() {
+    return tables;
   }
 }

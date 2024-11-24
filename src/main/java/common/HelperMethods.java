@@ -1,5 +1,9 @@
 package common;
 
+import common.index.IndexInfo;
+import common.pair.Pair;
+import common.tuple.Tuple;
+import compiler.DBCatalog;
 import java.util.*;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;

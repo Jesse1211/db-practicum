@@ -1,10 +1,9 @@
 package compiler;
 
-import common.BinaryHandler;
-import common.DBCatalog;
-import common.IndexBuilder;
-import common.IndexInfo;
-import common.QueryPlanBuilder;
+import io_handler.BinaryHandler;
+import builder.IndexBuilder;
+import common.index.IndexInfo;
+import builder.QueryPlanBuilder;
 import common.tree.TreeNode;
 import java.io.File;
 import java.io.FileOutputStream;

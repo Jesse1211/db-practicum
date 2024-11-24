@@ -1,12 +1,4 @@
-package common;
-
-import operator_node.DuplicateEliminationOperatorNode;
-import operator_node.EmptyOperatorNode;
-import operator_node.JoinOperatorNode;
-import operator_node.ProjectOperatorNode;
-import operator_node.ScanOperatorNode;
-import operator_node.SelectOperatorNode;
-import operator_node.SortOperatorNode;
+package operator_node;
 
 /** An interface to visit ALL operator nodes for Logical Plan */
 public interface OperatorNodeVisitor {

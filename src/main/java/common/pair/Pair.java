@@ -1,4 +1,4 @@
-package common;
+package common.pair;
 
 import java.util.Objects;
 

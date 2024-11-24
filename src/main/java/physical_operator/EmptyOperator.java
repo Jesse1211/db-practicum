@@ -1,6 +1,6 @@
 package physical_operator;
 
-import common.Tuple;
+import common.tuple.Tuple;
 
 /**
  * An operator for EMPTY, used to represent an empty operator. It is used to represent the end of

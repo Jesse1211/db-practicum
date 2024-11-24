@@ -1,6 +1,5 @@
 package operator_node;
 
-import common.OperatorNodeVisitor;
 import net.sf.jsqlparser.expression.Expression;
 
 /** SelectOperatorNode is a class to represent the select operator in the logical query plan. */

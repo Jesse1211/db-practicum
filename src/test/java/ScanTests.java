@@ -1,6 +1,6 @@
-import common.DBCatalog;
-import common.QueryPlanBuilder;
-import common.Tuple;
+import compiler.DBCatalog;
+import builder.QueryPlanBuilder;
+import common.tuple.Tuple;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

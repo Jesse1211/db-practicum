@@ -1,7 +1,5 @@
 package operator_node;
 
-import common.OperatorNodeVisitor;
-
 /**
  * DuplicateEliminationOperatorNode is a class to represent the duplicate elimination operator in
  * the logical query plan.

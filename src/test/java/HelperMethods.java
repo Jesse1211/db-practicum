@@ -1,4 +1,4 @@
-import common.Tuple;
+import common.tuple.Tuple;
 import java.util.ArrayList;
 import java.util.List;
 import physical_operator.Operator;

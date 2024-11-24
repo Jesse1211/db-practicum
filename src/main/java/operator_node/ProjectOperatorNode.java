@@ -1,7 +1,6 @@
 package operator_node;
 
 import common.HelperMethods;
-import common.OperatorNodeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

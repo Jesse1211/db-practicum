@@ -1,5 +1,6 @@
-package common;
+package compiler;
 
+import common.tuple.Tuple;
 import java.util.Map;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.expression.LongValue;

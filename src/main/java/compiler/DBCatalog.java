@@ -1,5 +1,6 @@
-package common;
+package compiler;
 
+import common.index.IndexInfo;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

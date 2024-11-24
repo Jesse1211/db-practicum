@@ -1,7 +1,6 @@
 package operator_node;
 
-import common.DBCatalog;
-import common.OperatorNodeVisitor;
+import compiler.DBCatalog;
 import net.sf.jsqlparser.schema.Table;
 
 /** ScanOperatorNode is a class to represent the scan operator in the logical query plan. */

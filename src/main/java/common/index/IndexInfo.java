@@ -1,4 +1,4 @@
-package common;
+package common.index;
 
 /**
  * Class to contain information about index: relation name, attribute name, whether it is clustered

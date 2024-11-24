@@ -1,4 +1,4 @@
-package common;
+package builder;
 
 import net.sf.jsqlparser.statement.Statement;
 import operator_node.OperatorNode;

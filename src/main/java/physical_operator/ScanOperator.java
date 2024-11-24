@@ -1,9 +1,9 @@
 package physical_operator;
 
-import common.BinaryHandler;
-import common.DBCatalog;
-import common.Tuple;
-import common.TupleReader;
+import io_handler.BinaryHandler;
+import compiler.DBCatalog;
+import common.tuple.Tuple;
+import common.tuple.TupleReader;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Table;
 

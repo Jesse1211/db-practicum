@@ -1,6 +1,6 @@
 package physical_operator;
 
-import common.Tuple;
+import common.tuple.Tuple;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;
 

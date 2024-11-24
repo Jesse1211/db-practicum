@@ -1,7 +1,7 @@
 package physical_operator;
 
-import common.Tuple;
-import common.TupleWriter;
+import common.tuple.Tuple;
+import common.tuple.TupleWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;

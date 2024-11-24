@@ -1,4 +1,4 @@
-package common;
+package common.tuple;
 
 import java.util.ArrayList;
 

@@ -1,5 +1,6 @@
-package common;
+package common.tuple;
 
+import common.pair.Pair;
 import java.util.ArrayList;
 
 /** An interface to read tuples from a file. */

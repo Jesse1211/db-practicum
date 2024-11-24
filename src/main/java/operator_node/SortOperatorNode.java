@@ -1,6 +1,5 @@
 package operator_node;
 
-import common.OperatorNodeVisitor;
 import java.util.List;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.OrderByElement;

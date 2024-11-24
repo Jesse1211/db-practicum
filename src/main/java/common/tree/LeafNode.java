@@ -1,6 +1,6 @@
 package common.tree;
 
-import common.Pair;
+import common.pair.Pair;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;

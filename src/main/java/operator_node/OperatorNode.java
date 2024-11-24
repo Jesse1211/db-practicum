@@ -1,6 +1,5 @@
 package operator_node;
 
-import common.OperatorNodeVisitor;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Column;
 

@@ -1,5 +1,5 @@
-import common.DBCatalog;
-import common.QueryPlanBuilder;
+import compiler.DBCatalog;
+import builder.QueryPlanBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

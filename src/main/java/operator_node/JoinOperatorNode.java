@@ -1,6 +1,5 @@
 package operator_node;
 
-import common.OperatorNodeVisitor;
 import java.util.ArrayList;
 
 /** JoinOperatorNode is a class to represent the join operator in the logical query plan. */

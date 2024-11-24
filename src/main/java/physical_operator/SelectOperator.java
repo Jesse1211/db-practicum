@@ -1,8 +1,8 @@
 package physical_operator;
 
-import common.ExpressionEvaluator;
+import compiler.ExpressionEvaluator;
 import common.HelperMethods;
-import common.Tuple;
+import common.tuple.Tuple;
 import java.util.ArrayList;
 import java.util.Map;
 import net.sf.jsqlparser.expression.Expression;

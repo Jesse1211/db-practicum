@@ -1,10 +1,10 @@
 package io_handler;
 
-import compiler.DBCatalog;
 import common.pair.Pair;
 import common.tuple.Tuple;
 import common.tuple.TupleReader;
 import common.tuple.TupleWriter;
+import compiler.DBCatalog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

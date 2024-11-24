@@ -1,8 +1,3 @@
 Sailors A B C
 Boats D E F
 Reserves G H
-Sailors_humanreadable A B C
-Boats_humanreadable D E F
-Reserves_humanreadable G H
-TEST1 A B
-TEST2 C D

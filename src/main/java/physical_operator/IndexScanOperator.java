@@ -1,10 +1,10 @@
 package physical_operator;
 
-import compiler.DBCatalog;
 import common.HelperMethods;
 import common.index.IndexDeserializer;
 import common.index.IndexInfo;
 import common.tuple.Tuple;
+import compiler.DBCatalog;
 import java.util.ArrayList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;

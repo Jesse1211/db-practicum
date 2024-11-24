@@ -1,12 +1,12 @@
 package physical_operator;
 
-import io_handler.BinaryHandler;
-import compiler.DBCatalog;
 import common.HelperMethods;
 import common.pair.Pair;
 import common.tuple.Tuple;
 import common.tuple.TupleReader;
 import common.tuple.TupleWriter;
+import compiler.DBCatalog;
+import io_handler.BinaryHandler;
 import java.io.File;
 import java.util.*;
 import net.sf.jsqlparser.schema.Column;

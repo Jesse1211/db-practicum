@@ -1,15 +1,15 @@
 package builder;
 
-import compiler.DBCatalog;
 import common.HelperMethods;
 import common.index.IndexInfo;
 import common.pair.Pair;
-import common.tuple.Tuple;
-import common.tuple.TupleReader;
-import io_handler.BinaryHandler;
 import common.tree.IndexNode;
 import common.tree.LeafNode;
 import common.tree.TreeNode;
+import common.tuple.Tuple;
+import common.tuple.TupleReader;
+import compiler.DBCatalog;
+import io_handler.BinaryHandler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;

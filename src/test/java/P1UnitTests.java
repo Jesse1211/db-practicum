@@ -1,8 +1,8 @@
-import io_handler.BinaryHandler;
-import compiler.DBCatalog;
 import builder.QueryPlanBuilder;
 import common.tuple.Tuple;
 import common.tuple.TupleReader;
+import compiler.DBCatalog;
+import io_handler.BinaryHandler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;

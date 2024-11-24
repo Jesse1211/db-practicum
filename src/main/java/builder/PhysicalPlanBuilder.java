@@ -2,10 +2,9 @@ package builder;
 
 import static java.lang.System.exit;
 
-import compiler.DBCatalog;
 import common.HelperMethods;
-import operator_node.OperatorNodeVisitor;
 import common.pair.Pair;
+import compiler.DBCatalog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +16,7 @@ import operator_node.DuplicateEliminationOperatorNode;
 import operator_node.EmptyOperatorNode;
 import operator_node.JoinOperatorNode;
 import operator_node.OperatorNode;
+import operator_node.OperatorNodeVisitor;
 import operator_node.ProjectOperatorNode;
 import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;

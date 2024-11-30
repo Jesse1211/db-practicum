@@ -5,10 +5,13 @@ import static java.lang.System.exit;
 import common.HelperMethods;
 import common.pair.Pair;
 import compiler.DBCatalog;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -67,60 +70,108 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    */
   @Override
   public void visit(JoinOperatorNode node) {
-    node.getLeftChildNode().accept(this);
-    Operator leftOperator = operator;
-    node.getRightChildNode().accept(this);
-    Operator rightOperator = operator;
+    ArrayDeque<OperatorNode> deque = new ArrayDeque<>(node.getChildNodes());
+    List<String> tableNames = node.getTableNames();
 
-    // read from config.properties to select the join method
-    switch (DBCatalog.getInstance().getJoinMethod()) {
-      case "TNLJ":
-        operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
-        break;
-      case "BNLJ":
-        operator =
-            new BNLJOperator(
-                node.getOutputSchema(),
-                leftOperator,
-                rightOperator,
-                DBCatalog.getInstance().getJoinBufferPageNumber());
-        break;
-      case "SMJ":
-        OperatorNode parent = node.getParentNode();
-        if (parent == null || !(parent instanceof SelectOperatorNode)) {
-          System.err.println("SMJ join should provide at least equality condition");
+    // start from index 0, indicating current table to join left. Every time we join a right table,
+    // we increment by 1.
+    int currentIndex = 0;
+
+    assert deque.size() >= 2 ;
+    deque.poll().accept(this);
+    Operator left = operator;
+    currentIndex ++;
+
+    while (!deque.isEmpty()) {
+      deque.poll().accept(this);
+      Operator right = operator;
+
+      ArrayList<Column> outputSchema = left.getOutputSchema();
+      outputSchema.addAll(right.getOutputSchema());
+
+      //choose which to join here :)
+      left = new JoinOperator(outputSchema, left, right);
+
+      // Find all residual join comparisons related to current table
+      Expression expression = null;
+      for (int prev = 0; prev < currentIndex; prev++) {
+        Expression new_expression = node.getComparisonExpressionMap().getOrDefault(
+                new Pair<>(tableNames.get(currentIndex), tableNames.get(prev)),
+                null
+        );
+        if (new_expression == null) continue;
+
+        if (expression == null) {
+          expression = new_expression;
+        } else {
+          expression = new AndExpression(expression, new_expression);
         }
-        Expression whereExpression = ((SelectOperatorNode) parent).getWhereExpression();
 
-        Pair<Column, Column> columnPair =
-            HelperMethods.getEqualityConditionColumnPair(
-                whereExpression, leftOperator, rightOperator);
-        if (columnPair == null) {
-          System.err.println("SMJ join should provide at least equality condition");
-          exit(-1);
-        }
+      }
 
-        // get equality condition, extract left and right columns
-        Operator leftSortOperator =
-            getSortOperator(
-                new SortOperatorNode(
-                    node.getLeftChildNode(), Collections.singletonList(columnPair.getLeft())),
-                leftOperator);
-        Operator rightSortOperator =
-            getSortOperator(
-                new SortOperatorNode(
-                    node.getRightChildNode(), Collections.singletonList(columnPair.getRight())),
-                rightOperator);
-
-        operator =
-            new SMJOperator(
-                node.getOutputSchema(),
-                leftSortOperator,
-                rightSortOperator,
-                columnPair.getLeft(),
-                columnPair.getRight());
-        break;
+      if (expression != null) {
+        left = new SelectOperator(outputSchema, left, expression);
+      }
+      currentIndex ++;
     }
+
+    operator = left;
+
+//
+//    node.getLeftChildNode().accept(this);
+//    Operator leftOperator = operator;
+//    node.getRightChildNode().accept(this);
+//    Operator rightOperator = operator;
+//
+//    // read from config.properties to select the join method
+//    switch (DBCatalog.getInstance().getJoinMethod()) {
+//      case "TNLJ":
+//        operator = new JoinOperator(node.getOutputSchema(), leftOperator, rightOperator);
+//        break;
+//      case "BNLJ":
+//        operator =
+//            new BNLJOperator(
+//                node.getOutputSchema(),
+//                leftOperator,
+//                rightOperator,
+//                DBCatalog.getInstance().getJoinBufferPageNumber());
+//        break;
+//      case "SMJ":
+//        OperatorNode parent = node.getParentNode();
+//        if (parent == null || !(parent instanceof SelectOperatorNode)) {
+//          System.err.println("SMJ join should provide at least equality condition");
+//        }
+//        Expression whereExpression = ((SelectOperatorNode) parent).getWhereExpression();
+//
+//        Pair<Column, Column> columnPair =
+//            HelperMethods.getEqualityConditionColumnPair(
+//                whereExpression, leftOperator, rightOperator);
+//        if (columnPair == null) {
+//          System.err.println("SMJ join should provide at least equality condition");
+//          exit(-1);
+//        }
+//
+//        // get equality condition, extract left and right columns
+//        Operator leftSortOperator =
+//            getSortOperator(
+//                new SortOperatorNode(
+//                    node.getLeftChildNode(), Collections.singletonList(columnPair.getLeft())),
+//                leftOperator);
+//        Operator rightSortOperator =
+//            getSortOperator(
+//                new SortOperatorNode(
+//                    node.getRightChildNode(), Collections.singletonList(columnPair.getRight())),
+//                rightOperator);
+//
+//        operator =
+//            new SMJOperator(
+//                node.getOutputSchema(),
+//                leftSortOperator,
+//                rightSortOperator,
+//                columnPair.getLeft(),
+//                columnPair.getRight());
+//        break;
+//    }
   }
 
   /**

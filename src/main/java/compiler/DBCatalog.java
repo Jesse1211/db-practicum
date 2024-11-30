@@ -348,7 +348,8 @@ public class DBCatalog {
    * @return join buffer page number
    */
   public int getJoinBufferPageNumber() {
-    return this.joinBufferPageNumber;
+    return 10; //Force hard code for P4
+//    return this.joinBufferPageNumber;
   }
 
   /**
@@ -357,6 +358,10 @@ public class DBCatalog {
    * @return sort method
    */
   public String getSortMethod() {
+    this.sortMethod = "External Sort"; // Force hard code for P4
+    if (this.sortMethod.equals("External Sort")) {
+      assert this.getSortBufferPageNumber() > 0;
+    }
     return this.sortMethod;
   }
 
@@ -366,7 +371,8 @@ public class DBCatalog {
    * @return sort buffer page number
    */
   public int getSortBufferPageNumber() {
-    return this.sortBufferPageNumber;
+    return 10; //Force hard code for P4
+//    return this.sortBufferPageNumber;
   }
 
   public int getBufferCapacity() {

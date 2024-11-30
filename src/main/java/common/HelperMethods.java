@@ -170,55 +170,111 @@ public class HelperMethods {
     }
   }
 
+
+  public static Pair<Integer, Integer> evaluateComparison(ComparisonOperator comparison) {
+    int lowKey = Integer.MIN_VALUE;
+    int highKey = Integer.MAX_VALUE;
+    Pair<Integer, Integer> pair = getComparisonValue(comparison);
+    int side = pair.getLeft();
+    int value = pair.getRight();
+    if (comparison instanceof GreaterThan) {
+      if (side == 1) {
+        // x > value
+        lowKey = Math.max(lowKey, value + 1);
+      } else {
+        // value > x => x < value
+        highKey = Math.min(highKey, value - 1);
+      }
+    } else if (comparison instanceof GreaterThanEquals) {
+      if (side == 1) {
+        // x >= value
+        lowKey = Math.max(lowKey, value);
+      } else {
+        // value >= x => x <= value
+        highKey = Math.min(highKey, value);
+      }
+    } else if (comparison instanceof MinorThan) {
+      if (side == 1) {
+        // x < value
+        highKey = Math.min(highKey, value - 1);
+      } else {
+        // value < x => x > value
+        lowKey = Math.max(lowKey, value + 1);
+      }
+    } else if (comparison instanceof MinorThanEquals) {
+      if (side == 1) {
+        // x <= value
+        highKey = Math.min(highKey, value);
+      } else {
+        // value <= x => x >= value
+        lowKey = Math.max(lowKey, value);
+      }
+    } else if (comparison instanceof EqualsTo) {
+      // x = value or value = x
+      lowKey = highKey = value;
+    }
+    return new Pair<>(lowKey, highKey);
+  }
+
   public static Pair<Integer, Integer> getLowKeyHighKey(
       List<ComparisonOperator> indexedComparisons) {
     int lowKey = Integer.MIN_VALUE;
     int highKey = Integer.MAX_VALUE;
 
     for (ComparisonOperator comparison : indexedComparisons) {
-      Pair<Integer, Integer> pair = getComparisonValue(comparison);
-      int side = pair.getLeft();
-      int value = pair.getRight();
-
-      if (comparison instanceof GreaterThan) {
-        if (side == 1) {
-          // x > value
-          lowKey = Math.max(lowKey, value + 1);
-        } else {
-          // value > x => x < value
-          highKey = Math.min(highKey, value - 1);
-        }
-      } else if (comparison instanceof GreaterThanEquals) {
-        if (side == 1) {
-          // x >= value
-          lowKey = Math.max(lowKey, value);
-        } else {
-          // value >= x => x <= value
-          highKey = Math.min(highKey, value);
-        }
-      } else if (comparison instanceof MinorThan) {
-        if (side == 1) {
-          // x < value
-          highKey = Math.min(highKey, value - 1);
-        } else {
-          // value < x => x > value
-          lowKey = Math.max(lowKey, value + 1);
-        }
-      } else if (comparison instanceof MinorThanEquals) {
-        if (side == 1) {
-          // x <= value
-          highKey = Math.min(highKey, value);
-        } else {
-          // value <= x => x >= value
-          lowKey = Math.max(lowKey, value);
-        }
-      } else if (comparison instanceof EqualsTo) {
-        // x = value or value = x
-        lowKey = highKey = value;
-        return new Pair<>(lowKey, highKey);
+      Pair<Integer, Integer> pair = evaluateComparison(comparison);
+      if (pair.getLeft() == pair.getRight()) {
+        // they are equal, no need to continue checking
+        return pair;
       }
+      lowKey = Math.max(lowKey, pair.getLeft());
+      highKey = Math.max(highKey, pair.getRight());
     }
     return new Pair<>(lowKey, highKey);
+//
+//      Pair<Integer, Integer> pair = getComparisonValue(comparison);
+//      int side = pair.getLeft();
+//      int value = pair.getRight();
+//
+//      if (comparison instanceof GreaterThan) {
+//        if (side == 1) {
+//          // x > value
+//          lowKey = Math.max(lowKey, value + 1);
+//        } else {
+//          // value > x => x < value
+//          highKey = Math.min(highKey, value - 1);
+//        }
+//      } else if (comparison instanceof GreaterThanEquals) {
+//        if (side == 1) {
+//          // x >= value
+//          lowKey = Math.max(lowKey, value);
+//        } else {
+//          // value >= x => x <= value
+//          highKey = Math.min(highKey, value);
+//        }
+//      } else if (comparison instanceof MinorThan) {
+//        if (side == 1) {
+//          // x < value
+//          highKey = Math.min(highKey, value - 1);
+//        } else {
+//          // value < x => x > value
+//          lowKey = Math.max(lowKey, value + 1);
+//        }
+//      } else if (comparison instanceof MinorThanEquals) {
+//        if (side == 1) {
+//          // x <= value
+//          highKey = Math.min(highKey, value);
+//        } else {
+//          // value <= x => x >= value
+//          lowKey = Math.max(lowKey, value);
+//        }
+//      } else if (comparison instanceof EqualsTo) {
+//        // x = value or value = x
+//        lowKey = highKey = value;
+//        return new Pair<>(lowKey, highKey);
+//      }
+//    }
+//    return new Pair<>(lowKey, highKey);
   }
 
   /**

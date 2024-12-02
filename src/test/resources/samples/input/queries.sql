@@ -13,3 +13,8 @@ SELECT * FROM Sailors S1, Sailors S2 WHERE S1.A < S2.A;
 SELECT B.F, B.D FROM Boats B ORDER BY B.D;
 SELECT * FROM Sailors S, Reserves R, Boats B WHERE S.A = R.G AND R.H = B.D ORDER BY S.C;
 SELECT DISTINCT * FROM Sailors S, Reserves R, Boats B WHERE S.A = R.G AND R.H = B.D ORDER BY S.C;
+
+-- test for benchmarking
+SELECT * FROM Sailors S1, Sailors S2, Sailors S3, Sailors S4, Sailors S5 WHERE S1.A = S2.A AND S2.B = S3.B AND S3.C = S4.C ORDER BY S1.A;
+SELECT * FROM Sailors S1, Sailors S2, Sailors S3, Sailors S4, Sailors S5 WHERE S1.A = S2.B AND S2.B = S3.C AND S3.C = S4.A;
+SELECT * FROM Sailors S1, Sailors S2, Sailors S3, Sailors S4, Sailors S5;

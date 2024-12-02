@@ -1,20 +1,13 @@
 package builder;
 
-import static java.lang.System.exit;
-
-import common.HelperMethods;
 import common.pair.Pair;
 import compiler.DBCatalog;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import operator_node.DuplicateEliminationOperatorNode;
 import operator_node.EmptyOperatorNode;
 import operator_node.JoinOperatorNode;
@@ -24,7 +17,6 @@ import operator_node.ProjectOperatorNode;
 import operator_node.ScanOperatorNode;
 import operator_node.SelectOperatorNode;
 import operator_node.SortOperatorNode;
-import physical_operator.BNLJOperator;
 import physical_operator.DuplicateEliminationOperator;
 import physical_operator.EmptyOperator;
 import physical_operator.ExternalSortOperator;
@@ -32,7 +24,6 @@ import physical_operator.IndexScanOperator;
 import physical_operator.JoinOperator;
 import physical_operator.Operator;
 import physical_operator.ProjectOperator;
-import physical_operator.SMJOperator;
 import physical_operator.ScanOperator;
 import physical_operator.SelectOperator;
 import physical_operator.SortOperator;
@@ -86,7 +77,8 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       deque.poll().accept(this);
       Operator right = operator;
 
-      ArrayList<Column> outputSchema = left.getOutputSchema();
+      ArrayList<Column> outputSchema = new ArrayList<>();
+      outputSchema.addAll(left.getOutputSchema());
       outputSchema.addAll(right.getOutputSchema());
 
       //choose which to join here :)
@@ -188,7 +180,17 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    */
   @Override
   public void visit(ScanOperatorNode node) {
-    operator = new ScanOperator(node.getTable());
+    if (node.getIndexAttribute() == null){
+      operator = new ScanOperator(node.getTable());
+    }else{
+      operator = new IndexScanOperator(
+              node.getLowerBound(),
+              node.getUpperBound(),
+              node.getTable(),
+              node.getIndexAttribute()
+      );
+    }
+
   }
 
   /**
@@ -205,33 +207,29 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    */
   @Override
   public void visit(SelectOperatorNode node) {
-    // check if we should apply index
-    if (DBCatalog.getInstance().getUseIndex() && node.getChildNode() instanceof ScanOperatorNode) {
-      Table table = ((ScanOperatorNode) node.getChildNode()).getTable();
-      List<ComparisonOperator> flattened =
-          HelperMethods.flattenExpression(node.getWhereExpression());
-      List<ComparisonOperator> indexedComparisons =
-          HelperMethods.getIndexedComparisons(flattened, table);
-
-      // if comparison contains index comparisons, set the operator to indexScanOperator, otherwise,
-      // use original ScanOperator
-      if (indexedComparisons.size() > 0) {
-        Pair<Integer, Integer> keyPair = HelperMethods.getLowKeyHighKey(indexedComparisons);
-        operator =
-            new IndexScanOperator(
-                node.getOutputSchema(), keyPair.getLeft(), keyPair.getRight(), table);
-      } else {
-        node.getChildNode().accept(this);
-      }
-
-      // if there are non index comparisons, add it to the selectOperator.
-      Expression nonIndexedComparison =
-          HelperMethods.getNonIndexedComparisons(flattened, indexedComparisons);
-      if (nonIndexedComparison != null) {
-        operator = new SelectOperator(node.getOutputSchema(), operator, nonIndexedComparison);
-      }
-      return;
-    }
+//    // check if we should apply index
+//    if (DBCatalog.getInstance().getUseIndex() && node.getChildNode() instanceof ScanOperatorNode) {
+//      Table table = ((ScanOperatorNode) node.getChildNode()).getTable();
+//      List<ComparisonOperator> flattened =  HelperMethods.flattenExpression(node.getWhereExpression());
+//      List<ComparisonOperator> indexedComparisons = HelperMethods.getIndexedComparisons(flattened, table);
+//
+//      // if comparison contains index comparisons, set the operator to indexScanOperator, otherwise,
+//      // use original ScanOperator
+//      if (indexedComparisons.size() > 0) {
+//        Pair<Integer, Integer> keyPair = HelperMethods.getLowKeyHighKey(indexedComparisons);
+//        operator = new IndexScanOperator(node.getOutputSchema(), keyPair.getLeft(), keyPair.getRight(), table);
+//      } else {
+//        node.getChildNode().accept(this);
+//      }
+//
+//      // if there are non index comparisons, add it to the selectOperator.
+//      Expression nonIndexedComparison =
+//          HelperMethods.getNonIndexedComparisons(flattened, indexedComparisons);
+//      if (nonIndexedComparison != null) {
+//        operator = new SelectOperator(node.getOutputSchema(), operator, nonIndexedComparison);
+//      }
+//      return;
+//    }
     node.getChildNode().accept(this);
     operator = new SelectOperator(node.getOutputSchema(), operator, node.getWhereExpression());
   }

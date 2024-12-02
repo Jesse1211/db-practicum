@@ -4,6 +4,7 @@ import builder.IndexBuilder;
 import builder.QueryPlanBuilder;
 import builder.StatsBuilder;
 import common.index.IndexInfo;
+import common.pair.Pair;
 import common.tree.TreeNode;
 import io_handler.BinaryHandler;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -84,36 +86,40 @@ public class Compiler {
 
   private static void buildIndex() {
     for (IndexInfo indexInfo : DBCatalog.getInstance().getAllIndexInfo()) {
-      IndexBuilder ib = new IndexBuilder(indexInfo);
-      List<TreeNode> nodes = ib.build();
-      try {
+      for (Entry<String, Pair<Boolean, Integer>> attributeInfo : indexInfo.attributes.entrySet()){
+        String attributeName = attributeInfo.getKey();
+        boolean isClustered = attributeInfo.getValue().getLeft();
+        int order = attributeInfo.getValue().getRight();
 
-        // Initialize file and file channel
-        File indexFile = new File(
-            inputDir + "/db/indexes/" + indexInfo.relationName + "." + indexInfo.attributeName);
-        indexFile.createNewFile();
-        FileOutputStream fileOutputStream = new FileOutputStream(indexFile);
-        FileChannel fileChannel = fileOutputStream.getChannel();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(DBCatalog.getInstance().getBufferCapacity());
+        IndexBuilder ib = new IndexBuilder(indexInfo.relationName, attributeName, isClustered, order);
+        List<TreeNode> nodes = ib.build();
+        try {
+          // Initialize file and file channel
+          File indexFile = new File(inputDir + "/db/indexes/" + indexInfo.relationName + "." + attributeName);
+          indexFile.createNewFile();
+          FileOutputStream fileOutputStream = new FileOutputStream(indexFile);
+          FileChannel fileChannel = fileOutputStream.getChannel();
+          ByteBuffer byteBuffer = ByteBuffer.allocate(DBCatalog.getInstance().getBufferCapacity());
 
-        // write header
-        ib.writeHeader(byteBuffer);
-        fileChannel.write(byteBuffer);
-
-        // write nodes
-        for (TreeNode node : nodes) {
-          node.serialize(byteBuffer);
+          // write header
+          ib.writeHeader(byteBuffer);
           fileChannel.write(byteBuffer);
-        }
 
-        fileChannel.close();
-        fileOutputStream.close();
-      } catch (Exception e) {
-        for (StackTraceElement ste : e.getStackTrace()) {
-          System.out.println(ste + "\n");
+          // write nodes
+          for (TreeNode node : nodes) {
+            node.serialize(byteBuffer);
+            fileChannel.write(byteBuffer);
+          }
+
+          fileChannel.close();
+          fileOutputStream.close();
+        } catch (Exception e) {
+          for (StackTraceElement ste : e.getStackTrace()) {
+            System.out.println(ste + "\n");
+          }
+          System.err.println("Exception occurred in interpreter" + e.getCause());
+          logger.error(e.getMessage());
         }
-        System.err.println("Exception occurred in interpreter" + e.getCause());
-        logger.error(e.getMessage());
       }
     }
   }

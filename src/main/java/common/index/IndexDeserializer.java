@@ -38,17 +38,39 @@ public class IndexDeserializer {
    * @param lowKey low key of the range
    * @param highKey high key of the range
    */
-  public IndexDeserializer(int lowKey, int highKey, IndexInfo indexInfo, int attributeIndex) {
-    this.isClustered = indexInfo.isClustered;
-    this.tupleReader = new BinaryHandler(indexInfo.relationName);
-    this.file =
-        DBCatalog.getInstance().getFileForIndex(indexInfo.relationName, indexInfo.attributeName);
+  public IndexDeserializer(int lowKey, int highKey, String relationName, String attributeName,  boolean isClustered, int attributeIndex) {
+    this.isClustered = isClustered;
+    this.tupleReader = new BinaryHandler(relationName);
+    this.file = DBCatalog.getInstance().getFileForIndex(relationName, attributeName);
     this.bufferCapacity = DBCatalog.getInstance().getBufferCapacity();
     this.byteBuffer = ByteBuffer.allocate(bufferCapacity);
     this.lowKey = lowKey;
     this.highKey = highKey;
     this.attributeIndex = attributeIndex;
     loadNodeById(loadHeaderNode());
+  }
+
+  public static int getNumLeaves(String relationName, String attributeName) {
+    try {
+      File file = DBCatalog.getInstance().getFileForIndex(relationName, attributeName);
+      FileInputStream fileInputStream = new FileInputStream(file);
+
+      FileChannel fileChannel = fileInputStream.getChannel();
+      fileChannel.position(0);
+
+      ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+      byteBuffer.clear();
+      fileChannel.read(byteBuffer);
+      byteBuffer.flip();
+      int numLeaves = byteBuffer.asIntBuffer().get(1);
+
+      fileChannel.close();
+      fileInputStream.close();
+      return numLeaves;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return -1;
   }
 
   /**

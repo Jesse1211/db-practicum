@@ -3,6 +3,7 @@ package physical_operator;
 import common.HelperMethods;
 import common.index.IndexDeserializer;
 import common.index.IndexInfo;
+import common.pair.Pair;
 import common.tuple.Tuple;
 import compiler.DBCatalog;
 import java.util.ArrayList;
@@ -14,18 +15,27 @@ public class IndexScanOperator extends Operator {
   private IndexDeserializer indexDeserializer;
 
   /**
-   * IndexScanOperator constructor
-   *
-   * @param lowKey low key of the range, can be null
-   * @param highKey high key of the range, can be null
+   * * IndexScanOperator constructor
+   * @param lowKey low key of the range
+   * @param highKey high key of the range
+   * @param table relation
+   * @param attributeName name of the indexed column
    */
-  public IndexScanOperator(ArrayList<Column> outputSchema, int lowKey, int highKey, Table table) {
-    super(outputSchema);
+  public IndexScanOperator(int lowKey, int highKey, Table table, String attributeName) {
+    super(new ArrayList<>());
+    this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
     IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
-    int attributeIndex =
-        HelperMethods.mapColumnIndex(outputSchema, false)
-            .get(indexInfo.relationName + "." + indexInfo.attributeName);
-    this.indexDeserializer = new IndexDeserializer(lowKey, highKey, indexInfo, attributeIndex);
+    int attributeIndex =HelperMethods.mapColumnIndex(outputSchema, false).get(
+            indexInfo.relationName + "." + attributeName
+    );
+    this.indexDeserializer = new IndexDeserializer(
+            lowKey,
+            highKey,
+            indexInfo.relationName,
+            attributeName,
+            indexInfo.attributes.get(attributeName).getLeft(),
+            attributeIndex
+    );
   }
 
   @Override

@@ -1,5 +1,3 @@
 src/test/resources/samples/input
 src/test/resources/samples/output
 src/test/resources/samples/tempdir
-0
-1

@@ -2,7 +2,7 @@ SELECT * FROM Boats;
 SELECT Sailors.A FROM Sailors;
 SELECT Boats.F, Boats.D FROM Boats;
 SELECT Sailors.A FROM Sailors WHERE Sailors.A < 50;
-SELECT * FROM Sailors, Boats WHERE Sailors.A = Boats.D AND Sailors.A <> 5 AND Boats.D <> 0 ORDER BY Sailors.A;
+SELECT * FROM Sailors, Boats WHERE Sailors.A = Boats.D AND Sailors.A < 500 AND Boat.E > 30 ORDER BY Sailors.A, Boats.D;
 SELECT * FROM Boats WHERE Boats.E > 20 AND Boats.D < 2000 ORDER BY Boats.E;
 SELECT Boats.E FROM Boats WHERE Boats.D < 2000;
 SELECT * FROM Sailors, Reserves WHERE Sailors.A = Reserves.G;

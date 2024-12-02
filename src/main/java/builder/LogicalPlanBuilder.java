@@ -3,7 +3,11 @@ package builder;
 import common.ComparisonEvaluator;
 import common.HelperMethods;
 import common.UnionFindElement;
+import common.index.IndexDeserializer;
+import common.index.IndexInfo;
 import common.pair.Pair;
+import common.stats.StatsInfo;
+import compiler.DBCatalog;
 import compiler.ExpressionEvaluator;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -133,7 +137,7 @@ public class LogicalPlanBuilder {
     if (valueWhereExpression != null) {
       ExpressionEvaluator evaluator = new ExpressionEvaluator();
       valueWhereExpression.accept(evaluator);
-      if (evaluator.getResult() == false) {
+      if (!evaluator.getResult()) {
         return new EmptyOperatorNode();
       }
     }
@@ -144,29 +148,38 @@ public class LogicalPlanBuilder {
 
     //regroup unionFindElements by table
     List<OperatorNode> joinChildren = new ArrayList<>();
-    List<String> tableNames = new ArrayList<>();
+    List<String> aliasNames = new ArrayList<>();
     for (Table table : allTables){
-
-      OperatorNode operatorNode = new ScanOperatorNode(table);
       Alias alias = table.getAlias();
-      String tableName = alias != null ? alias.getName() : table.getName();
-      tableNames.add(tableName);
+      String aliasName = alias != null ? alias.getName() : table.getName();
+      aliasNames.add(aliasName);
 
-      Expression expression = createComparisonExpressionForTable(unionFindElements, tableName);
-      if (notEqualToMap.containsKey(tableName)) {
+      String index = chooseScanIndex(unionFindElements, table);
+      Expression expression = createComparisonExpressionForTable(unionFindElements, aliasName, index);
+
+      OperatorNode operatorNode;
+      if(index != null){
+        Pair<Integer, Integer> indexBounds = getBounds(unionFindElements, aliasName + "." + index);
+        operatorNode = new ScanOperatorNode(table, index, indexBounds.getLeft(), indexBounds.getRight());
+      }else{
+        operatorNode = new ScanOperatorNode(table);
+      }
+
+      if (notEqualToMap.containsKey(aliasName)) {
         if (expression == null) {
-          expression = notEqualToMap.get(tableName);
+          expression = notEqualToMap.get(aliasName);
         }else{
-          expression = new AndExpression(expression, notEqualToMap.get(tableName));
+          expression = new AndExpression(expression, notEqualToMap.get(aliasName));
         }
       }
+
       if (expression != null) {
         operatorNode = new SelectOperatorNode(operatorNode, expression);
       }
       joinChildren.add(operatorNode);
     }
 
-    return new JoinOperatorNode(tableNames, joinChildren,residuals);
+    return new JoinOperatorNode(aliasNames, joinChildren,residuals);
 
 //
 ////
@@ -286,20 +299,95 @@ public class LogicalPlanBuilder {
 //    return operatorNode;
   }
 
+  private static Pair<Integer, Integer> getBounds(Set<UnionFindElement> unionFindElements, String attributeName){
+    for (UnionFindElement element : unionFindElements) {
+      if (element.attributes.containsKey(attributeName)) {
+        return new Pair<>(element.lowerBound, element.upperBound);
+      }
+    }
+    return null;
+  }
+
+  private static String chooseScanIndex (Set<UnionFindElement> unionFindElements,  Table table){
+    String tableName = table.getName();
+    Map<String, Double> reductionFactor = computeReductionFactor(unionFindElements, table);
+    IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(tableName);
+    if (indexInfo == null) return null;
+    StatsInfo statsInfo = DBCatalog.getInstance().getStatsInfo(tableName);
+    int numTuples = statsInfo.count;
+    int numPages = Math.ceilDiv(
+            numTuples * statsInfo.columnStats.size() * 4,
+            DBCatalog.getInstance().getBufferCapacity()
+    );
+
+    double minCost = numPages;
+    String selectedIndex = null;
+    for(Entry<String, Double> entry: reductionFactor.entrySet()) {
+      String attribute = entry.getKey();
+      Double r = entry.getValue();
+
+      // if no index on current column, continue
+      if (!indexInfo.attributes.containsKey(attribute)) continue;
+      double cost;
+      // If p is the number of pages in the relation, t the number of tuples, r the reduction factor and l the
+      // number of leaves in the index, the cost for a clustered index is 3 + p ∗ r while for an unclustered index it is
+      // 3 + l ∗ r + t ∗ r.
+      boolean isClustered = indexInfo.attributes.get(attribute).getLeft();
+      if (isClustered){
+        cost = 0 + numPages * r;
+      }else{
+        int numLeaves = IndexDeserializer.getNumLeaves(indexInfo.relationName, attribute);
+        cost = 0 + numLeaves * r + numTuples * r;
+      }
+
+      if (cost < minCost) {
+        minCost = cost;
+        selectedIndex = attribute;
+      }
+    }
+    return selectedIndex;
+  }
+
+  private static Map<String, Double> computeReductionFactor(Set<UnionFindElement> unionFindElements, Table table){
+    Alias alias = table.getAlias();
+    String aliasName = alias != null ? alias.getName() : table.getName();
+    String tableName = table.getName();
+
+    StatsInfo info = DBCatalog.getInstance().getStatsInfo(tableName);
+    Map<String, Double> reductionFactors = new HashMap<>();
+    for (UnionFindElement element : unionFindElements) {
+      for (Entry<String, Column> entry : element.attributes.entrySet()) {
+        Column column = entry.getValue();
+        if(column.getTable().getName().equals(aliasName)){
+          String columnName = column.getColumnName();
+          Pair<Integer, Integer> tupleBound = info.columnStats.get(columnName);
+          long upperBound = Math.min(element.upperBound, tupleBound.getRight());
+          long lowerBound = Math.max(element.lowerBound, tupleBound.getLeft());
+          long totalRange = tupleBound.getRight() - tupleBound.getLeft();
+          reductionFactors.put(columnName, (upperBound - lowerBound) / (double)totalRange);
+        }
+      }
+    }
+    return reductionFactors;
+  }
 
 
-  private static Expression createComparisonExpressionForTable(Set<UnionFindElement> unionFindElements, String tableName){
+  private static Expression createComparisonExpressionForTable(Set<UnionFindElement> unionFindElements, String tableName, String index){
     Expression expression = null;
     // for find all columns in union find groups that have this table. n^2 complexity
     for (UnionFindElement element : unionFindElements){
       for(Entry<String, Column> entry: element.attributes.entrySet()){
         Column column = entry.getValue();
+        // no need to build comparisons for index since we are using index scan, that'll select the values
+        // between lower bound and upper bound.
+        if (column.getColumnName().equals(index)) continue;
         if(column.getTable().getName().equals(tableName)){
 
           if (element.lowerBound == Integer.MIN_VALUE && element.upperBound == Integer.MAX_VALUE){
             //then we just need a regular scan
             continue;
           }
+
           ComparisonOperator greaterThanEquals = new GreaterThanEquals();
           greaterThanEquals.setLeftExpression(column);
           greaterThanEquals.setRightExpression(new LongValue(element.lowerBound));

@@ -42,14 +42,17 @@ public class IndexBuilder {
   /**
    * IndexBuilder constructor
    *
-   * @param indexInfo index information
+   * @param tableName
+   * @param attributeName
+   * @param isClustered
+   * @param order
    */
-  public IndexBuilder(IndexInfo indexInfo) {
-    this.tableName = indexInfo.relationName;
-    this.attributeName = indexInfo.attributeName;
+  public IndexBuilder(String tableName, String attributeName, boolean isClustered, int order) {
+    this.tableName = tableName;
+    this.attributeName = attributeName;
     this.columns = DBCatalog.getInstance().getColumns(tableName);
-    this.isClustered = indexInfo.isClustered;
-    this.order = indexInfo.order;
+    this.isClustered = isClustered;
+    this.order = order;
   }
 
   /**

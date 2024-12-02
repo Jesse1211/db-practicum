@@ -6,14 +6,10 @@ import common.stats.StatsInfo;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.processing.Filer;
 
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
@@ -43,8 +39,8 @@ public class DBCatalog {
   private String inputDir;
   private String tempDir;
   private String outputDir;
-  private boolean isBuildIndex;
-  private boolean isEvaluateSQL;
+  private boolean isBuildIndex = true;
+  private boolean isEvaluateSQL = true;
 
   // For Plan Builder Config
   private String joinMethod;
@@ -54,7 +50,7 @@ public class DBCatalog {
   private boolean useIndex = false;
 
   // For index information
-  private Map<String, IndexInfo> indexInfo;
+  private Map<String, IndexInfo> indexInfoMap;
 
   // For stats information
   private Map<String, StatsInfo> statsInfoMap;
@@ -95,7 +91,7 @@ public class DBCatalog {
           case 0:
             inputDir = tokens[0];
             setDataDirectory(inputDir + "/db/schema.txt");
-            setPlanBuilderConfig(inputDir + "/plan_builder_config.txt");
+//            setPlanBuilderConfig(inputDir + "/plan_builder_config.txt");
             setIndexDirectory(inputDir + "/db/index_info.txt");
             break;
           case 1:
@@ -104,12 +100,12 @@ public class DBCatalog {
           case 2:
             tempDir = tokens[0];
             break;
-          case 3:
-            isBuildIndex = tokens[0].equals("1");
-            break;
-          case 4:
-            isEvaluateSQL = tokens[0].equals("1");
-            break;
+//          case 3:
+//            isBuildIndex = tokens[0].equals("1");
+//            break;
+//          case 4:
+//            isEvaluateSQL = tokens[0].equals("1");
+//            break;
         }
         index++;
       }
@@ -168,40 +164,40 @@ public class DBCatalog {
    * @param directory: The input directory.
    * @return void
    */
-  private void setPlanBuilderConfig(String directory) {
-    try {
-      BufferedReader br = new BufferedReader(new FileReader(directory));
-      String line;
-      String[] joinMethods = new String[] { "TNLJ", "BNLJ", "SMJ" };
-      String[] sortMethods = new String[] { "In-Memory Sort", "External Sort" };
-
-      // read first line
-      line = br.readLine();
-      String[] tokens = line.split("\\s");
-      this.joinMethod = joinMethods[Integer.parseInt(tokens[0])];
-      if (tokens.length > 1) {
-        this.joinBufferPageNumber = Integer.parseInt(tokens[1]);
-      }
-
-      // read second line
-      line = br.readLine();
-      tokens = line.split("\\s");
-      this.sortMethod = sortMethods[Integer.parseInt(tokens[0])];
-
-      if (tokens.length > 1) {
-        this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
-      }
-
-      // read third line
-      line = br.readLine();
-      tokens = line.split("\\s");
-      this.useIndex = tokens[0].equals("1");
-
-      br.close();
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-    }
-  }
+//  private void setPlanBuilderConfig(String directory) {
+//    try {
+//      BufferedReader br = new BufferedReader(new FileReader(directory));
+//      String line;
+//      String[] joinMethods = new String[] { "TNLJ", "BNLJ", "SMJ" };
+//      String[] sortMethods = new String[] { "In-Memory Sort", "External Sort" };
+//
+//      // read first line
+//      line = br.readLine();
+//      String[] tokens = line.split("\\s");
+//      this.joinMethod = joinMethods[Integer.parseInt(tokens[0])];
+//      if (tokens.length > 1) {
+//        this.joinBufferPageNumber = Integer.parseInt(tokens[1]);
+//      }
+//
+//      // read second line
+//      line = br.readLine();
+//      tokens = line.split("\\s");
+//      this.sortMethod = sortMethods[Integer.parseInt(tokens[0])];
+//
+//      if (tokens.length > 1) {
+//        this.sortBufferPageNumber = Integer.parseInt(tokens[1]);
+//      }
+//
+//      // read third line
+//      line = br.readLine();
+//      tokens = line.split("\\s");
+//      this.useIndex = tokens[0].equals("1");
+//
+//      br.close();
+//    } catch (Exception e) {
+//      logger.error(e.getMessage());
+//    }
+//  }
 
   /**
    * Get & Set index information from index_info.txt.
@@ -212,14 +208,16 @@ public class DBCatalog {
     try {
       BufferedReader br = new BufferedReader(new FileReader(directory));
       String line;
-      indexInfo = new HashMap<>();
+      indexInfoMap = new HashMap<>();
       while ((line = br.readLine()) != null) {
         String[] tokens = line.split("\\s");
         String relationName = tokens[0];
         String attributeName = tokens[1];
         boolean isClustered = tokens[2].equals("1");
         int order = Integer.parseInt(tokens[3]);
-        indexInfo.put(relationName, new IndexInfo(relationName, attributeName, isClustered, order));
+        IndexInfo info = indexInfoMap.getOrDefault(relationName, new IndexInfo(relationName));
+        info.addAttribute(attributeName, isClustered, order);
+        indexInfoMap.put(relationName, info);
       }
       br.close();
     } catch (Exception e) {
@@ -394,7 +392,7 @@ public class DBCatalog {
    * @return IndexInfo
    */
   public IndexInfo getIndexInfo(String name) {
-    return this.indexInfo.get(name);
+    return this.indexInfoMap.get(name);
   }
 
   /**
@@ -403,7 +401,7 @@ public class DBCatalog {
    * @return List<IndexInfo>
    */
   public List<IndexInfo> getAllIndexInfo() {
-    return this.indexInfo.values().stream().toList();
+    return this.indexInfoMap.values().stream().toList();
   }
 
   /**

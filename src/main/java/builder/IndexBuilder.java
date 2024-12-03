@@ -1,7 +1,6 @@
 package builder;
 
 import common.HelperMethods;
-import common.index.IndexInfo;
 import common.pair.Pair;
 import common.tree.IndexNode;
 import common.tree.LeafNode;

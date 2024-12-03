@@ -27,8 +27,7 @@ import org.apache.logging.log4j.*;
 import physical_operator.Operator;
 
 /**
- * Top level harness class; reads queries from an input file one at a time,
- * processes them and sends
+ * Top level harness class; reads queries from an input file one at a time, processes them and sends
  * output to file or to System depending on flag.
  */
 public class Compiler {
@@ -86,16 +85,18 @@ public class Compiler {
 
   private static void buildIndex() {
     for (IndexInfo indexInfo : DBCatalog.getInstance().getAllIndexInfo()) {
-      for (Entry<String, Pair<Boolean, Integer>> attributeInfo : indexInfo.attributes.entrySet()){
+      for (Entry<String, Pair<Boolean, Integer>> attributeInfo : indexInfo.attributes.entrySet()) {
         String attributeName = attributeInfo.getKey();
         boolean isClustered = attributeInfo.getValue().getLeft();
         int order = attributeInfo.getValue().getRight();
 
-        IndexBuilder ib = new IndexBuilder(indexInfo.relationName, attributeName, isClustered, order);
+        IndexBuilder ib =
+            new IndexBuilder(indexInfo.relationName, attributeName, isClustered, order);
         List<TreeNode> nodes = ib.build();
         try {
           // Initialize file and file channel
-          File indexFile = new File(inputDir + "/db/indexes/" + indexInfo.relationName + "." + attributeName);
+          File indexFile =
+              new File(inputDir + "/db/indexes/" + indexInfo.relationName + "." + attributeName);
           indexFile.createNewFile();
           FileOutputStream fileOutputStream = new FileOutputStream(indexFile);
           FileChannel fileChannel = fileOutputStream.getChannel();
@@ -128,11 +129,13 @@ public class Compiler {
     StringBuilder sb = new StringBuilder();
     StatsBuilder statsBuilder = new StatsBuilder(sb);
     HashMap<String, ArrayList<Column>> tables = DBCatalog.getInstance().getTables();
-    tables.forEach((table, tableSchema) -> {
-      statsBuilder.processTable(table, tableSchema);
-    });
+    tables.forEach(
+        (table, tableSchema) -> {
+          statsBuilder.processTable(table, tableSchema);
+        });
 
-    try (FileWriter fileWriter = new FileWriter(DBCatalog.getInstance().getInputDir() + "/db/stats.txt")) {
+    try (FileWriter fileWriter =
+        new FileWriter(DBCatalog.getInstance().getInputDir() + "/db/stats.txt")) {
       fileWriter.write(sb.toString());
     } catch (IOException e) {
       e.printStackTrace();
@@ -140,17 +143,15 @@ public class Compiler {
   }
 
   /**
-   * Reads statements from queriesFile one at a time, builds query plan and
-   * evaluates, dumping
+   * Reads statements from queriesFile one at a time, builds query plan and evaluates, dumping
    * results to files or console as desired.
    *
-   * <p>
-   * If dumping to files result of ith query is in file named query i, indexed
-   * stating at 1.
+   * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
    */
   public static void main(String[] args) {
     // DBCatalog.getInstance().setInterpreterConfig(args[0]);
-    DBCatalog.getInstance().setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
+    DBCatalog.getInstance()
+        .setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
     inputDir = DBCatalog.getInstance().getInputDir();
     outputDir = DBCatalog.getInstance().getOutputDir();
 

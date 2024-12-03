@@ -24,14 +24,16 @@ public class JoinOperator extends Operator {
    * @param rightChildOperator rightChildOperator that needs to perform to join
    */
   public JoinOperator(
-      ArrayList<Column> outputSchema, Operator leftChildOperator, Operator rightChildOperator, boolean reverse) {
+      ArrayList<Column> outputSchema,
+      Operator leftChildOperator,
+      Operator rightChildOperator,
+      boolean reverse) {
     super(outputSchema);
 
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
     this.reverse = reverse;
     leftTuple = leftChildOperator.getNextTuple();
-
   }
 
   @Override

@@ -29,8 +29,7 @@ import physical_operator.SelectOperator;
 import physical_operator.SortOperator;
 
 /**
- * PhysicalPlanBuilder is a class to build the physical query plan based on
- * relational algebra query
+ * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra query
  * plan.
  */
 public class PhysicalPlanBuilder implements OperatorNodeVisitor {
@@ -38,12 +37,10 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   private Operator operator;
 
   /**
-   * PhysicalPlanBuilder is a class to build the physical query plan based on
-   * relational algebra
+   * PhysicalPlanBuilder is a class to build the physical query plan based on relational algebra
    * query plan.
    */
-  public PhysicalPlanBuilder() {
-  }
+  public PhysicalPlanBuilder() {}
 
   /**
    * @param node
@@ -89,21 +86,21 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       deque.poll().accept(this);
       Operator right = operator;
 
-//      ArrayList<Column> outputSchema = new ArrayList<>();
-//      outputSchema.addAll(left.getOutputSchema());
-//      outputSchema.addAll(right.getOutputSchema());
+      //      ArrayList<Column> outputSchema = new ArrayList<>();
+      //      outputSchema.addAll(left.getOutputSchema());
+      //      outputSchema.addAll(right.getOutputSchema());
 
-      ArrayList<Column> outputSchema= new ArrayList<>();
+      ArrayList<Column> outputSchema = new ArrayList<>();
       Boolean reverse = null;
-      for (Column c : node.getOutputSchema()){
-        for (Column cLeft: left.getOutputSchema()){
-          if (cLeft.getName(true).equals(c.getName(true))){
+      for (Column c : node.getOutputSchema()) {
+        for (Column cLeft : left.getOutputSchema()) {
+          if (cLeft.getName(true).equals(c.getName(true))) {
             outputSchema.add(cLeft);
             if (reverse == null) reverse = false;
           }
         }
-        for (Column cRight: right.getOutputSchema()){
-          if( cRight.getName(true).equals(c.getName(true))){
+        for (Column cRight : right.getOutputSchema()) {
+          if (cRight.getName(true).equals(c.getName(true))) {
             outputSchema.add(cRight);
             if (reverse == null) reverse = true;
           }
@@ -116,18 +113,16 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       // Find all residual join comparisons related to current table
       Expression expression = null;
       for (int prev = 0; prev < currentIndex; prev++) {
-        Expression new_expression = node.getComparisonExpressionMap().getOrDefault(
-            new Pair<>(tableNames.get(currentIndex), tableNames.get(prev)),
-            null);
-        if (new_expression == null)
-          continue;
+        Expression new_expression =
+            node.getComparisonExpressionMap()
+                .getOrDefault(new Pair<>(tableNames.get(currentIndex), tableNames.get(prev)), null);
+        if (new_expression == null) continue;
 
         if (expression == null) {
           expression = new_expression;
         } else {
           expression = new AndExpression(expression, new_expression);
         }
-
       }
 
       if (expression != null) {
@@ -214,13 +209,13 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     if (node.getIndexAttribute() == null) {
       operator = new ScanOperator(node.getTable());
     } else {
-      operator = new IndexScanOperator(
-          node.getLowerBound(),
-          node.getUpperBound(),
-          node.getTable(),
-          node.getIndexAttribute());
+      operator =
+          new IndexScanOperator(
+              node.getLowerBound(),
+              node.getUpperBound(),
+              node.getTable(),
+              node.getIndexAttribute());
     }
-
   }
 
   /**

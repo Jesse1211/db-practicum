@@ -14,11 +14,11 @@ import net.sf.jsqlparser.schema.Column;
 
 // R.A < 100
 public class ComparisonEvaluator {
-  private Set<ComparisonOperator> residuals= new HashSet<>();
+  private Set<ComparisonOperator> residuals = new HashSet<>();
   private Map<String, ComparisonOperator> notEqualToValueMap = new HashMap<>();
   private UnionFind unionFind = UnionFind.getInstance(true);
 
-  public void visit(ComparisonOperator comparison){
+  public void visit(ComparisonOperator comparison) {
     Expression leftExpression = comparison.getLeftExpression();
     Expression rightExpression = comparison.getRightExpression();
 
@@ -44,21 +44,22 @@ public class ComparisonEvaluator {
       notEqualToValueMap.put(name, comparison);
     }
     // else R.A = 8, set the bound.
-    Column attribute = (leftExpression instanceof Column) ? (Column)leftExpression : (Column)rightExpression;
+    Column attribute =
+        (leftExpression instanceof Column) ? (Column) leftExpression : (Column) rightExpression;
     Pair<Integer, Integer> pair = HelperMethods.evaluateComparison(comparison); // low, high
     UnionFindElement e = unionFind.find(attribute);
     unionFind.addBounds(e, pair.getLeft(), pair.getRight());
   }
 
-  public Set<UnionFindElement> getResult(){
+  public Set<UnionFindElement> getResult() {
     return unionFind.getElements();
   }
 
-  public Set<ComparisonOperator> getResiduals(){
+  public Set<ComparisonOperator> getResiduals() {
     return this.residuals;
   }
 
-  public Map<String, ComparisonOperator> getNotEqualToValueMap(){
+  public Map<String, ComparisonOperator> getNotEqualToValueMap() {
     return this.notEqualToValueMap;
   }
 }

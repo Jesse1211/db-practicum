@@ -97,13 +97,13 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       Boolean reverse = null;
       for (Column c : node.getOutputSchema()){
         for (Column cLeft: left.getOutputSchema()){
-          if (cLeft.getColumnName() == c.getColumnName()){
+          if (cLeft.getName(true).equals(c.getName(true))){
             outputSchema.add(cLeft);
             if (reverse == null) reverse = false;
           }
         }
         for (Column cRight: right.getOutputSchema()){
-          if(cRight.getColumnName() == c.getColumnName()){
+          if( cRight.getName(true).equals(c.getName(true))){
             outputSchema.add(cRight);
             if (reverse == null) reverse = true;
           }

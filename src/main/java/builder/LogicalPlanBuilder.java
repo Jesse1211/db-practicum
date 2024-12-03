@@ -179,7 +179,7 @@ public class LogicalPlanBuilder {
       joinChildren.add(operatorNode);
     }
 
-    return new JoinOperatorNode(aliasNames, joinChildren,residuals);
+    return new JoinOperatorNode(allTables, joinChildren,residuals);
 
 //
 ////

@@ -192,19 +192,17 @@ public class P1UnitTests {
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
     Map<Tuple, Integer> frequencyMap = new HashMap<>();
-
+    Map<Tuple, Integer> frequencyMap1 = new HashMap<>();
     for (Tuple tuple : expectedTuples) {
       frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
     }
 
-    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
-
-    for (int i = 0; i < expectedTuples.size(); i++) {
-      Tuple expectedTuple = expectedTuples.get(i);
-      int count = frequencyMap.getOrDefault(expectedTuple, 0);
-      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
-      frequencyMap.put(expectedTuple, count - 1);
+    for (Tuple tuple : tuples) {
+      frequencyMap1.put(tuple, frequencyMap1.getOrDefault(tuple, 0) + 1);
     }
+
+    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
+    Assertions.assertEquals(frequencyMap1, frequencyMap, "Tuples not same");
   }
 
   @Test
@@ -217,19 +215,17 @@ public class P1UnitTests {
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
     Map<Tuple, Integer> frequencyMap = new HashMap<>();
-
+    Map<Tuple, Integer> frequencyMap1 = new HashMap<>();
     for (Tuple tuple : expectedTuples) {
       frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
     }
 
-    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
-
-    for (int i = 0; i < expectedTuples.size(); i++) {
-      Tuple expectedTuple = expectedTuples.get(i);
-      int count = frequencyMap.getOrDefault(expectedTuple, 0);
-      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
-      frequencyMap.put(expectedTuple, count - 1);
+    for (Tuple tuple : tuples) {
+      frequencyMap1.put(tuple, frequencyMap1.getOrDefault(tuple, 0) + 1);
     }
+
+    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
+    Assertions.assertEquals(frequencyMap1, frequencyMap, "Tuples not same");
   }
 
   @Test
@@ -242,19 +238,17 @@ public class P1UnitTests {
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
     Map<Tuple, Integer> frequencyMap = new HashMap<>();
-
+    Map<Tuple, Integer> frequencyMap1 = new HashMap<>();
     for (Tuple tuple : expectedTuples) {
       frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
     }
 
-    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
-
-    for (int i = 0; i < expectedTuples.size(); i++) {
-      Tuple expectedTuple = expectedTuples.get(i);
-      int count = frequencyMap.getOrDefault(expectedTuple, 0);
-      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
-      frequencyMap.put(expectedTuple, count - 1);
+    for (Tuple tuple : tuples) {
+      frequencyMap1.put(tuple, frequencyMap1.getOrDefault(tuple, 0) + 1);
     }
+
+    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
+    Assertions.assertEquals(frequencyMap1, frequencyMap, "Tuples not same");
   }
 
   @Test
@@ -285,19 +279,17 @@ public class P1UnitTests {
     List<Tuple> tuples = HelperMethods.collectAllTuples(plan);
     List<Tuple> expectedTuples = tupleReader.readAllTuples();
     Map<Tuple, Integer> frequencyMap = new HashMap<>();
-
+    Map<Tuple, Integer> frequencyMap1 = new HashMap<>();
     for (Tuple tuple : expectedTuples) {
       frequencyMap.put(tuple, frequencyMap.getOrDefault(tuple, 0) + 1);
     }
 
-    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
-
-    for (int i = 0; i < expectedTuples.size(); i++) {
-      Tuple expectedTuple = expectedTuples.get(i);
-      int count = frequencyMap.getOrDefault(expectedTuple, 0);
-      Assertions.assertTrue(count > 0, "Unexpected tuple at index " + i);
-      frequencyMap.put(expectedTuple, count - 1);
+    for (Tuple tuple : tuples) {
+      frequencyMap1.put(tuple, frequencyMap1.getOrDefault(tuple, 0) + 1);
     }
+
+    Assertions.assertEquals(expectedTuples.size(), tuples.size(), "Unexpected number of rows.");
+    Assertions.assertEquals(frequencyMap1, frequencyMap, "Tuples not same");
   }
 
   @Test

@@ -7,15 +7,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Table;
 
-/** JoinOperatorNode is a class to represent the join operator in the logical query plan. */
+/**
+ * JoinOperatorNode is a class to represent the join operator in the logical
+ * query plan.
+ */
 public class JoinOperatorNode extends OperatorNode {
   private List<OperatorNode> childNodes;
-  private List<String> tableNames;
+  private List<Table> tables;
   private Set<ComparisonOperator> comparisons;
   private Map<Pair<String, String>, Expression> comparisonExpressionMap;
 
@@ -24,20 +29,20 @@ public class JoinOperatorNode extends OperatorNode {
    *
    * @param childNodes the child nodes of the join operator
    */
-  public JoinOperatorNode(List<String> tableNames, List<OperatorNode> childNodes, Set<ComparisonOperator> comparisons) {
+  public JoinOperatorNode(List<Table> tables, List<OperatorNode> childNodes, Set<ComparisonOperator> comparisons) {
     this.childNodes = childNodes;
     this.comparisons = comparisons;
-    this.tableNames = tableNames;
+    this.tables = tables;
     this.outputSchema = new ArrayList<>();
-    for (OperatorNode child: childNodes){
+    for (OperatorNode child : childNodes) {
       this.outputSchema.addAll(child.getOutputSchema());
     }
     createComparisonExpressionMap();
   }
 
-  private void createComparisonExpressionMap(){
+  private void createComparisonExpressionMap() {
     this.comparisonExpressionMap = new HashMap<>();
-    for (ComparisonOperator comparison: comparisons){
+    for (ComparisonOperator comparison : comparisons) {
       Pair<String, String> tableNamePair = HelperMethods.getComparisonTableNames(comparison);
       Expression expression = comparisonExpressionMap.getOrDefault(tableNamePair, null);
       if (expression == null) {
@@ -48,28 +53,28 @@ public class JoinOperatorNode extends OperatorNode {
     }
   }
 
-//  public OperatorNode getLeftChildNode() {
-//    return leftChildNode;
-//  }
+  // public OperatorNode getLeftChildNode() {
+  // return leftChildNode;
+  // }
 
-//  public OperatorNode getRightChildNode() {
-//    return rightChildNode;
-//  }
+  // public OperatorNode getRightChildNode() {
+  // return rightChildNode;
+  // }
 
-//  public void setLeftChildNode(OperatorNode leftChildNode) {
-//    this.leftChildNode = leftChildNode;
-//  }
-//
-//  public void setRightChildNode(OperatorNode rightChildNode) {
-//    this.rightChildNode = rightChildNode;
-//  }
+  // public void setLeftChildNode(OperatorNode leftChildNode) {
+  // this.leftChildNode = leftChildNode;
+  // }
+  //
+  // public void setRightChildNode(OperatorNode rightChildNode) {
+  // this.rightChildNode = rightChildNode;
+  // }
 
   @Override
   public void accept(OperatorNodeVisitor operatorNodeVisitor) {
     operatorNodeVisitor.visit(this);
   }
 
-  public List<OperatorNode> getChildNodes(){
+  public List<OperatorNode> getChildNodes() {
     return this.childNodes;
   }
 
@@ -81,8 +86,26 @@ public class JoinOperatorNode extends OperatorNode {
     return comparisonExpressionMap;
   }
 
-  public List<String> getTableNames(){
-    return this.tableNames;
+  public List<String> getTableAliasNames() {
+    List<String> tableAliasNames = new ArrayList<>();
+    for (Table table : this.tables) {
+      Alias alias = table.getAlias();
+      String aliasName = alias != null ? alias.getName() : table.getName();
+      tableAliasNames.add(aliasName);
+    }
+    return tableAliasNames;
+  }
+
+  public List<String> getTableNames() {
+    List<String> tableNames = new ArrayList<>();
+    for (Table table : this.tables) {
+      tableNames.add(table.getName());
+    }
+    return tableNames;
+  }
+
+  public List<Table> getTables() {
+    return this.tables;
   }
 
   @Override

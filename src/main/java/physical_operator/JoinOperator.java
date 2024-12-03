@@ -15,6 +15,8 @@ public class JoinOperator extends Operator {
 
   private Tuple leftTuple;
 
+  private boolean reverse;
+
   /**
    * JoinOperator Constructor
    *
@@ -22,13 +24,14 @@ public class JoinOperator extends Operator {
    * @param rightChildOperator rightChildOperator that needs to perform to join
    */
   public JoinOperator(
-      ArrayList<Column> outputSchema, Operator leftChildOperator, Operator rightChildOperator) {
+      ArrayList<Column> outputSchema, Operator leftChildOperator, Operator rightChildOperator, boolean reverse) {
     super(outputSchema);
 
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
-
+    this.reverse = reverse;
     leftTuple = leftChildOperator.getNextTuple();
+
   }
 
   @Override
@@ -59,6 +62,6 @@ public class JoinOperator extends Operator {
     }
 
     // Glues them together
-    return leftTuple.concat(rightTuple);
+    return reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
   }
 }

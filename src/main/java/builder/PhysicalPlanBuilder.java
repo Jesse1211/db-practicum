@@ -71,15 +71,6 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     JoinSequenceCreator joinSequenceCreator = new JoinSequenceCreator(node);
     ArrayDeque<OperatorNode> deque = joinSequenceCreator.getJoinOrder();
 
-    List<OperatorNode> list1 = new ArrayList<>(node.getChildNodes());
-    List<OperatorNode> list2 = new ArrayList<>(deque);
-
-    for (int i = 0; i < list1.size(); i++) {
-      if (!list1.get(i).equals(list2.get(i))) {
-        System.err.println("Join order is not correct");
-      }
-    }
-
     // ArrayDeque<OperatorNode> deque = new ArrayDeque<>(node.getChildNodes());
 
     List<String> tableNames = node.getTableAliasNames();
@@ -98,12 +89,29 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       deque.poll().accept(this);
       Operator right = operator;
 
-      ArrayList<Column> outputSchema = new ArrayList<>();
-      outputSchema.addAll(left.getOutputSchema());
-      outputSchema.addAll(right.getOutputSchema());
+//      ArrayList<Column> outputSchema = new ArrayList<>();
+//      outputSchema.addAll(left.getOutputSchema());
+//      outputSchema.addAll(right.getOutputSchema());
+
+      ArrayList<Column> outputSchema= new ArrayList<>();
+      Boolean reverse = null;
+      for (Column c : node.getOutputSchema()){
+        for (Column cLeft: left.getOutputSchema()){
+          if (cLeft.getColumnName() == c.getColumnName()){
+            outputSchema.add(cLeft);
+            if (reverse == null) reverse = false;
+          }
+        }
+        for (Column cRight: right.getOutputSchema()){
+          if(cRight.getColumnName() == c.getColumnName()){
+            outputSchema.add(cRight);
+            if (reverse == null) reverse = true;
+          }
+        }
+      }
 
       // choose which to join here :)
-      left = new JoinOperator(outputSchema, left, right);
+      left = new JoinOperator(outputSchema, left, right, reverse);
 
       // Find all residual join comparisons related to current table
       Expression expression = null;

@@ -2,194 +2,241 @@ package builder;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Map.Entry;
-
+import common.UnionFind;
+import common.UnionFindElement;
 import common.pair.Pair;
 import common.stats.StatsInfo;
 import compiler.DBCatalog;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import operator_node.JoinOperatorNode;
 import operator_node.OperatorNode;
-import operator_node.ScanOperatorNode;
-import operator_node.SelectOperatorNode;
-
-// // Utilize JoinSequenceCreator to get the join order, then combine each element
-//     // inside the deque in order.
-//     JoinSequenceCreator joinSequenceCreator = new JoinSequenceCreator(node);
-//     ArrayDeque<OperatorNode> deque = joinSequenceCreator.getJoinOrder();
 
 public class JoinSequenceCreator {
-    List<OperatorNode> nodeList;
-    PriorityQueue<Pair<List<String>, Integer>> tableSubsets; // {[table combination], cost}
-    ArrayDeque<OperatorNode> joinOrder; // left to right == buttom to top
-    Map<Pair<String, String>, Expression> comparisonExpressionMap; // {<table1, table2>, expression}
 
-    public JoinSequenceCreator(JoinOperatorNode joinNode) {
-        this.nodeList = new ArrayList<>();
-        this.tableSubsets = new PriorityQueue<>((a, b) -> a.getRight() - b.getRight()); // sort cost in ascending order
-        this.comparisonExpressionMap = joinNode.getComparisonExpressionMap();
-        findAllNodes(joinNode);
-        findAllTableSubsets(joinNode.getTableNames(), new ArrayList<>(), tableSubsets, new HashSet<>());
-        
-        for (Entry entry : comparisonExpressionMap.entrySet()) {
-            computeVvalue(entry);
+    /**
+     * An object to store state for a join combination
+     */
+    class Order {
+        private List<Table> tableCombination; // order matters, 1st means root, last means leaf
+        List<Expression> joinConditions;
+        private double cost;
+
+        /**
+         * Build a object which stores the join order and cost
+         * 
+         * @param tableCombination order of the tables, last means root, 1st means leaf
+         * @param joinConditions   join conditions
+         * @param cost             total cost of the join (from leaf (last) to root
+         *                         (first))
+         */
+        public Order(List<Table> tableCombination, List<Expression> joinConditions, double cost) {
+            this.tableCombination = tableCombination;
+            this.joinConditions = joinConditions;
+            this.cost = cost;
         }
     }
 
-    public ArrayDeque<OperatorNode> getJoinOrder() {
-        return joinOrder;
+    Map<String, OperatorNode> tableNameToNode;
+    List<Table> tableList;
+
+    /**
+     * Dynamic programming table to store the cost of joining two nodes.
+     * dp[i][j] = the best cost of joining from the ith node to the jth node.
+     * the last row represents the root node.
+     * base case:
+     * dp[0][j] = the cost of single relation of the jth node is Zero.
+     */
+    Order[][] dp;
+
+    public JoinSequenceCreator(JoinOperatorNode joinNode) {
+        this.tableList = joinNode.getTables();
+        this.tableNameToNode = new HashMap<>();
+
+        for (int i = 0; i < this.tableList.size(); i++) {
+            Table table = tableList.get(i);
+            Alias alias = table.getAlias();
+            String aliasName = alias != null ? alias.getName() : table.getName();
+            this.tableNameToNode.put(aliasName, joinNode.getChildNodes().get(i));
+        }
+
+        this.dp = new Order[tableNameToNode.size()][tableNameToNode.size()];
+        computeDpTable();
     }
 
     /**
-     * Find all the operator nodes in the tree.
-     *
-     * @param root
+     * Compute the dynamic programming table to store the cost of joining two nodes.
+     * Similar logic to LC.77 Combinations.
      */
-    public void findAllNodes(OperatorNode root) {
-        if (!(root instanceof JoinOperatorNode)) {
-            return;
+    private void computeDpTable() {
+        // 1. Initialize the base case
+        for (int i = 0; i < tableList.size(); i++) {
+            // cost only counts the intermediate relations, hence 0 for the base case
+            dp[0][i] = new Order(new ArrayList<>(List.of(this.tableList.get(i))), new ArrayList<>(), 0);
         }
-        Queue<OperatorNode> queue = new ArrayDeque<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            OperatorNode node = queue.poll();
-            nodeList.add(node);
 
-            if (node instanceof JoinOperatorNode) {
-                JoinOperatorNode join = (JoinOperatorNode) node;
-                for (OperatorNode child : join.getChildNodes()) {
-                    queue.offer(child);
+        // 2. Fill the dp table
+        for (int i = 1; i < tableList.size(); i++) { // exclude base case
+            for (int j = 0; j < tableList.size(); j++) { // traverse every column (from leaf to root)
+                double minCost = Double.MAX_VALUE;
+                Table tableMatch = null;
+                Order prev = dp[i - 1][j];
+
+                // Find the best cost of joining the ith node to the jth node
+                for (int k = 0; k < tableList.size(); k++) {
+                    Table curTable = tableList.get(k);
+                    if (prev.tableCombination.contains(curTable)) {
+                        continue;
+                    }
+
+                    double cost = computeCost(prev, curTable.getName());
+
+                    if (cost < minCost) {
+                        tableMatch = curTable;
+                        minCost = cost;
+                    }
+                }
+
+                minCost += prev.cost; // the cost of left child + the cost of joining new table
+                List<Table> tableCombination = new ArrayList<>();
+                tableCombination.addAll(prev.tableCombination);
+                tableCombination.add(tableMatch);
+
+                List<Expression> joinConditions = new ArrayList<>();
+                joinConditions.addAll(prev.joinConditions);
+                // joinConditions.add(comparisonExpressionMap.get(new
+                // Pair<>(prev.tableCombination.get(0), tableMatch))); //TODO: 没法拿到expression
+
+                dp[i][j] = new Order(tableCombination, joinConditions, minCost);
+            }
+        }
+    }
+
+    /**
+     * Compute all join cost from the table sequence
+     * 
+     * @param order    current order
+     * @param curTable new table to join the order
+     * @return the cost after join
+     */
+    private double computeCost(Order order, String newTable) {
+        double joinCost = 1.0;
+        Set<UnionFindElement> unionFind = UnionFind.getInstance(false).getElements();
+
+        // Cost is the intermediate relations' tuples, hence the product of the tuples
+        for (Table table : order.tableCombination) {
+            String tableName = table.getName();
+            StatsInfo statsInfo = DBCatalog.getInstance().getStatsInfo(tableName);
+            joinCost *= statsInfo.count;
+        }
+
+        // Compute v-value boundry for each table
+        Map<String, Pair<Integer, Integer>> tableBound = computeVValue(unionFind);
+
+        for (UnionFindElement element : unionFind) {
+
+            Set<String> tableUnion = new HashSet<>(); // avoid duplicate table combination
+            for (Column column1 : element.attributes.values()) {
+                Table table1 = column1.getTable();
+                String i = column1.getTable().getName();
+
+                for (Column column2 : element.attributes.values()) {
+                    Table table2 = column2.getTable();
+                    String j = column2.getTable().getName();
+                    if (!tableUnion.contains(i + j) && !tableUnion.contains(j + i)) {
+                        tableUnion.add(i + j);
+                        tableUnion.add(j + i);
+
+                        if (tableList.contains(table1) && tableList.contains(table2)) {
+                            double v1 = findVValue(column1, tableBound);
+                            double v2 = findVValue(column2, tableBound);
+                            joinCost *= joinCost / Math.max(v1, v2);
+                        }
+                    }
                 }
             }
         }
+
+        return joinCost;
     }
 
     /**
-     * Find all the subsets (Combinaion) of the tables.
-     *
-     * @param index
-     * @param cur
-     * @param subsets
-     * @param visited
+     * Compute v-value boundry for each table
+     * 
+     * @param unionFind
+     * @return table -> <min, max>
      */
-    private void findAllTableSubsets(List<String> tableNames, List<String> cur,
-            PriorityQueue<Pair<List<String>, Integer>> subsets,
-            Set<String> visited) {
-        if (cur.size() == tableNames.size() + 1) {
-            return;
-        }
-
-        for (String tableName : tableNames) {
-            if (visited.contains(tableName)) {
-                continue;
-            }
-
-            cur.add(tableName);
-            visited.add(tableName);
-
-            // calculate the cost of the current subset, and add it to the priority queue
-            int cost = getCost(cur);
-            subsets.offer(new Pair<>(new ArrayList<>(cur), cost));
-
-            // recursively find the next subset
-            findAllTableSubsets(tableNames, cur, subsets, visited);
-            cur.remove(cur.size() - 1);
-            visited.remove(tableName);
-        }
-    }
-
-    /**
-     * Get the cost of the current subset.
-     *
-     * @param cur: index of the nodes in the subset
-     * @return the cost of the subset
-     */
-    private int getCost(List<String> cur) {
-        // cost = sum of tuple sizes of all nodes in the subset
-        int cost = 0;
-        return 0;
-    }
-
-    /**
-     * Estimate the cost of joining two nodes.
-     *
-     * @param vleft
-     * @param vright
-     * @param leftSize
-     * @param rightSize
-     */
-    private int extimateCostByV(int vleft, int vright, int leftSize, int rightSize, int attributeCount,
-            boolean hasEquality) {
-        int joinSize = 0;
-        if (!hasEquality) {
-            // Does not have equality comparison, consider as cross product
-            joinSize = leftSize * rightSize;
-        } else {
-            // Disregard the unEqualities
-            if (attributeCount == 1) {
-                // Join ONE 'same attribute'
-                joinSize = (leftSize * rightSize) / Math.max(vleft, vright);
-            } else {
-                // Join N 'different attributes'
-                joinSize = (leftSize * rightSize) / (Math.max(vleft, vright) * Math.min(vleft,
-                        vright));
+    private Map<String, Pair<Integer, Integer>> computeVValue(Set<UnionFindElement> unionFind) {
+        Map<String, Pair<Integer, Integer>> tableBound = new HashMap<>(); // table -> <min, max>
+        for (UnionFindElement element : unionFind) {
+            for (Column column : element.attributes.values()) {
+                String tableName = column.getTable().getName();
+                Pair<Integer, Integer> pair = tableBound.getOrDefault(tableName,
+                        new Pair<>(Integer.MAX_VALUE, Integer.MIN_VALUE));
+                tableBound.put(tableName, new Pair<>(Math.min(pair.getLeft(), element.lowerBound),
+                        Math.max(pair.getRight(), element.upperBound)));
             }
         }
-        return joinSize;
+        return tableBound;
     }
 
     /**
      * Get the number of distinct values that attribute A takes in table R
      *
-     * @param R table
-     * @param A attribute
+     * @param A   attribute
+     * @param min the lower bound for selection
+     * @param max the upper bound for selection
      * @return V-value
      */
-    private int vValue(Table R, Column A) {
-        StatsInfo statsInfo = DBCatalog.getInstance().getStatsInfo(R.getName());
-        int max = statsInfo.columnStats.get(A.getColumnName()).getRight();
-        int min = statsInfo.columnStats.get(A.getColumnName()).getLeft();
+    private int findVValue(Column A, Map<String, Pair<Integer, Integer>> tableBound) {
+        String tableName = A.getTable().getName();
+        StatsInfo statsInfo = DBCatalog.getInstance().getStatsInfo(tableName);
+        int max = Math.max(statsInfo.columnStats.get(A.getColumnName()).getRight(),
+                tableBound.get(tableName).getRight());
+        int min = Math.min(statsInfo.columnStats.get(A.getColumnName()).getLeft(), tableBound.get(tableName).getLeft());
+
+        if (max - min + 1 == 0) {
+            return 1;
+        }
         return max - min + 1;
     }
 
     /**
-     * Get the number of distinct values that attribute A takes in table R
-     *
-     * @param R table
-     * @param A attribute
-     * @return V-value
+     * Get the join order of the nodes.
+     * Based on the dp table, find the best cost of joining all the nodes.
+     * 
+     * @return The join order of the nodes, from left (leaf) to right (root).
      */
-    private int computeVvalue(Entry entry) {
-        Pair<String, String> key = (Pair<String, String>) entry.getKey();
-        String table1 = key.getLeft();
-        String table2 = key.getRight();
-        String expression = ((Expression) entry.getValue()).toString();
+    public ArrayDeque<OperatorNode> getJoinOrder() {
 
-        String a = "1";
-        if (expression.contains(" = ")) {
-            // Selection on base table
+        // 3. Find the best cost of joining all the nodes
+        double minCost = Double.MAX_VALUE;
+        Order bestOrder = dp[tableList.size() - 1][0];
+        for (int i = 1; i < tableList.size(); i++) {
+            Order cur = dp[tableList.size() - 1][i];
+            if (cur.cost < minCost) {
+                minCost = cur.cost;
+                bestOrder = cur;
+            }
         }
 
-        // Table R = ((ScanOperatorNode) operatorNode).getTable();
-        // if (operatorNode instanceof SelectOperatorNode) {
-        //     // Base table
-        //     Column A = ((SelectOperatorNode) operatorNode).getOutputSchema().getFirst();
-        //     return vValue(R, A);
-        // // } else if (isSelectionOnBaseTable) {
-        // //     // Derived table
-        // //     return 0;
-        // } else {
-        //     // Join
-        //     return 0;
-        // }
-        return 0;
+        // convert the table order sequence to a list of operator node
+        ArrayDeque<OperatorNode> joinOrder = new ArrayDeque<>();
+
+        for (int i = 0; i < bestOrder.tableCombination.size(); i++) {
+            Table table = bestOrder.tableCombination.get(i);
+            Alias alias = table.getAlias();
+            String aliasName = alias != null ? alias.getName() : table.getName();
+            joinOrder.add(tableNameToNode.get(aliasName));
+        }
+
+        return joinOrder;
     }
 }

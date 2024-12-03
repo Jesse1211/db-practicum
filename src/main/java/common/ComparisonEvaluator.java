@@ -16,7 +16,7 @@ import net.sf.jsqlparser.schema.Column;
 public class ComparisonEvaluator {
   private Set<ComparisonOperator> residuals= new HashSet<>();
   private Map<String, ComparisonOperator> notEqualToValueMap = new HashMap<>();
-  private UnionFind unionFind = new UnionFind();
+  private UnionFind unionFind = UnionFind.getInstance(true);
 
   public void visit(ComparisonOperator comparison){
     Expression leftExpression = comparison.getLeftExpression();

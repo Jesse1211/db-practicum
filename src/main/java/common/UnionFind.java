@@ -5,10 +5,19 @@ import java.util.Set;
 import net.sf.jsqlparser.schema.Column;
 
 public class UnionFind {
+  private static UnionFind unionFind;
   private Set<UnionFindElement> elements = new HashSet<>();
 
-  public UnionFindElement find(Column attribute){
-    // given a particular attribute, find and return the union-find element containing that attribute;
+  public static UnionFind getInstance(boolean reset) {
+    if (unionFind == null || reset) {
+      unionFind = new UnionFind();
+    }
+    return unionFind;
+  }
+
+  public UnionFindElement find(Column attribute) {
+    // given a particular attribute, find and return the union-find element
+    // containing that attribute;
     // if no such element is found, create it and return it.
     String columnName = attribute.getName(true);
     for(UnionFindElement e: elements){

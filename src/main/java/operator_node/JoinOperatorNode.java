@@ -23,17 +23,19 @@ public class JoinOperatorNode extends OperatorNode {
   private List<Table> tables;
   private Set<ComparisonOperator> comparisons;
   private Map<Pair<String, String>, Expression> comparisonExpressionMap;
+  private Set<Pair<String, String>> equalityJoinMap;
 
   /**
    * Set the left and right child nodes to the join operator
    *
    * @param childNodes the child nodes of the join operator
    */
-  public JoinOperatorNode(List<Table> tables, List<OperatorNode> childNodes, Set<ComparisonOperator> comparisons) {
+  public JoinOperatorNode(List<Table> tables, List<OperatorNode> childNodes, Set<ComparisonOperator> comparisons, Set<Pair<String, String>> equalityJoinMap) {
     this.childNodes = childNodes;
     this.comparisons = comparisons;
     this.tables = tables;
     this.outputSchema = new ArrayList<>();
+    this.equalityJoinMap = equalityJoinMap;
     for (OperatorNode child : childNodes) {
       this.outputSchema.addAll(child.getOutputSchema());
     }
@@ -113,6 +115,11 @@ public class JoinOperatorNode extends OperatorNode {
     System.out.println(
         "JoinOperator should not have a single child, used getLeftChildNode and getRightChildNode instead.");
     return null;
+  }
+
+
+  public Set<Pair<String, String>> getEqualityJoinMap(){
+    return this.equalityJoinMap;
   }
 
 }

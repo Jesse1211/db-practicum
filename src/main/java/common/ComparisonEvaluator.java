@@ -16,6 +16,7 @@ import net.sf.jsqlparser.schema.Column;
 public class ComparisonEvaluator {
   private Set<ComparisonOperator> residuals= new HashSet<>();
   private Map<String, ComparisonOperator> notEqualToValueMap = new HashMap<>();
+  private Set<Pair<String, String>> equalityJoinMap = new HashSet<>();
   private UnionFind unionFind = UnionFind.getInstance(true);
 
   public void visit(ComparisonOperator comparison){
@@ -30,9 +31,12 @@ public class ComparisonEvaluator {
     // if join condition R.A = S.B, 2 columns, then union them.
     if (leftExpression instanceof Column && rightExpression instanceof Column) {
       if (comparison instanceof EqualsTo) {
-        UnionFindElement e1 = unionFind.find((Column) leftExpression);
-        UnionFindElement e2 = unionFind.find((Column) rightExpression);
+        Column left = (Column) leftExpression;
+        Column right = (Column) rightExpression;
+        UnionFindElement e1 = unionFind.find(left);
+        UnionFindElement e2 = unionFind.find(right);
         unionFind.union(e1, e2);
+        equalityJoinMap.add(new Pair<>(left.getName(true), right.getName(true)));
       }
       residuals.add(comparison);
       return;
@@ -61,4 +65,6 @@ public class ComparisonEvaluator {
   public Map<String, ComparisonOperator> getNotEqualToValueMap(){
     return this.notEqualToValueMap;
   }
+
+  public Set<Pair<String, String>> getEqualityJoinMap(){return this.equalityJoinMap;}
 }

@@ -51,6 +51,10 @@ public class JoinSequenceBuilder {
    */
   Order[][] dp;
 
+  /**
+   * Construct a join sequence builder
+   * @param joinNode the join operator node
+   */
   public JoinSequenceBuilder(JoinOperatorNode joinNode) {
     this.tableList = joinNode.getTables();
     this.tableNameToNode = new HashMap<>();

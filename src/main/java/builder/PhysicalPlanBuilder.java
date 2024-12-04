@@ -247,36 +247,6 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
    */
   @Override
   public void visit(SelectOperatorNode node) {
-    // // check if we should apply index
-    // if (DBCatalog.getInstance().getUseIndex() && node.getChildNode() instanceof
-    // ScanOperatorNode) {
-    // Table table = ((ScanOperatorNode) node.getChildNode()).getTable();
-    // List<ComparisonOperator> flattened =
-    // HelperMethods.flattenExpression(node.getWhereExpression());
-    // List<ComparisonOperator> indexedComparisons =
-    // HelperMethods.getIndexedComparisons(flattened, table);
-    //
-    // // if comparison contains index comparisons, set the operator to
-    // indexScanOperator, otherwise,
-    // // use original ScanOperator
-    // if (indexedComparisons.size() > 0) {
-    // Pair<Integer, Integer> keyPair =
-    // HelperMethods.getLowKeyHighKey(indexedComparisons);
-    // operator = new IndexScanOperator(node.getOutputSchema(), keyPair.getLeft(),
-    // keyPair.getRight(), table);
-    // } else {
-    // node.getChildNode().accept(this);
-    // }
-    //
-    // // if there are non index comparisons, add it to the selectOperator.
-    // Expression nonIndexedComparison =
-    // HelperMethods.getNonIndexedComparisons(flattened, indexedComparisons);
-    // if (nonIndexedComparison != null) {
-    // operator = new SelectOperator(node.getOutputSchema(), operator,
-    // nonIndexedComparison);
-    // }
-    // return;
-    // }
     node.getChildNode().accept(this);
     operator = new SelectOperator(node.getOutputSchema(), operator, node.getWhereExpression());
   }
@@ -297,25 +267,9 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   }
 
   /**
-   * Build the sort operator based on the sort method.
-   *
-   * @param node
-   * @param childOpeartor
-   * @return
+   * Print the physical plan.
+   * @return the physical plan
    */
-  // private Operator getSortOperator(SortOperatorNode node, Operator childOpeartor) {
-  //   switch (DBCatalog.getInstance().getSortMethod()) {
-  //     case "In-Memory Sort":
-  //       return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
-  //     case "External Sort":
-  //       return new ExternalSortOperator(
-  //           node.getOutputSchema(),
-  //           childOpeartor,
-  //           node.getOrders(),
-  //           DBCatalog.getInstance().getSortBufferPageNumber());
-  //   }
-  //   return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
-  // }
   public StringBuilder print() {
     return operator.print();
   }

@@ -19,6 +19,12 @@ public class UnionFind {
     return unionFind;
   }
 
+  /** 
+   * Find the UnionFindElement containing the attribute. If no such element is found, create it.
+   * 
+   * @param attribute Column to find
+   * @return UnionFindElement containing the attribute
+   */
   public UnionFindElement find(Column attribute) {
     // given a particular attribute, find and return the union-find element
     // containing that attribute;
@@ -36,6 +42,11 @@ public class UnionFind {
     return e;
   }
 
+  /**
+   * Merge two UnionFindElements, e1 and e2, into a single UnionFindElement.
+   * @param e1 
+   * @param e2
+   */
   public void union(UnionFindElement e1, UnionFindElement e2) {
     // merge smaller rank into larger rank
     if (e1.attributes.size() > e2.attributes.size()) {
@@ -51,11 +62,21 @@ public class UnionFind {
     }
   }
 
+  /**
+   * Add bounds to a UnionFindElement.
+   * @param e
+   * @param lowerBound
+   * @param upperBound
+   */
   public void addBounds(UnionFindElement e, int lowerBound, int upperBound) {
     e.lowerBound = Math.max(e.lowerBound, lowerBound);
     e.upperBound = Math.min(e.upperBound, upperBound);
   }
 
+  /**
+   * Get all UnionFindElements.
+   * @return Set of UnionFindElements
+   */
   public Set<UnionFindElement> getElements() {
     return elements;
   }

@@ -74,7 +74,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
 
     // Utilize JoinSequenceCreator to get the join order, then combine each element
     // inside the deque in order.
-    JoinSequenceCreator joinSequenceCreator = new JoinSequenceCreator(node);
+    JoinSequenceBuilder joinSequenceCreator = new JoinSequenceBuilder(node);
     ArrayDeque<OperatorNode> deque = joinSequenceCreator.getJoinOrder();
     Set<Pair<String, String>> equalityJoinMap = node.getEqualityJoinMap();
 

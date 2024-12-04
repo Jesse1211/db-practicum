@@ -19,7 +19,7 @@ import net.sf.jsqlparser.schema.Table;
 import operator_node.JoinOperatorNode;
 import operator_node.OperatorNode;
 
-public class JoinSequenceCreator {
+public class JoinSequenceBuilder {
 
   /** An object to store state for a join combination */
   class Order {
@@ -51,7 +51,7 @@ public class JoinSequenceCreator {
    */
   Order[][] dp;
 
-  public JoinSequenceCreator(JoinOperatorNode joinNode) {
+  public JoinSequenceBuilder(JoinOperatorNode joinNode) {
     this.tableList = joinNode.getTables();
     this.tableNameToNode = new HashMap<>();
 
@@ -106,9 +106,6 @@ public class JoinSequenceCreator {
 
         List<Expression> joinConditions = new ArrayList<>();
         joinConditions.addAll(prev.joinConditions);
-        // joinConditions.add(comparisonExpressionMap.get(new
-        // Pair<>(prev.tableCombination.get(0), tableMatch))); //TODO: 没法拿到expression
-
         dp[i][j] = new Order(tableCombination, joinConditions, minCost);
       }
     }
@@ -163,10 +160,10 @@ public class JoinSequenceCreator {
   }
 
   /**
-   * Compute v-value boundry for each table
+   * Compute the v-value boundry for each table
    *
-   * @param unionFind
-   * @return table -> <min, max>
+   * @param unionFind union find set
+   * @return table boundry
    */
   private Map<String, Pair<Integer, Integer>> computeVValue(Set<UnionFindElement> unionFind) {
     Map<String, Pair<Integer, Integer>> tableBound = new HashMap<>(); // table -> <min, max>
@@ -186,12 +183,11 @@ public class JoinSequenceCreator {
   }
 
   /**
-   * Get the number of distinct values that attribute A takes in table R
+   * Find the v-value for a column
    *
-   * @param A attribute
-   * @param min the lower bound for selection
-   * @param max the upper bound for selection
-   * @return V-value
+   * @param A column
+   * @param tableBound table boundry
+   * @return v-value
    */
   private int findVValue(Column A, Map<String, Pair<Integer, Integer>> tableBound) {
     String tableName = A.getTable().getName();
@@ -212,10 +208,9 @@ public class JoinSequenceCreator {
   }
 
   /**
-   * Get the join order of the nodes. Based on the dp table, find the best cost of joining all the
-   * nodes.
+   * Get the best join order
    *
-   * @return The join order of the nodes, from left (leaf) to right (root).
+   * @return the best join order
    */
   public ArrayDeque<OperatorNode> getJoinOrder() {
 

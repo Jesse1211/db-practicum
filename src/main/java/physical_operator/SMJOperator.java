@@ -65,53 +65,77 @@ public class SMJOperator extends Operator {
 
   @Override
   public Tuple getNextTuple() {
-    // merge sorted tuples
-    Tuple rightTuple = rightChildOperator.getNextTuple();
-    rightCurrentIndex++;
+    // Initialize leftTuple if it's the first call or has been reset
+    if (leftTuple == null) {
+      leftTuple = leftChildOperator.getNextTuple();
+    }
 
+    // Initialize rightTuple and increment the index
+    Tuple rightTuple = rightChildOperator.getNextTuple();
+    if (rightTuple != null) {
+      rightCurrentIndex++;
+    }
+
+    // Merge sorted tuples
     while (leftTuple != null && rightTuple != null) {
       int leftVal = leftTuple.getElementAtIndex(leftColumnIndex);
       int rightVal = rightTuple.getElementAtIndex(rightColumnIndex);
 
       if (leftVal == rightVal) {
-        if (!rightResetIndexMap.containsKey(rightVal)) {
-          // value to index map
-          rightResetIndexMap.put(rightVal, rightCurrentIndex);
-        }
+        // Update the reset index map if necessary
+        rightResetIndexMap.putIfAbsent(rightVal, rightCurrentIndex);
+
+        // Concatenate tuples based on the reverse flag
         return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
       }
 
       if (leftVal < rightVal) {
-        // if left value is smaller, move left
+        // Move to the next left tuple
         leftTuple = leftChildOperator.getNextTuple();
         if (leftTuple == null) {
           return null;
         }
+
+        // Check and reset index if needed
         if (checkAndResetIndex()) {
           rightTuple = rightChildOperator.getNextTuple();
-          return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
+          if (rightTuple != null) {
+            rightCurrentIndex++;
+            return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
+          } else {
+            return null;
+          }
         }
       } else {
-        // if right value is smaller, move right
+        // Move to the next right tuple
         rightTuple = rightChildOperator.getNextTuple();
-        rightCurrentIndex++;
+        if (rightTuple != null) {
+          rightCurrentIndex++;
+        }
       }
     }
 
-    if (leftTuple == null) {
+    // Handle cases where one of the tuples is null
+    if (leftTuple == null || rightTuple == null) {
+      // Attempt to fetch the next left tuple if rightTuple is null
+      if (rightTuple == null) {
+        leftTuple = leftChildOperator.getNextTuple();
+        if (leftTuple == null) {
+          return null;
+        }
+
+        // Check and reset index if needed
+        if (checkAndResetIndex()) {
+          rightTuple = rightChildOperator.getNextTuple();
+          if (rightTuple != null) {
+            rightCurrentIndex++;
+            return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
+          }
+        }
+      }
       return null;
     }
 
-    if (rightTuple == null) {
-      leftTuple = leftChildOperator.getNextTuple();
-      if (leftTuple == null) {
-        return null;
-      }
-      if (checkAndResetIndex()) {
-        rightTuple = rightChildOperator.getNextTuple();
-        return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
-      }
-    }
     return null;
   }
 

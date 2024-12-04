@@ -149,9 +149,9 @@ public class Compiler {
    * <p>If dumping to files result of ith query is in file named query i, indexed stating at 1.
    */
   public static void main(String[] args) {
-    // DBCatalog.getInstance().setInterpreterConfig(args[0]);
-    DBCatalog.getInstance()
-        .setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
+     DBCatalog.getInstance().setInterpreterConfig(args[0]);
+//    DBCatalog.getInstance()
+//        .setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
     inputDir = DBCatalog.getInstance().getInputDir();
     outputDir = DBCatalog.getInstance().getOutputDir();
 

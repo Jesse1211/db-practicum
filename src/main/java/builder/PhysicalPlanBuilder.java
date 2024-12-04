@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import operator_node.DuplicateEliminationOperatorNode;
 import operator_node.EmptyOperatorNode;
@@ -170,6 +172,17 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
             node.getComparisonExpressionMap()
                 .getOrDefault(new Pair<>(tableNames.get(currentIndex), tableNames.get(prev)), null);
         if (new_expression == null) continue;
+
+        if (new_expression instanceof EqualsTo){
+          String leftColumnName = ((ComparisonOperator)new_expression).getLeftExpression(Column.class).getName(true);
+          String rightColumnName = ((ComparisonOperator)new_expression).getRightExpression(Column.class).getName(true);
+
+          Pair<String, String> columnNamePair = new Pair<>(leftColumnName, rightColumnName);
+
+          Pair<String, String> smjColumnNamePair = new Pair<>(columnPair.getLeft().getName(true), columnPair.getRight().getName(true));
+          if(columnNamePair.equals(smjColumnNamePair)) continue;
+        }
+
 
         if (expression == null) {
           expression = new_expression;

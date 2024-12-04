@@ -89,4 +89,22 @@ public class BNLJOperator extends Operator {
     leftChildOperator.reset();
     rightChildOperator.reset();
   }
+
+  /**
+   * Get the left operator.
+   *
+   * @return left operator
+   */
+  public Operator getLeftOperator() {
+    return leftChildOperator;
+  }
+
+  /**
+   * Get the right operator.
+   *
+   * @return right operator
+   */
+  public Operator getRightOperator() {
+    return rightChildOperator;
+  }
 }

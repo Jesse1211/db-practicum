@@ -36,4 +36,13 @@ public class DuplicateEliminationOperator extends Operator {
     prevTuple = tuple;
     return tuple;
   }
+
+  /**
+   * Get the child operator.
+   *
+   * @return child operator
+   */
+  public Operator getChildOperator() {
+    return childOperator;
+  }
 }

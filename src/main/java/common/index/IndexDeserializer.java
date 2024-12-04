@@ -101,7 +101,7 @@ public class IndexDeserializer {
 
       this.leafNodeNum = this.byteBuffer.asIntBuffer().get(1);
       return this.byteBuffer.asIntBuffer().get(0);
-      //      this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
+      // this.treeOrder = this.byteBuffer.asIntBuffer().get(2);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -249,5 +249,32 @@ public class IndexDeserializer {
       return null;
     }
     return tuple;
+  }
+
+  /**
+   * Get the attribute index
+   *
+   * @return the attribute index
+   */
+  public int getAttributeIndex() {
+    return attributeIndex;
+  }
+
+  /**
+   * Get the low key
+   *
+   * @return the low key
+   */
+  public int getLowKey() {
+    return lowKey;
+  }
+
+  /**
+   * Get the high key
+   *
+   * @return the high key
+   */
+  public int getHighKey() {
+    return highKey;
   }
 }

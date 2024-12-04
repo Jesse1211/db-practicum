@@ -281,6 +281,13 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
     return operator;
   }
 
+  /**
+   * Build the sort operator based on the sort method.
+   *
+   * @param node
+   * @param childOpeartor
+   * @return
+   */
   private Operator getSortOperator(SortOperatorNode node, Operator childOpeartor) {
     switch (DBCatalog.getInstance().getSortMethod()) {
       case "In-Memory Sort":
@@ -293,5 +300,11 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
             DBCatalog.getInstance().getSortBufferPageNumber());
     }
     return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
+  }
+
+  public void print() {
+    StringBuilder tree = new StringBuilder();
+    operator.print();
+    System.out.println(tree.toString());
   }
 }

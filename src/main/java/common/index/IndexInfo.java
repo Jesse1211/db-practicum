@@ -36,4 +36,8 @@ public class IndexInfo {
   public void addAttribute(String attributeName, boolean isClustered, int order) {
     attributes.put(attributeName, new Pair<>(isClustered, order));
   }
+
+  public Map<String, Pair<Boolean, Integer>> getAttributes() {
+    return attributes;
+  }
 }

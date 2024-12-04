@@ -11,6 +11,10 @@ import net.sf.jsqlparser.schema.Table;
 /** file scan with retrieving a range of tuples from the table by using B+ tree index */
 public class IndexScanOperator extends Operator {
   private IndexDeserializer indexDeserializer;
+  public int lowKey;
+  public int highKey;
+  public String attributeName;
+  public Table table;
 
   /**
    * * IndexScanOperator constructor
@@ -22,6 +26,11 @@ public class IndexScanOperator extends Operator {
    */
   public IndexScanOperator(int lowKey, int highKey, Table table, String attributeName) {
     super(new ArrayList<>());
+    this.lowKey = lowKey;
+    this.highKey = highKey;
+    this.attributeName = attributeName;
+    this.table = table;
+
     this.outputSchema = DBCatalog.getInstance().getColumnsWithAlias(table);
     IndexInfo indexInfo = DBCatalog.getInstance().getIndexInfo(table.getName());
     int attributeIndex =
@@ -45,5 +54,14 @@ public class IndexScanOperator extends Operator {
   @Override
   public Tuple getNextTuple() {
     return indexDeserializer.next();
+  }
+
+  /**
+   * Get the index deserializer
+   *
+   * @return
+   */
+  public IndexDeserializer getIndexDeserializer() {
+    return indexDeserializer;
   }
 }

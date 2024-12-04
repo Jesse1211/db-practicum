@@ -7,17 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Table;
 
-/**
- * JoinOperatorNode is a class to represent the join operator in the logical
- * query plan.
- */
+/** JoinOperatorNode is a class to represent the join operator in the logical query plan. */
 public class JoinOperatorNode extends OperatorNode {
   private List<OperatorNode> childNodes;
   private List<Table> tables;
@@ -30,7 +26,11 @@ public class JoinOperatorNode extends OperatorNode {
    *
    * @param childNodes the child nodes of the join operator
    */
-  public JoinOperatorNode(List<Table> tables, List<OperatorNode> childNodes, Set<ComparisonOperator> comparisons, Set<Pair<String, String>> equalityJoinMap) {
+  public JoinOperatorNode(
+      List<Table> tables,
+      List<OperatorNode> childNodes,
+      Set<ComparisonOperator> comparisons,
+      Set<Pair<String, String>> equalityJoinMap) {
     this.childNodes = childNodes;
     this.comparisons = comparisons;
     this.tables = tables;
@@ -117,9 +117,7 @@ public class JoinOperatorNode extends OperatorNode {
     return null;
   }
 
-
-  public Set<Pair<String, String>> getEqualityJoinMap(){
+  public Set<Pair<String, String>> getEqualityJoinMap() {
     return this.equalityJoinMap;
   }
-
 }

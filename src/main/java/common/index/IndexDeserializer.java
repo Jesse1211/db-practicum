@@ -38,7 +38,13 @@ public class IndexDeserializer {
    * @param lowKey low key of the range
    * @param highKey high key of the range
    */
-  public IndexDeserializer(int lowKey, int highKey, String relationName, String attributeName,  boolean isClustered, int attributeIndex) {
+  public IndexDeserializer(
+      int lowKey,
+      int highKey,
+      String relationName,
+      String attributeName,
+      boolean isClustered,
+      int attributeIndex) {
     this.isClustered = isClustered;
     this.tupleReader = new BinaryHandler(relationName);
     this.file = DBCatalog.getInstance().getFileForIndex(relationName, attributeName);

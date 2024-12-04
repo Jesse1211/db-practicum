@@ -12,9 +12,10 @@ public class IndexInfo {
   public String relationName;
   // change to map
   public Map<String, Pair<Boolean, Integer>> attributes = new HashMap<>();
-//  public String attributeName;
-//  public boolean isClustered;
-//  public int order;
+
+  //  public String attributeName;
+  //  public boolean isClustered;
+  //  public int order;
 
   /**
    * Constructor for IndexInfo

@@ -35,7 +35,7 @@ public class SMJOperator extends Operator {
       Operator rightChildOperator,
       Column leftColumn,
       Column rightColumn,
-          boolean reverse) {
+      boolean reverse) {
     super(outputSchema);
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
@@ -109,7 +109,7 @@ public class SMJOperator extends Operator {
       }
       if (checkAndResetIndex()) {
         rightTuple = rightChildOperator.getNextTuple();
-        return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple) ;
+        return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
       }
     }
     return null;

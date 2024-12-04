@@ -28,7 +28,8 @@ public class BNLJOperator extends Operator {
       ArrayList<Column> outputSchema,
       Operator leftChildOperator,
       Operator rightChildOperator,
-      int bufferSizeInPage, boolean reverse) {
+      int bufferSizeInPage,
+      boolean reverse) {
 
     super(outputSchema);
     this.bufferSizeInPage = bufferSizeInPage;
@@ -84,7 +85,7 @@ public class BNLJOperator extends Operator {
     }
 
     Tuple leftTuple = this.tupleBuffer[this.leftTupleBlockIndex++];
-    return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple) ;
+    return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
   }
 
   @Override

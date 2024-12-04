@@ -25,7 +25,7 @@ public class StatsBuilder {
 
     for (Column column : tableSchema) {
       String colName = column.getColumnName();
-      columnStats.put(colName, new int[] { Integer.MAX_VALUE, Integer.MIN_VALUE });
+      columnStats.put(colName, new int[] {Integer.MAX_VALUE, Integer.MIN_VALUE});
     }
 
     Tuple tuple;

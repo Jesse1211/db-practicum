@@ -19,9 +19,9 @@ public class UnionFind {
     return unionFind;
   }
 
-  /** 
+  /**
    * Find the UnionFindElement containing the attribute. If no such element is found, create it.
-   * 
+   *
    * @param attribute Column to find
    * @return UnionFindElement containing the attribute
    */
@@ -44,7 +44,8 @@ public class UnionFind {
 
   /**
    * Merge two UnionFindElements, e1 and e2, into a single UnionFindElement.
-   * @param e1 
+   *
+   * @param e1
    * @param e2
    */
   public void union(UnionFindElement e1, UnionFindElement e2) {
@@ -64,6 +65,7 @@ public class UnionFind {
 
   /**
    * Add bounds to a UnionFindElement.
+   *
    * @param e
    * @param lowerBound
    * @param upperBound
@@ -75,6 +77,7 @@ public class UnionFind {
 
   /**
    * Get all UnionFindElements.
+   *
    * @return Set of UnionFindElements
    */
   public Set<UnionFindElement> getElements() {

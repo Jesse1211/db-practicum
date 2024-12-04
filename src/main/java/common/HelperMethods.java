@@ -103,8 +103,9 @@ public class HelperMethods {
   }
 
   /**
-   * Get the comparison value from the comparison operator expression
-   * First element in the pair represents the number is <= or = or >= using -1, 0, 1 respectively
+   * Get the comparison value from the comparison operator expression First element in the pair
+   * represents the number is <= or = or >= using -1, 0, 1 respectively
+   *
    * @param comparison comparison operator
    * @return pair of comparison value
    */
@@ -121,6 +122,7 @@ public class HelperMethods {
 
   /**
    * Evaluate the comparison operator
+   *
    * @param comparison comparison operator
    * @return pair of low key and high key
    */

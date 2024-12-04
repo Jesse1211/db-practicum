@@ -189,6 +189,7 @@ public class LogicalPlanBuilder {
 
   /**
    * Get the lower, upper bounds for a given attribute
+   *
    * @param unionFindElements set of union find elements
    * @param attributeName attribute name to get bounds for
    * @return pair of lower, upper bounds
@@ -205,6 +206,7 @@ public class LogicalPlanBuilder {
 
   /**
    * Choose the best index to scan for a given table
+   *
    * @param unionFindElements set of union find elements
    * @param table table to choose index for
    * @return the index to scan
@@ -253,6 +255,7 @@ public class LogicalPlanBuilder {
 
   /**
    * Compute the reduction factor for a given table
+   *
    * @param unionFindElements set of union find elements
    * @param table table to compute reduction factor for
    * @return map of column name to reduction factor
@@ -283,6 +286,7 @@ public class LogicalPlanBuilder {
 
   /**
    * Create a comparison expression for a given table
+   *
    * @param unionFindElements set of union find elements
    * @param tableName table to create comparison expression for
    * @param index index to scan

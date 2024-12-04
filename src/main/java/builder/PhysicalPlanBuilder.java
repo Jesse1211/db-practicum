@@ -268,6 +268,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
 
   /**
    * Print the physical plan.
+   *
    * @return the physical plan
    */
   public StringBuilder print() {

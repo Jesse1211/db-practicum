@@ -53,6 +53,7 @@ public class JoinSequenceBuilder {
 
   /**
    * Construct a join sequence builder
+   *
    * @param joinNode the join operator node
    */
   public JoinSequenceBuilder(JoinOperatorNode joinNode) {

@@ -94,11 +94,11 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
       deque.poll().accept(this);
       Operator right = operator;
 
-//      ArrayList<Column> outputSchema = new ArrayList<>();
-//      outputSchema.addAll(left.getOutputSchema());
-//      outputSchema.addAll(right.getOutputSchema());
+      //      ArrayList<Column> outputSchema = new ArrayList<>();
+      //      outputSchema.addAll(left.getOutputSchema());
+      //      outputSchema.addAll(right.getOutputSchema());
 
-      ArrayList<Column> outputSchema= new ArrayList<>();
+      ArrayList<Column> outputSchema = new ArrayList<>();
       Boolean reverse = null;
       for (Column c : node.getOutputSchema()) {
         for (Column cLeft : left.getOutputSchema()) {
@@ -280,6 +280,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   public Operator getResult() {
     return operator;
   }
+
   /**
    * Build the sort operator based on the sort method.
    *

@@ -13,10 +13,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
 import net.sf.jsqlparser.schema.Table;
 
-/**
- * JoinOperatorNode is a class to represent the join operator in the logical
- * query plan.
- */
+/** JoinOperatorNode is a class to represent the join operator in the logical query plan. */
 public class JoinOperatorNode extends OperatorNode {
   private List<OperatorNode> childNodes;
   private List<Table> tables;

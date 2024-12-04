@@ -1,5 +1,6 @@
 package builder;
 
+import common.pair.Pair;
 import net.sf.jsqlparser.statement.Statement;
 import operator_node.OperatorNode;
 import physical_operator.Operator;
@@ -20,6 +21,8 @@ import physical_operator.Operator;
  * 2 student instructions, Section 2.1
  */
 public class QueryPlanBuilder {
+  public StringBuilder logicalPlanTree;
+  public StringBuilder physicalPlanTree;
 
   /**
    * Top level method to translate statement to query plan
@@ -33,12 +36,14 @@ public class QueryPlanBuilder {
    * @precondition stmt is a Select having a body that is a PlainSelect
    */
   public Operator buildPlan(Statement stmt) {
-    OperatorNode root = LogicalPlanBuilder.buildPlan(stmt);
+    Pair<OperatorNode, StringBuilder> logicalPair = LogicalPlanBuilder.buildPlan(stmt);
+    OperatorNode root = logicalPair.getLeft();
+    this.logicalPlanTree = logicalPair.getRight();
 
     // Translate to physical plan
     PhysicalPlanBuilder physicalPlanBuilder = new PhysicalPlanBuilder();
     root.accept(physicalPlanBuilder);
-    physicalPlanBuilder.print();
+    this.physicalPlanTree = physicalPlanBuilder.print();
     return physicalPlanBuilder.getResult();
   }
 }

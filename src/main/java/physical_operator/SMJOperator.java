@@ -9,6 +9,8 @@ import net.sf.jsqlparser.schema.Column;
 
 /** Sort Merge Join Operator */
 public class SMJOperator extends Operator {
+  public String leftColumnName;
+  public String rightColumnName;
 
   private Operator leftChildOperator;
   private Operator rightChildOperator;
@@ -37,6 +39,10 @@ public class SMJOperator extends Operator {
       Column rightColumn,
       boolean reverse) {
     super(outputSchema);
+
+    this.leftColumnName = leftColumn.getName(true);
+    this.rightColumnName = rightColumn.getName(true);
+
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
     this.reverse = reverse;
@@ -46,8 +52,8 @@ public class SMJOperator extends Operator {
     Map<String, Integer> rightColumnMap =
         HelperMethods.mapColumnIndex(rightChildOperator.getOutputSchema());
 
-    leftColumnIndex = leftColumnMap.get(leftColumn.getName(true));
-    rightColumnIndex = rightColumnMap.get(rightColumn.getName(true));
+    leftColumnIndex = leftColumnMap.get(leftColumnName);
+    rightColumnIndex = rightColumnMap.get(rightColumnName);
 
     leftTuple = leftChildOperator.getNextTuple();
     rightCurrentIndex = -1;

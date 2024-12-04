@@ -173,16 +173,18 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
                 .getOrDefault(new Pair<>(tableNames.get(currentIndex), tableNames.get(prev)), null);
         if (new_expression == null) continue;
 
-        if (new_expression instanceof EqualsTo){
-          String leftColumnName = ((ComparisonOperator)new_expression).getLeftExpression(Column.class).getName(true);
-          String rightColumnName = ((ComparisonOperator)new_expression).getRightExpression(Column.class).getName(true);
+        if (new_expression instanceof EqualsTo) {
+          String leftColumnName =
+              ((ComparisonOperator) new_expression).getLeftExpression(Column.class).getName(true);
+          String rightColumnName =
+              ((ComparisonOperator) new_expression).getRightExpression(Column.class).getName(true);
 
           Pair<String, String> columnNamePair = new Pair<>(leftColumnName, rightColumnName);
 
-          Pair<String, String> smjColumnNamePair = new Pair<>(columnPair.getLeft().getName(true), columnPair.getRight().getName(true));
-          if(columnNamePair.equals(smjColumnNamePair)) continue;
+          Pair<String, String> smjColumnNamePair =
+              new Pair<>(columnPair.getLeft().getName(true), columnPair.getRight().getName(true));
+          if (columnNamePair.equals(smjColumnNamePair)) continue;
         }
-
 
         if (expression == null) {
           expression = new_expression;
@@ -314,9 +316,7 @@ public class PhysicalPlanBuilder implements OperatorNodeVisitor {
   //   }
   //   return new SortOperator(node.getOutputSchema(), childOpeartor, node.getOrders());
   // }
-  public void print() {
-    StringBuilder tree = new StringBuilder();
-    operator.print();
-    System.out.println(tree.toString());
+  public StringBuilder print() {
+    return operator.print();
   }
 }

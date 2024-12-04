@@ -56,6 +56,18 @@ public class Compiler {
         try {
           Operator plan = queryPlanBuilder.buildPlan(statement);
 
+          StringBuilder logicalPlanTree = queryPlanBuilder.logicalPlanTree;
+          StringBuilder physicalPlanTree = queryPlanBuilder.physicalPlanTree;
+          File logicalPlanFile = new File(outputDir + "/query" + counter + "_logicalplan");
+          File physicalPlanFile = new File(outputDir + "/query" + counter + "_physicalplan");
+          logicalPlanFile.createNewFile();
+          physicalPlanFile.createNewFile();
+          try (FileWriter logicalPlanWriter = new FileWriter(logicalPlanFile);
+              FileWriter physicalPlanWriter = new FileWriter(physicalPlanFile)) {
+            logicalPlanWriter.write(logicalPlanTree.toString());
+            physicalPlanWriter.write(physicalPlanTree.toString());
+          }
+
           if (outputToFiles) {
             File outfile = new File(outputDir + "/query" + counter);
             outfile.createNewFile();
@@ -150,8 +162,8 @@ public class Compiler {
    */
   public static void main(String[] args) {
      DBCatalog.getInstance().setInterpreterConfig(args[0]);
-//    DBCatalog.getInstance()
-//        .setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
+    // DBCatalog.getInstance()
+    //     .setInterpreterConfig("src/test/resources/samples/interpreter_config_file.txt");
     inputDir = DBCatalog.getInstance().getInputDir();
     outputDir = DBCatalog.getInstance().getOutputDir();
 

@@ -131,11 +131,10 @@ public abstract class Operator {
   }
 
   /** Print the physical query plan in term of a tree structure */
-  public void print() {
+  public StringBuilder print() {
     StringBuilder tree = new StringBuilder();
     dfs(tree, this, 0);
-    System.out.println(tree.toString());
-    return;
+    return tree;
   }
 
   /**
@@ -146,6 +145,7 @@ public abstract class Operator {
    * @param level the current level of the tree
    */
   private void dfs(StringBuilder tree, Operator cur, int level) {
+
     for (int i = 0; i < level; i++) {
       tree.append("-");
     }
@@ -164,15 +164,35 @@ public abstract class Operator {
           .append("]\n");
       dfs(tree, ((ProjectOperator) (cur)).getChildOperator(), level + 1);
     } else if (cur instanceof SelectOperator) {
-      if (!(((SelectOperator) (cur)).getChildOperator() instanceof JoinOperator)) {
-        tree.append("Select[");
-        // when the child operator is not a join operator
-        tree.append(((SelectOperator) cur).getWhereExpression().toString());
-        tree.append("]\n");
-        dfs(tree, ((SelectOperator) (cur)).getChildOperator(), level + 1);
+      SelectOperator operator = ((SelectOperator) cur);
+
+      if (operator.getChildOperator() instanceof JoinOperator) {
+        tree.append("TNLJ[").append(operator.getWhereExpression().toString()).append("]\n");
+
+        Operator left = ((JoinOperator) operator.getChildOperator()).getLeftOperator();
+        Operator right = ((JoinOperator) operator.getChildOperator()).getRightOperator();
+        dfs(tree, left, level + 1);
+        dfs(tree, right, level + 1);
+      } else if (operator.getChildOperator() instanceof BNLJOperator) {
+        tree.append("BNLJ[").append(operator.getWhereExpression().toString()).append("]\n");
+        Operator left = ((BNLJOperator) operator.getChildOperator()).getLeftOperator();
+        Operator right = ((BNLJOperator) operator.getChildOperator()).getRightOperator();
+        dfs(tree, left, level + 1);
+        dfs(tree, right, level + 1);
       } else {
-        dfs(tree, ((SelectOperator) (cur)).getChildOperator(), level);
+        tree.append("Select[").append(operator.getWhereExpression().toString()).append("]\n");
+        dfs(tree, ((SelectOperator) cur).getChildOperator(), level + 1);
       }
+
+    } else if (cur instanceof SMJOperator) {
+      SMJOperator operator = ((SMJOperator) cur);
+      tree.append("SMJ[")
+          .append(operator.leftColumnName)
+          .append(" = ")
+          .append(operator.rightColumnName)
+          .append("]\n");
+      dfs(tree, ((SMJOperator) (cur)).getLeftOperator(), level + 1);
+      dfs(tree, ((SMJOperator) (cur)).getRightOperator(), level + 1);
     } else if (cur instanceof ScanOperator) {
       tree.append("TableScan[" + cur.getOutputSchema().get(0).getTable().getName() + "]\n");
     } else if (cur instanceof IndexScanOperator) {
@@ -194,18 +214,6 @@ public abstract class Operator {
               + ", "
               + high
               + "]\n");
-    } else if (cur instanceof JoinOperator) {
-      tree.append("TNLJ[]\n");
-      dfs(tree, ((JoinOperator) (cur)).getLeftOperator(), level + 1);
-      dfs(tree, ((JoinOperator) (cur)).getRightOperator(), level + 1);
-    } else if (cur instanceof SMJOperator) {
-      tree.append("SMJ[]\n");
-      dfs(tree, ((SMJOperator) (cur)).getLeftOperator(), level + 1);
-      dfs(tree, ((SMJOperator) (cur)).getRightOperator(), level + 1);
-    } else if (cur instanceof BNLJOperator) {
-      tree.append("BNLJ[]\n");
-      dfs(tree, ((BNLJOperator) (cur)).getLeftOperator(), level + 1);
-      dfs(tree, ((BNLJOperator) (cur)).getRightOperator(), level + 1);
     } else if (cur instanceof SortOperator) {
       tree.append("Sort[")
           .append(HelperMethods.convertColumnList(((SortOperator) cur).getOrders()))

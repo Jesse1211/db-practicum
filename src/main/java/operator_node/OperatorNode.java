@@ -77,11 +77,10 @@ public abstract class OperatorNode {
   }
 
   /** Print the logical query plan in term of a tree structure */
-  public void print() {
+  public StringBuilder print() {
     StringBuilder tree = new StringBuilder();
     dfs(tree, this, 0);
-    System.out.println(tree.toString());
-    return;
+    return tree;
   }
 
   /**

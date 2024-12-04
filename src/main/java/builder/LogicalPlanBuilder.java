@@ -47,7 +47,7 @@ public class LogicalPlanBuilder {
    * @param stmt query to be translated
    * @return the root of the query plan
    */
-  public static OperatorNode buildPlan(Statement stmt) {
+  public static Pair<OperatorNode, StringBuilder> buildPlan(Statement stmt) {
     // https://github.com/JSQLParser/JSqlParser/wiki/Examples-of-SQL-parsing
     Select select = (Select) stmt;
     PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
@@ -81,8 +81,7 @@ public class LogicalPlanBuilder {
       operatorNode = new DuplicateEliminationOperatorNode(operatorNode);
     }
 
-    operatorNode.print();
-    return operatorNode;
+    return new Pair<>(operatorNode, operatorNode.print());
   }
 
   /**

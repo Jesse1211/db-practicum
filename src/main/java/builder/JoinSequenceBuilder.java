@@ -67,7 +67,7 @@ public class JoinSequenceBuilder {
       this.tableNameToNode.put(aliasName, joinNode.getChildNodes().get(i));
     }
 
-    this.dp = new Order[tableNameToNode.size()][tableNameToNode.size()];
+    this.dp = new Order[tableList.size()][tableList.size()];
     computeDpTable();
   }
 

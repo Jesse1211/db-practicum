@@ -1,3 +1,43 @@
+# Phase 4
+
+## Top Level Class
+The top level class is Compiler, which contains a main method that takes a single parameter
+of the interpreter config file.
+
+## Selection Pushing
+The selection pushing is implemented in `src/main/common/ComparisonEvaluator`, which utilizes
+`UnionFind` class to build a set of `UnionFindElement`, each `UnionFindElement` is a cluster of columns
+that share the same lower bound and upper bound value.
+
+## Choice of Implementation For Each Logical Selection Operator
+The choice of logical selection operator in our project is the same as deciding whether to use
+a indexScan or a regular scan. Our project follows the instruction is calculating the estimate cost using 
+the formula provided.  
+
+**Cost of using index:** \
+If `p` is the number of pages in the relation, `t` the number of tuples, `r` the reduction factor and `l` the
+number of leaves in the index, the cost for a clustered index is `3 + p ∗ r` while for an unclustered index it is
+`3 + l ∗ r + t ∗ r`. The cost 
+
+**Cost of not using index(regular scan):** \
+Page number of stored data. Calculating of the number of page will be `Ceil(numAttribute * numTuple * 4 / pageSize)`
+
+These code of choosing index can be found in `/src/main/builder/LogicalPlanBuilder`'s `chooseScanIndex` method.
+
+## Choice of Join Order
+The choice of join order uses a dynamic programming approach described in the instruction. 
+
+
+The code can be found in `/src/main/builder/JoinSequenceCreator`
+
+## Choice of Implementation of Each Join Operator
+The choice of join operator is also following the example given in instruction:
+`"SMJ runs much faster than BNLJ, so I implement all joins as SMJ where possible. However, SMJ does not
+apply to joins that have other-than-equality comparisons or to pure cross-products, so those are
+implemented using BNLJ"`
+
+The code can be found in `/src/main/builder/PhysicalPlanBuilder` in `public void visit(JoinOperatorNode node)`
+
 # Phase 3
 
 For previous phases, check `README_Phase2.md`.

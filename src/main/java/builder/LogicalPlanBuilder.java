@@ -148,6 +148,7 @@ public class LogicalPlanBuilder {
     Set<UnionFindElement> unionFindElements = comparisonEvaluator.getResult();
     Set<ComparisonOperator> residuals = comparisonEvaluator.getResiduals();
     Map<String, ComparisonOperator> notEqualToMap = comparisonEvaluator.getNotEqualToValueMap();
+    Set<Pair<String, String>> equalityJoinMap = comparisonEvaluator.getEqualityJoinMap();
 
     // regroup unionFindElements by table
     List<OperatorNode> joinChildren = new ArrayList<>();
@@ -184,7 +185,7 @@ public class LogicalPlanBuilder {
       joinChildren.add(operatorNode);
     }
 
-    return new JoinOperatorNode(allTables, joinChildren, residuals);
+    return new JoinOperatorNode(allTables, joinChildren, residuals, equalityJoinMap);
 
     //
     ////

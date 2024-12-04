@@ -18,6 +18,7 @@ public class SMJOperator extends Operator {
   private Tuple leftTuple;
   private int rightCurrentIndex;
   private Map<Integer, Integer> rightResetIndexMap;
+  private boolean reverse;
 
   /**
    * SMJOperator Constructor
@@ -33,10 +34,12 @@ public class SMJOperator extends Operator {
       Operator leftChildOperator,
       Operator rightChildOperator,
       Column leftColumn,
-      Column rightColumn) {
+      Column rightColumn,
+      boolean reverse) {
     super(outputSchema);
     this.leftChildOperator = leftChildOperator;
     this.rightChildOperator = rightChildOperator;
+    this.reverse = reverse;
 
     Map<String, Integer> leftColumnMap =
         HelperMethods.mapColumnIndex(leftChildOperator.getOutputSchema());
@@ -75,7 +78,7 @@ public class SMJOperator extends Operator {
           // value to index map
           rightResetIndexMap.put(rightVal, rightCurrentIndex);
         }
-        return leftTuple.concat(rightTuple);
+        return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
       }
 
       if (leftVal < rightVal) {
@@ -86,7 +89,7 @@ public class SMJOperator extends Operator {
         }
         if (checkAndResetIndex()) {
           rightTuple = rightChildOperator.getNextTuple();
-          return leftTuple.concat(rightTuple);
+          return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
         }
       } else {
         // if right value is smaller, move right
@@ -106,7 +109,7 @@ public class SMJOperator extends Operator {
       }
       if (checkAndResetIndex()) {
         rightTuple = rightChildOperator.getNextTuple();
-        return leftTuple.concat(rightTuple);
+        return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
       }
     }
     return null;

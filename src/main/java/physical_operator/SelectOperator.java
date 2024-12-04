@@ -55,4 +55,22 @@ public class SelectOperator extends Operator {
     }
     return null;
   }
+
+  /**
+   * Get the child operator.
+   *
+   * @return child operator
+   */
+  public Operator getChildOperator() {
+    return childOperator;
+  }
+
+  /**
+   * Get the where expression.
+   *
+   * @return where expression
+   */
+  public Expression getWhereExpression() {
+    return whereExpression;
+  }
 }

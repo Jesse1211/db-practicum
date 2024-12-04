@@ -46,4 +46,13 @@ public class ProjectOperator extends Operator {
     }
     return null;
   }
+
+  /**
+   * Get the child operator.
+   *
+   * @return child operator
+   */
+  public Operator getChildOperator() {
+    return childOperator;
+  }
 }

@@ -66,4 +66,22 @@ public class JoinOperator extends Operator {
     // Glues them together
     return reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
   }
+
+  /**
+   * Get the left operator.
+   *
+   * @return left operator
+   */
+  public Operator getLeftOperator() {
+    return leftChildOperator;
+  }
+
+  /**
+   * Get the right operator.
+   *
+   * @return right operator
+   */
+  public Operator getRightOperator() {
+    return rightChildOperator;
+  }
 }

@@ -8,6 +8,10 @@ public class UnionFind {
   private static UnionFind unionFind;
   private Set<UnionFindElement> elements = new HashSet<>();
 
+  /**
+   * @param reset True if you want to reset the UnionFind instance
+   * @return
+   */
   public static UnionFind getInstance(boolean reset) {
     if (unionFind == null || reset) {
       unionFind = new UnionFind();

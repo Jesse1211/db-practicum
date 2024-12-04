@@ -13,6 +13,7 @@ public class BNLJOperator extends Operator {
   private Operator leftChildOperator;
   private Operator rightChildOperator;
   private Tuple rightTuple;
+  private boolean reverse;
 
   /**
    * Block Nested Loop Join Operator Constructor
@@ -27,7 +28,8 @@ public class BNLJOperator extends Operator {
       ArrayList<Column> outputSchema,
       Operator leftChildOperator,
       Operator rightChildOperator,
-      int bufferSizeInPage) {
+      int bufferSizeInPage,
+      boolean reverse) {
 
     super(outputSchema);
     this.bufferSizeInPage = bufferSizeInPage;
@@ -36,6 +38,7 @@ public class BNLJOperator extends Operator {
 
     // Load for the first time
     this.rightTuple = rightChildOperator.getNextTuple();
+    this.reverse = reverse;
     loadLeftChildBlock();
   }
 
@@ -81,12 +84,31 @@ public class BNLJOperator extends Operator {
       return null;
     }
 
-    return this.tupleBuffer[this.leftTupleBlockIndex++].concat(rightTuple);
+    Tuple leftTuple = this.tupleBuffer[this.leftTupleBlockIndex++];
+    return this.reverse ? rightTuple.concat(leftTuple) : leftTuple.concat(rightTuple);
   }
 
   @Override
   public void reset() {
     leftChildOperator.reset();
     rightChildOperator.reset();
+  }
+
+  /**
+   * Get the left operator.
+   *
+   * @return left operator
+   */
+  public Operator getLeftOperator() {
+    return leftChildOperator;
+  }
+
+  /**
+   * Get the right operator.
+   *
+   * @return right operator
+   */
+  public Operator getRightOperator() {
+    return rightChildOperator;
   }
 }

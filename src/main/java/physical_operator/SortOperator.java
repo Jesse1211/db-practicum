@@ -60,4 +60,13 @@ public class SortOperator extends Operator {
     }
     return null;
   }
+
+  /**
+   * Get the orders of the columns in the ORDER BY clause
+   *
+   * @return list of columns in ORDER BY elements
+   */
+  public List<Column> getOrders() {
+    return orders;
+  }
 }

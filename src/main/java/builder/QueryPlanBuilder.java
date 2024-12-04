@@ -38,6 +38,7 @@ public class QueryPlanBuilder {
     // Translate to physical plan
     PhysicalPlanBuilder physicalPlanBuilder = new PhysicalPlanBuilder();
     root.accept(physicalPlanBuilder);
+    physicalPlanBuilder.print();
     return physicalPlanBuilder.getResult();
   }
 }

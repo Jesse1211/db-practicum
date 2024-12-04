@@ -145,4 +145,22 @@ public class ExternalSortOperator extends Operator {
   public Tuple getNextTuple() {
     return this.tupleReader.readNextTuple();
   }
+
+  /**
+   * Get the child operator.
+   *
+   * @return child operator
+   */
+  public Operator getChildOperator() {
+    return childOperator;
+  }
+
+  /**
+   * Get the orders.
+   *
+   * @return orders
+   */
+  public List<Column> getOrders() {
+    return orders;
+  }
 }

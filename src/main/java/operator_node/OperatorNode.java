@@ -95,7 +95,9 @@ public abstract class OperatorNode {
       tree.append("-");
     }
 
-    if (cur instanceof DuplicateEliminationOperatorNode) {
+    if (cur instanceof EmptyOperatorNode) {
+      tree.append("Leaf[null]\n");
+    } else if (cur instanceof DuplicateEliminationOperatorNode) {
       tree.append("DupElim\n");
       if (cur.getChildNode() != null) {
         dfs(tree, cur.getChildNode(), level + 1);
@@ -120,11 +122,16 @@ public abstract class OperatorNode {
 
       // print residual joins
       Set<ComparisonOperator> comparisons = ((JoinOperatorNode) cur).getComparisons();
+      boolean hasResidualJoin = false;
       for (ComparisonOperator comparison : comparisons) {
-
+        hasResidualJoin = true;
         if (comparison instanceof NotEqualsTo) {
           tree.append("[" + comparison.toString() + "]\n");
         }
+      }
+
+      if (!hasResidualJoin) {
+        tree.append("[null]\n");
       }
 
       // print union find

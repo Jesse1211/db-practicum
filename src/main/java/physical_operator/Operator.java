@@ -150,7 +150,9 @@ public abstract class Operator {
       tree.append("-");
     }
 
-    if (cur instanceof DuplicateEliminationOperator) {
+    if (cur instanceof EmptyOperator) {
+      tree.append("EmptyScan[null]\n");
+    } else if (cur instanceof DuplicateEliminationOperator) {
       tree.append("DupElim\n");
       dfs(tree, ((DuplicateEliminationOperator) (cur)).getChildOperator(), level + 1);
     } else if (cur instanceof ExternalSortOperator) {
@@ -184,6 +186,13 @@ public abstract class Operator {
         dfs(tree, ((SelectOperator) cur).getChildOperator(), level + 1);
       }
 
+    } else if (cur instanceof BNLJOperator) {
+      BNLJOperator operator = ((BNLJOperator) cur);
+      tree.append("BNLJ[null]\n");
+      Operator left = operator.getLeftOperator();
+      Operator right = operator.getRightOperator();
+      dfs(tree, left, level + 1);
+      dfs(tree, right, level + 1);
     } else if (cur instanceof SMJOperator) {
       SMJOperator operator = ((SMJOperator) cur);
       tree.append("SMJ[")
